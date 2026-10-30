@@ -107,6 +107,8 @@ class _DlnaTransport implements DlnaService {
   @override
   Stream<PositionParser> get positionStream => const Stream.empty();
   @override
+  Stream<bool> get playingStream => const Stream.empty();
+  @override
   Future<void> castTo(
     String deviceId,
     String url, {

@@ -63,7 +63,9 @@ class _KaraokeLineState extends ConsumerState<KaraokeLine>
   @override
   void initState() {
     super.initState();
-    final ps = ref.read(playerStateProvider);
+    // 用「当前真正在出声的渲染器」的状态：投屏时本机进度被冻结，
+    // 直接读 playerStateProvider 会让逐字高亮一起停住。
+    final ps = ref.read(activePlaybackStateProvider);
     _anchorPos = ps.currentTime;
     _estimated = ps.currentTime;
     _playing = ps.isPlaying;
@@ -112,12 +114,18 @@ class _KaraokeLineState extends ConsumerState<KaraokeLine>
 
   @override
   Widget build(BuildContext context) {
-    // 权威播放位置更新 → 重新锚定。
-    ref.listen(playerStateProvider.select((s) => s.currentTime), (_, next) {
+    // 权威播放位置更新 → 重新锚定（本机 or 投屏远端的当前位置）。
+    ref.listen(activePlaybackStateProvider.select((s) => s.currentTime), (
+      _,
+      next,
+    ) {
       _reanchor(next);
     });
     // 播放/暂停切换 → 以当前估计位置为锚，避免跳变。
-    ref.listen(playerStateProvider.select((s) => s.isPlaying), (_, next) {
+    ref.listen(activePlaybackStateProvider.select((s) => s.isPlaying), (
+      _,
+      next,
+    ) {
       _reanchor(_estimated);
       _playing = next;
     });

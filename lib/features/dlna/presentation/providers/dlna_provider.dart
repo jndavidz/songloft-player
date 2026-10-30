@@ -138,6 +138,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
   StreamSubscription? _devicesSub;
   StreamSubscription? _positionSub;
   StreamSubscription? _completionSub;
+  StreamSubscription? _playingSub;
 
   @override
   DlnaState build() {
@@ -146,6 +147,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
       _devicesSub?.cancel();
       _positionSub?.cancel();
       _completionSub?.cancel();
+      _playingSub?.cancel();
     });
     return const DlnaState();
   }
@@ -212,6 +214,14 @@ class DlnaNotifier extends Notifier<DlnaState> {
       _completionSub = _service.completionStream.listen(
         (_) => _onDeviceCompleted(),
       );
+
+      // 设备真实播放态：轮询到 PLAYING/PAUSED/STOPPED 时纠正 UI 的乐观翻转，
+      // 避免「图标已变播放、设备其实没恢复」这种状态分叉。
+      _playingSub?.cancel();
+      _playingSub = _service.playingStream.listen((playing) {
+        if (!state.isCasting || state.isPlaying == playing) return;
+        state = state.copyWith(isPlaying: playing);
+      });
 
       state = state.copyWith(
         activeDevice: () => device,
@@ -308,12 +318,12 @@ class DlnaNotifier extends Notifier<DlnaState> {
       await _serialize(() async {
         if (!state.isCasting) return;
         final playing = state.isPlaying;
-        if (playing) {
-          await _service.pause();
-        } else {
-          await _service.play();
-        }
-        if (state.isCasting) state = state.copyWith(isPlaying: !playing);
+        // 返回的是「设备已确认」的真实结果（DlnaService 内部有回读+补偿）：
+        // 未确认时保持原状态，下一次点击仍下发同一意图，而不是翻转成相反指令。
+        final confirmed =
+            playing ? await _service.pause() : await _service.play();
+        if (!state.isCasting || !confirmed) return;
+        state = state.copyWith(isPlaying: !playing);
       });
     } catch (e) {
       state = state.copyWith(error: () => e.toString());
@@ -335,6 +345,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
     _isChangingSong = false;
     _positionSub?.cancel();
     _completionSub?.cancel();
+    _playingSub?.cancel();
     _service.disconnect();
     state = state.copyWith(
       activeDevice: () => null,

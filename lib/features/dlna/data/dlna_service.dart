@@ -6,9 +6,23 @@ import '../domain/dlna_state.dart';
 import 'dlna_log.dart';
 
 class DlnaService {
-  DlnaService({DLNAManager? manager}) : _manager = manager ?? DLNAManager();
+  DlnaService({
+    DLNAManager? manager,
+    Duration verifyProbeGap = const Duration(milliseconds: 150),
+  }) : _manager = manager ?? DLNAManager(),
+       _verifyProbeGap = verifyProbeGap;
 
   final DLNAManager _manager;
+
+  /// 下发 Play/Pause 后回读 TransportState 的探测间隔；测试注入零间隔。
+  final Duration _verifyProbeGap;
+
+  /// 每次下发的确认窗口：最多探测次数（6 × 150ms ≈ 0.9s）。
+  static const _verifyProbes = 6;
+
+  /// 单次用户点击最多下发次数（1 次 + 2 次补偿，最后一次带 Seek 重锚）。
+  static const _transportAttempts = 3;
+
   DeviceManager? _deviceManager;
   DLNADevice? _activeDevice;
 
@@ -18,16 +32,24 @@ class DlnaService {
   int _generation = 0;
   final _pollErrors = <String, String>{};
   String? _lastTransport;
+  Duration? _lastPosition; // 最近一次轮询到的播放位置，恢复兜底时用作 Seek 锚点
+  bool? _lastPlaying; // 最近一次向 UI 上报的设备真实播放态（去重用）
 
   final _devicesController = StreamController<List<DlnaDeviceInfo>>.broadcast();
   final _positionController = StreamController<PositionParser>.broadcast();
   final _completionController = StreamController<void>.broadcast();
+  final _playingController = StreamController<bool>.broadcast();
 
   Stream<List<DlnaDeviceInfo>> get devicesStream => _devicesController.stream;
   Stream<PositionParser> get positionStream => _positionController.stream;
 
   /// 设备端播放完成事件（当前曲在渲染设备上播完时触发）
   Stream<void> get completionStream => _completionController.stream;
+
+  /// 设备**真实**播放态（来自 2s 轮询的 TransportState），仅在变化时发出。
+  /// UI 用它纠正乐观翻转：设备丢弃了 Play/Pause 时，图标不会说谎。
+  Stream<bool> get playingStream => _playingController.stream;
+
   DLNADevice? get activeDevice => _activeDevice;
 
   Future<void> startDiscovery() async {
@@ -77,6 +99,7 @@ class DlnaService {
     final generation = ++_generation;
     _pollErrors.clear();
     _lastTransport = null;
+    _lastPosition = null;
     final device = _deviceManager?.deviceList[deviceId];
     dlnaLog(
       'cast device=$deviceId title=$title mime=${mime.protocolInfo} url=$url',
@@ -172,7 +195,9 @@ class DlnaService {
             generation == _generation &&
             !_suppressCompletion &&
             !_positionController.isClosed) {
-          _positionController.add(PositionParser(xml));
+          final position = PositionParser(xml);
+          _lastPosition = Duration(seconds: position.RelTimeInt);
+          _positionController.add(position);
           _pollErrors.remove('GetPositionInfo');
         }
       } catch (error) {
@@ -190,6 +215,9 @@ class DlnaService {
           dlnaLog('transport device=${device.info.URLBase} state=$summary');
         }
         _pollErrors.remove('GetTransportInfo');
+        // 把设备真实播放态同步给 UI（暂停也算一次真实态变化，不是播完）。
+        final playing = playingFromTransport(s);
+        if (playing != null) _emitPlaying(playing);
         if (s == 'PLAYING' || s == 'TRANSITIONING') {
           _hasStartedPlaying = true;
         } else if (s == 'STOPPED' || s == 'NO_MEDIA_PRESENT') {
@@ -205,6 +233,28 @@ class DlnaService {
         // 忽略设备切歌/结束瞬间的连接错误，下一轮继续
       }
     });
+  }
+
+  /// TransportState → 是否正在播放。过渡态（TRANSITIONING 等）返回 null：
+  /// 此刻既不能确认起播也不能确认暂停，交由下一次探测判断。
+  static bool? playingFromTransport(String state) {
+    switch (state.toUpperCase()) {
+      case 'PLAYING':
+        return true;
+      case 'PAUSED':
+      case 'PAUSED_PLAYBACK':
+      case 'STOPPED':
+      case 'NO_MEDIA_PRESENT':
+        return false;
+      default:
+        return null;
+    }
+  }
+
+  void _emitPlaying(bool playing) {
+    if (_lastPlaying == playing) return;
+    _lastPlaying = playing;
+    if (!_playingController.isClosed) _playingController.add(playing);
   }
 
   void _reportPollError(String action, DLNADevice device, Object error) {
@@ -239,8 +289,106 @@ class DlnaService {
     _hasStartedPlaying = false;
   }
 
-  Future<void> play() => _control('Play', (device) => device.play());
-  Future<void> pause() => _control('Pause', (device) => device.pause());
+  /// 恢复播放，并**回读 TransportState 确认真的起播**。
+  ///
+  /// 渲染器（如 LX06 的 DMR）在 pause→play 过渡期会丢弃第一条 Play：SOAP 回 200，
+  /// 但设备仍停在 PAUSED_PLAYBACK。旧实现只看 HTTP 成功就乐观翻转 UI，于是第一次
+  /// 「开始」表现为无响应（图标已变播放、声音没恢复），用户得再点一次暂停+开始。
+  /// 这里把「下发」升级为「下发 + 回读确认 + 补偿重发」，返回是否确认成功。
+  Future<bool> play() => _toggleTransport(playing: true);
+
+  /// 暂停，同样以设备 TransportState 确认（PAUSED*/STOPPED 视为生效）。
+  Future<bool> pause() => _toggleTransport(playing: false);
+
+  Future<bool> _toggleTransport({required bool playing}) async {
+    final device = _activeDevice;
+    if (device == null) return false;
+    final generation = _generation;
+    final action = playing ? 'Play' : 'Pause';
+    for (var attempt = 1; attempt <= _transportAttempts; attempt++) {
+      // 会话已换代（换设备/断开）就不再补偿，避免把命令发给新设备。
+      if (_activeDevice != device || generation != _generation) return false;
+      // 最后一次补偿：以最近位置 Seek 重锚后再 Play，兜底「Play 被当空操作」的渲染器。
+      final anchor = playing ? _lastPosition : null;
+      if (attempt == _transportAttempts &&
+          anchor != null &&
+          anchor > Duration.zero) {
+        final sk = _formatPosition(anchor);
+        await _control(
+          'Seek',
+          (device) => device.seek(sk),
+          detail: 'position=$sk',
+        );
+      }
+      try {
+        await _control(
+          action,
+          (device) => playing ? device.play() : device.pause(),
+        );
+      } catch (error) {
+        // 过渡期渲染器会主动断连接，补偿一次比把错误丢给用户更有用。
+        dlnaLog('$action failed attempt=$attempt: $error');
+        if (attempt == _transportAttempts) rethrow;
+        await Future<void>.delayed(_verifyProbeGap);
+        continue;
+      }
+      if (_activeDevice != device || generation != _generation) return false;
+      final result = await _waitForTransport(
+        device,
+        playing: playing,
+        generation: generation,
+      );
+      if (result == true) {
+        _emitPlaying(playing);
+        return true;
+      }
+      if (result == null) {
+        // 设备不回报 TransportState（少数渲染器）：无从确认，按 HTTP 成功兜底，
+        // 不能因为验证不了就把 UI 卡在旧状态上。
+        dlnaLog('$action unverified (no transport state)');
+        return true;
+      }
+      dlnaLog('$action not effective attempt=$attempt');
+    }
+    dlnaLog('$action unconfirmed after $_transportAttempts attempts');
+    return false;
+  }
+
+  /// 轮询 TransportState 直到与 [playing] 一致。
+  /// 返回 true = 已确认，false = 读到相反状态，null = 全程读不到状态。
+  Future<bool?> _waitForTransport(
+    DLNADevice device, {
+    required bool playing,
+    required int generation,
+  }) async {
+    var readable = false;
+    for (var probe = 0; probe < _verifyProbes; probe++) {
+      await Future<void>.delayed(_verifyProbeGap);
+      if (_activeDevice != device || generation != _generation) return false;
+      final state = await _readTransportState(device);
+      if (state == null) continue;
+      readable = true;
+      if (playingFromTransport(state) == playing) return true;
+    }
+    return readable ? false : null;
+  }
+
+  Future<String?> _readTransportState(DLNADevice device) async {
+    try {
+      final xml = await device.getTransportInfo();
+      return TransportInfoParser(xml).CurrentTransportState.toUpperCase();
+    } catch (error) {
+      _reportPollError('GetTransportInfo', device, error);
+      return null;
+    }
+  }
+
+  static String _formatPosition(Duration position) {
+    final h = position.inHours.toString().padLeft(2, '0');
+    final m = (position.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (position.inSeconds % 60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
 
   Future<void> stop() async {
     _stopCompletionMonitor();
@@ -249,14 +397,8 @@ class DlnaService {
   }
 
   Future<void> seek(Duration position) async {
-    final h = position.inHours.toString().padLeft(2, '0');
-    final m = (position.inMinutes % 60).toString().padLeft(2, '0');
-    final s = (position.inSeconds % 60).toString().padLeft(2, '0');
-    await _control(
-      'Seek',
-      (device) => device.seek('$h:$m:$s'),
-      detail: 'position=$h:$m:$s',
-    );
+    final sk = _formatPosition(position);
+    await _control('Seek', (device) => device.seek(sk), detail: 'position=$sk');
   }
 
   Future<void> setVolume(int volume) => _control(
@@ -275,6 +417,8 @@ class DlnaService {
       _control('Stop', (device) => device.stop()).catchError((Object _) {}),
     );
     _activeDevice = null;
+    _lastPosition = null;
+    _lastPlaying = null; // 下次投屏重新上报真实态，不吞第一次
   }
 
   void dispose() {
@@ -284,5 +428,6 @@ class DlnaService {
     _devicesController.close();
     _positionController.close();
     _completionController.close();
+    _playingController.close();
   }
 }

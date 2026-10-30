@@ -99,7 +99,13 @@ class LyricNotifier extends Notifier<LyricState> {
     final lyricUrl = key.$1;
     final songUpdatedAt = key.$2?.toIso8601String();
 
-    ref.listen(playerStateProvider.select((s) => s.currentTime), (prev, next) {
+    // 歌词时间轴跟随「当前实际在出声的那个渲染器」：本机播放 = 本机进度，
+    // DLNA 投屏 = 远端轮询到的进度。只听 playerStateProvider 时，投屏会
+    // pauseLocal 冻结本机进度，歌词就停在投屏那一刻不再滚动。
+    ref.listen(activePlaybackStateProvider.select((s) => s.currentTime), (
+      prev,
+      next,
+    ) {
       _updateCurrentLine(next);
     });
 
@@ -279,7 +285,8 @@ class LyricNotifier extends Notifier<LyricState> {
     }
 
     _lastLoadedUrl = lyricUrl;
-    final position = ref.read(playerStateProvider).currentTime;
+    // 与时间轴同源：投屏时用远端进度定位当前行，避免刚加载就落到本机冻结位置。
+    final position = ref.read(activePlaybackStateProvider).currentTime;
     final index = synced ? LyricParser.findCurrentLine(lyrics, position) : -1;
     state = LyricState(
       lyrics: lyrics,
