@@ -3572,10 +3572,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsQualityDialogTitle => '选择音质';
 
   @override
-  String get settingsQualityOriginalDesc => '不转码，使用文件原始码率';
+  String get settingsQualityOriginalDesc => '不请求档位：本地原文件直出、网络按源默认';
 
   @override
-  String get settingsQualityTranscodeDesc => '转码为 MP3，适合弱网环境';
+  String get settingsQualityTranscodeDesc =>
+      '仅对网络歌曲生效：向音源索取该档位、不足取实际最高档；本地歌曲恒原文件直出';
 
   @override
   String get settingsAutoPlayOnLaunchTitle => '打开后自动播放';

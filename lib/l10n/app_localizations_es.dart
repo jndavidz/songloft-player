@@ -3787,11 +3787,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsQualityOriginalDesc =>
-      'Sin transcodificación, usa la calidad original del archivo';
+      'Sin nivel solicitado: los archivos locales se reproducen tal cual, las canciones en red usan el valor por defecto de la fuente';
 
   @override
   String get settingsQualityTranscodeDesc =>
-      'Transcodificar a MP3, adecuado para redes débiles';
+      'Solo canciones en red: solicita este nivel a la fuente y usa el mejor disponible si falta; los archivos locales siempre se reproducen tal cual';
 
   @override
   String get settingsAutoPlayOnLaunchTitle =>

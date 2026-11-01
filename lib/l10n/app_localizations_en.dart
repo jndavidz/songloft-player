@@ -3735,11 +3735,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsQualityOriginalDesc =>
-      'No transcoding, use the file\'s original bitrate';
+      'No tier requested: local files play as-is, network songs use the source default';
 
   @override
   String get settingsQualityTranscodeDesc =>
-      'Transcode to MP3, suited for weak networks';
+      'Network songs only: request this tier from the source, falling back to the best available; local files always play as-is';
 
   @override
   String get settingsAutoPlayOnLaunchTitle => 'Auto-play on launch';

@@ -6492,13 +6492,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsQualityOriginalDesc.
   ///
   /// In zh, this message translates to:
-  /// **'不转码，使用文件原始码率'**
+  /// **'不请求档位：本地原文件直出、网络按源默认'**
   String get settingsQualityOriginalDesc;
 
   /// No description provided for @settingsQualityTranscodeDesc.
   ///
   /// In zh, this message translates to:
-  /// **'转码为 MP3，适合弱网环境'**
+  /// **'仅对网络歌曲生效：向音源索取该档位、不足取实际最高档；本地歌曲恒原文件直出'**
   String get settingsQualityTranscodeDesc;
 
   /// No description provided for @settingsAutoPlayOnLaunchTitle.
