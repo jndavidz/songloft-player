@@ -819,15 +819,13 @@ class SongloftAudioHandler extends BaseAudioHandler with SeekHandler {
       } else {
         // 音质档位路由（spec: .scratch/audio-quality-routing）：本地歌恒原文件直出；
         // 网络歌不再请求后端转码，档位经 source_quality 透传给音源插件索取、不足降档。
-        final qualityParams = UrlHelper.resolvePlayQualityParams(
-          songType: song.type,
-          setting: quality,
-        );
         songUrl = UrlHelper.buildSongUrl(
           song.url!,
           songFormat: song.format,
-          quality: qualityParams.quality,
-          sourceQualityHint: qualityParams.sourceQualityHint,
+          sourceQualityHint: UrlHelper.resolvePlayQualityParams(
+            songType: song.type,
+            setting: quality,
+          ),
           hlsDirect: isDesktopLive,
           audioTrack: effectiveTrack,
           normalize: normalize,

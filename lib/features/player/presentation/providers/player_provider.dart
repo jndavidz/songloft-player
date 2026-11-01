@@ -2325,15 +2325,13 @@ class PlayerNotifier extends Notifier<PlayerState> {
       // 与播放链路同规则（spec: .scratch/audio-quality-routing D3/D9）：本地/电台
       // 不带音质参数；网络歌带 source_quality hint（预热分支后端不消费 hint，
       // 预热落插件默认档原生流，档位差异化解析只发生在真实播放）。
-      final qualityParams = UrlHelper.resolvePlayQualityParams(
-        songType: nextSong.type,
-        setting: quality,
-      );
       final songUrl = UrlHelper.buildSongUrl(
         nextSong.url!,
         songFormat: nextSong.format,
-        quality: qualityParams.quality,
-        sourceQualityHint: qualityParams.sourceQualityHint,
+        sourceQualityHint: UrlHelper.resolvePlayQualityParams(
+          songType: nextSong.type,
+          setting: quality,
+        ),
         normalize: normalizeOn,
       );
       final separator = songUrl.contains('?') ? '&' : '?';

@@ -4,62 +4,61 @@ import 'package:songloft_flutter/core/utils/url_helper.dart';
 
 void main() {
   group('resolvePlayQualityParams（音质档位路由，spec: audio-quality-routing D2/D3）', () {
-    test('本地歌：任何设置档都不产生 quality 与 source_quality', () {
+    test('本地歌：任何设置档都不产生 hint', () {
       for (final setting in ['original', '128', '192', '320']) {
-        final params = UrlHelper.resolvePlayQualityParams(
-          songType: AppConstants.songTypeLocal,
-          setting: setting,
+        expect(
+          UrlHelper.resolvePlayQualityParams(
+            songType: AppConstants.songTypeLocal,
+            setting: setting,
+          ),
+          isNull,
+          reason: 'local setting=$setting',
         );
-        expect(params.quality, isNull, reason: 'local quality=$setting');
-        expect(params.sourceQualityHint, isNull, reason: 'local hint=$setting');
       }
     });
 
-    test('网络歌：设置档映射为 native 拼写 hint，且不再触发后端转码 quality', () {
+    test('网络歌：设置档映射为 native 拼写 hint', () {
       expect(
         UrlHelper.resolvePlayQualityParams(
           songType: AppConstants.songTypeRemote,
           setting: '320',
-        ).sourceQualityHint,
+        ),
         '320k',
       );
       expect(
         UrlHelper.resolvePlayQualityParams(
           songType: AppConstants.songTypeRemote,
           setting: '192',
-        ).sourceQualityHint,
+        ),
         '192k',
       );
       expect(
         UrlHelper.resolvePlayQualityParams(
           songType: AppConstants.songTypeRemote,
           setting: '128',
-        ).sourceQualityHint,
+        ),
         '128k',
       );
-      final params = UrlHelper.resolvePlayQualityParams(
-        songType: AppConstants.songTypeRemote,
-        setting: '320',
-      );
-      expect(params.quality, isNull, reason: '播放链路不再请求后端转码');
     });
 
-    test('网络歌 original：不带任何音质参数', () {
-      final params = UrlHelper.resolvePlayQualityParams(
-        songType: AppConstants.songTypeRemote,
-        setting: 'original',
+    test('网络歌 original：不携带 hint', () {
+      expect(
+        UrlHelper.resolvePlayQualityParams(
+          songType: AppConstants.songTypeRemote,
+          setting: 'original',
+        ),
+        isNull,
       );
-      expect(params.quality, isNull);
-      expect(params.sourceQualityHint, isNull);
     });
 
     test('电台：直播流不参与档位路由', () {
-      final params = UrlHelper.resolvePlayQualityParams(
-        songType: AppConstants.songTypeRadio,
-        setting: '320',
+      expect(
+        UrlHelper.resolvePlayQualityParams(
+          songType: AppConstants.songTypeRadio,
+          setting: '320',
+        ),
+        isNull,
       );
-      expect(params.quality, isNull);
-      expect(params.sourceQualityHint, isNull);
     });
   });
 

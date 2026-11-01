@@ -46,23 +46,17 @@ class UrlHelper {
 
   /// 播放链路的音质档位路由（spec: .scratch/audio-quality-routing D2/D3）。
   ///
-  /// - 本地歌 / 电台：不产生任何音质参数——本地恒原文件直出，电台是直播流。
-  /// - 网络歌：不再追加 `quality=`（避免后端"下载+转码"），改为返回
-  ///   [sourceQualityHint]（设置档位的 musicdl native 拼写），由后端透传给
-  ///   音源插件 `/api/music/url`，向源索取对应档位、不足降档。
-  /// - [setting] 为 App 音质设置（'original'/'128'/'192'/'320'）。
-  static ({String? quality, String? sourceQualityHint}) resolvePlayQualityParams({
+  /// 返回 `source_quality` hint（musicdl native 拼写），null = 不携带：
+  /// - 本地歌 / 电台：恒 null——本地原文件直出、电台是直播流。
+  /// - 网络歌：设置档位（'128'/'192'/'320'）映射为 native 拼写；'original'/未知 → null。
+  /// 播放 URL 因此**不再追加 `quality=`**（避免后端"下载+转码"），档位由后端透传给
+  /// 音源插件 `/api/music/url`，向源索取对应档位、不足降档。
+  static String? resolvePlayQualityParams({
     required String songType,
     required String? setting,
   }) {
-    if (songType != AppConstants.songTypeRemote) {
-      return (quality: null, sourceQualityHint: null);
-    }
-    final hint = nativeQualityTier(setting);
-    if (hint == null) {
-      return (quality: null, sourceQualityHint: null);
-    }
-    return (quality: null, sourceQualityHint: hint);
+    if (songType != AppConstants.songTypeRemote) return null;
+    return nativeQualityTier(setting);
   }
 
   /// App 音质设置值 → musicdl native 档位拼写；'original'/未知 → null（不带 hint）。
