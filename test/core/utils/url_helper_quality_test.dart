@@ -70,7 +70,9 @@ void main() {
         sourceQualityHint: '320k',
       );
       expect(url, contains('source_quality=320k'));
-      expect(url, isNot(contains('quality=')));
+      // 注意 source_quality= 子串包含 quality=，须按参数边界断言
+      expect(url, isNot(contains('?quality=')));
+      expect(url, isNot(contains('&quality=')));
     });
 
     test('hint 为空时不追加 source_quality（与旧版 URL 形态一致）', () {
