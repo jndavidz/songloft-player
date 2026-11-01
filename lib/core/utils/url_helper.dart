@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../config/app_config.dart';
+import '../../config/constants.dart';
 import '../storage/secure_storage.dart';
 import 'audio_format_helper.dart';
 
@@ -43,11 +44,50 @@ class UrlHelper {
     return fullUrl;
   }
 
+  /// 播放链路的音质档位路由（spec: .scratch/audio-quality-routing D2/D3）。
+  ///
+  /// - 本地歌 / 电台：不产生任何音质参数——本地恒原文件直出，电台是直播流。
+  /// - 网络歌：不再追加 `quality=`（避免后端"下载+转码"），改为返回
+  ///   [sourceQualityHint]（设置档位的 musicdl native 拼写），由后端透传给
+  ///   音源插件 `/api/music/url`，向源索取对应档位、不足降档。
+  /// - [setting] 为 App 音质设置（'original'/'128'/'192'/'320'）。
+  static ({String? quality, String? sourceQualityHint}) resolvePlayQualityParams({
+    required String songType,
+    required String? setting,
+  }) {
+    if (songType != AppConstants.songTypeRemote) {
+      return (quality: null, sourceQualityHint: null);
+    }
+    final hint = nativeQualityTier(setting);
+    if (hint == null) {
+      return (quality: null, sourceQualityHint: null);
+    }
+    return (quality: null, sourceQualityHint: hint);
+  }
+
+  /// App 音质设置值 → musicdl native 档位拼写；'original'/未知 → null（不带 hint）。
+  static String? nativeQualityTier(String? setting) {
+    switch (setting) {
+      case '128':
+        return '128k';
+      case '192':
+        return '192k';
+      case '320':
+        return '320k';
+      default:
+        return null;
+    }
+  }
+
   /// 构建歌曲播放 URL
   ///
   /// [songFormat] 歌曲原始格式（如 "wma"），用于判断当前平台是否需要转码。
   /// 当平台不支持该格式时自动追加 format 参数请求服务端转码。
   /// [quality] 音质偏好（'128'/'192'/'320'），非空且非 'original' 时追加 quality 参数。
+  /// 播放链路应改用 [resolvePlayQualityParams] 决定 quality/sourceQualityHint 的取值；
+  /// 本参数保留给缓存下载等"有意让后端转码定档"的场景。
+  /// [sourceQualityHint] 非空时追加 `source_quality=<native 拼写>`：后端把它透传给
+  /// 音源插件 `/api/music/url`（向源索取档位、不足降档），不参与后端转码判定。
   /// [hlsDirect] 为 true 时追加 `hls=direct`：让后端对 HLS 电台强制 302 直连源站、
   /// 绕过本机 HLS 反代（即使反代开关已开）。原生 player 自带 HLS 解析且无 CORS 限制，
   /// 直连可避免直播切片经反代往返后过期导致 404（songloft-org/songloft#249）；
@@ -59,6 +99,7 @@ class UrlHelper {
     String url, {
     String? songFormat,
     String? quality,
+    String? sourceQualityHint,
     bool hlsDirect = false,
     int? audioTrack,
     bool normalize = false,
@@ -75,6 +116,10 @@ class UrlHelper {
     }
     if (quality != null && quality.isNotEmpty && quality != 'original') {
       result += '${result.contains('?') ? '&' : '?'}quality=$quality';
+    }
+    if (sourceQualityHint != null && sourceQualityHint.isNotEmpty) {
+      result +=
+          '${result.contains('?') ? '&' : '?'}source_quality=$sourceQualityHint';
     }
     if (hlsDirect) {
       result += '${result.contains('?') ? '&' : '?'}hls=direct';
