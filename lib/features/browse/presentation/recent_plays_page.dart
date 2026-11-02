@@ -49,16 +49,14 @@ class _RecentPlaysPageState extends ConsumerState<RecentPlaysPage> {
     }
     try {
       final api = ref.read(playHistoryApiProvider);
-      final page = await api.getRecentHistory(
-        limit: 50,
-        offset: reset ? 0 : _offset,
-      );
+      final offset = reset ? 0 : _offset;
+      final result = await api.getRecentHistory(limit: 50, offset: offset);
       if (!mounted) return;
       setState(() {
         if (reset) _entries.clear();
-        _entries.addAll(page);
-        _isEnd = page.length < 50;
-        if (!_isEnd) _offset = reset ? page.length : _offset + page.length;
+        _entries.addAll(result.items);
+        _isEnd = offset + result.items.length >= result.total;
+        _offset = offset + result.items.length;
         _isLoading = false;
         _isLoadingMore = false;
       });
@@ -78,7 +76,7 @@ class _RecentPlaysPageState extends ConsumerState<RecentPlaysPage> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text(l10n.browseClearHistory),
+            title: Text(l10n.browseClearPlayHistory),
             content: Text(l10n.deleteIrreversible),
             actions: [
               TextButton(
@@ -126,7 +124,7 @@ class _RecentPlaysPageState extends ConsumerState<RecentPlaysPage> {
           if (_entries.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
-              tooltip: l10n.browseClearHistory,
+              tooltip: l10n.browseClearPlayHistory,
               onPressed: _clearAll,
             ),
         ],

@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import 'sheet_detail_page.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 
 class RecommendSheetsPage extends ConsumerStatefulWidget {
@@ -232,15 +233,12 @@ class _SheetCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  sheet.coverUrl != null && sheet.coverUrl!.isNotEmpty
-                      ? Image.network(
-                        sheet.coverUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (_, _, _) =>
-                                const ColoredBox(color: Color(0x1A808080)),
-                      )
-                      : const ColoredBox(color: Color(0x1A808080)),
+                  BrowseCover(
+                    url: sheet.coverUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fallbackIcon: Icons.queue_music_outlined,
+                  ),
                   if (sheet.playCount > 0)
                     Positioned(
                       top: 6,

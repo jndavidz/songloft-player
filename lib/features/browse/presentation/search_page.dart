@@ -11,7 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../player/presentation/providers/player_provider.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import '../data/remote_playback.dart';
@@ -19,6 +21,7 @@ import '../data/search_history_store.dart';
 import 'album_detail_page.dart';
 import 'artist_detail_page.dart';
 import 'sheet_detail_page.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
@@ -309,6 +312,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
   }
 
   Widget _buildResults(BuildContext context) {
+    final currentSong = ref.watch(currentSongProvider);
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -355,7 +359,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
               track: track,
               index: index,
               showSource: true,
-              isCurrent: false,
+              isCurrent: isCurrentBrowseTrack(currentSong, track),
               onTap:
                   () => RemotePlayback.importAndPlay(
                     context,
@@ -369,7 +373,10 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
           case BrowseSearchType.album:
             final album = _albums[index];
             return ListTile(
-              leading: _thumb(album.coverUrl, Icons.album_outlined),
+              leading: BrowseCover(
+                url: album.coverUrl,
+                fallbackIcon: Icons.album_outlined,
+              ),
               title: Text(
                 album.name,
                 maxLines: 1,
@@ -385,7 +392,11 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
           case BrowseSearchType.artist:
             final artist = _artists[index];
             return ListTile(
-              leading: _thumb(artist.avatarUrl, Icons.person_outline),
+              leading: BrowseCover(
+                url: artist.avatarUrl,
+                circle: true,
+                fallbackIcon: Icons.person_outline,
+              ),
               title: Text(
                 artist.name,
                 maxLines: 1,
@@ -404,7 +415,10 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
           case BrowseSearchType.sheet:
             final sheet = _sheets[index];
             return ListTile(
-              leading: _thumb(sheet.coverUrl, Icons.queue_music_outlined),
+              leading: BrowseCover(
+                url: sheet.coverUrl,
+                fallbackIcon: Icons.queue_music_outlined,
+              ),
               title: Text(
                 sheet.name,
                 maxLines: 1,
@@ -420,22 +434,6 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
         }
       },
     );
-  }
-
-  Widget _thumb(String? url, IconData fallbackIcon) {
-    if (url != null && url.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.network(
-          url,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _thumbFallback(fallbackIcon),
-        ),
-      );
-    }
-    return _thumbFallback(fallbackIcon);
   }
 
   Widget _thumbFallback(IconData icon) => Container(

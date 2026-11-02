@@ -54,7 +54,8 @@ class PlayHistoryApi {
   }
 
   /// 跨上下文查询最近播放（按歌曲去重、全局倒序，供曲库「播放历史」页）。
-  Future<List<PlayHistoryEntry>> getRecentHistory({
+  /// 返回 (items, total)：total 为去重后歌曲总数，驱动触底分页判据。
+  Future<({List<PlayHistoryEntry> items, int total})> getRecentHistory({
     int? limit,
     int? offset,
   }) async {
@@ -67,9 +68,13 @@ class PlayHistoryApi {
       queryParameters: query,
     );
     final items = response.data?['items'] as List<dynamic>? ?? const [];
-    return items
-        .map((e) => PlayHistoryEntry.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return (
+      items:
+          items
+              .map((e) => PlayHistoryEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      total: (response.data?['total'] as num?)?.toInt() ?? 0,
+    );
   }
 
   /// 清空全部上下文的播放历史（最近播放页的全局清空），返回删除条数。

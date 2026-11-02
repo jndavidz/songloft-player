@@ -3053,5 +3053,6 @@
   "browseAddToPlaylist": "加入歌单",
   "browseKeywordRequired": "请输入搜索关键词",
   "browseOfflineHint": "需要连接服务器后使用",
-  "browseComingSoon": "即将上线"
+  "browseComingSoon": "即将上线",
+  "browseClearPlayHistory": "清空全部播放记录"
 }

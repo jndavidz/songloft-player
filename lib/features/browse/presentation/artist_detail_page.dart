@@ -8,10 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../player/presentation/providers/player_provider.dart';
+import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import '../data/remote_playback.dart';
 import 'album_detail_page.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
@@ -113,6 +116,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final currentSong = ref.watch(currentSongProvider);
     final artist = _info ?? widget.artist;
     final theme = Theme.of(context);
 
@@ -136,25 +140,11 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Row(
                   children: [
-                    ClipOval(
-                      child:
-                          artist.avatarUrl != null &&
-                                  artist.avatarUrl!.isNotEmpty
-                              ? Image.network(
-                                artist.avatarUrl!,
-                                width: 88,
-                                height: 88,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (_, _, _) => const ColoredBox(
-                                      color: Color(0x1A808080),
-                                    ),
-                              )
-                              : const SizedBox(
-                                width: 88,
-                                height: 88,
-                                child: ColoredBox(color: Color(0x1A808080)),
-                              ),
+                    BrowseCover(
+                      url: artist.avatarUrl,
+                      size: 88,
+                      circle: true,
+                      fallbackIcon: Icons.person_outline,
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
@@ -265,6 +255,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
                   return BrowseTrackTile(
                     track: track,
                     index: index,
+                    isCurrent: isCurrentBrowseTrack(currentSong, track),
                     onTap:
                         () => RemotePlayback.importAndPlay(
                           context,
@@ -291,7 +282,10 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
                   }
                   final album = _albums[index];
                   return ListTile(
-                    leading: _albumCover(album.coverUrl),
+                    leading: BrowseCover(
+                      url: album.coverUrl,
+                      fallbackIcon: Icons.album_outlined,
+                    ),
                     title: Text(
                       album.name,
                       maxLines: 1,
@@ -310,26 +304,6 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _albumCover(String? url) {
-    if (url != null && url.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.network(
-          url,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => const ColoredBox(color: Color(0x1A808080)),
-        ),
-      );
-    }
-    return const SizedBox(
-      width: 48,
-      height: 48,
-      child: ColoredBox(color: Color(0x1A808080)),
     );
   }
 

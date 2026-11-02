@@ -11,9 +11,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../player/presentation/providers/player_provider.dart';
+import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import '../data/remote_playback.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
@@ -115,6 +118,7 @@ class _AlbumDetailPageState extends ConsumerState<AlbumDetailPage> {
     AppLocalizations l10n,
   ) {
     final info = _info!;
+    final currentSong = ref.watch(currentSongProvider);
     final theme = Theme.of(context);
     final meta = <String>[
       if (album.publishTime != null)
@@ -132,24 +136,11 @@ class _AlbumDetailPageState extends ConsumerState<AlbumDetailPage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
+                BrowseCover(
+                  url: album.coverUrl,
+                  size: 128,
                   borderRadius: BorderRadius.circular(8),
-                  child:
-                      album.coverUrl != null && album.coverUrl!.isNotEmpty
-                          ? Image.network(
-                            album.coverUrl!,
-                            width: 128,
-                            height: 128,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (_, _, _) =>
-                                    const ColoredBox(color: Color(0x1A808080)),
-                          )
-                          : const SizedBox(
-                            width: 128,
-                            height: 128,
-                            child: ColoredBox(color: Color(0x1A808080)),
-                          ),
+                  fallbackIcon: Icons.album_outlined,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -226,6 +217,7 @@ class _AlbumDetailPageState extends ConsumerState<AlbumDetailPage> {
               index: index,
               showTrackNo: true,
               showSource: (album.source ?? 'netease') != track.source,
+              isCurrent: isCurrentBrowseTrack(currentSong, track),
               onTap:
                   () => RemotePlayback.importAndPlay(
                     context,

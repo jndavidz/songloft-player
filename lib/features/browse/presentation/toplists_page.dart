@@ -8,10 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../player/presentation/providers/player_provider.dart';
+import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import '../data/remote_playback.dart';
 import 'widgets/browse_state_view.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_track_tile.dart';
 
 class ToplistsPage extends ConsumerStatefulWidget {
@@ -118,15 +121,12 @@ class _ToplistCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  toplist.coverUrl != null && toplist.coverUrl!.isNotEmpty
-                      ? Image.network(
-                        toplist.coverUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (_, _, _) =>
-                                const ColoredBox(color: Color(0x1A808080)),
-                      )
-                      : const ColoredBox(color: Color(0x1A808080)),
+                  BrowseCover(
+                    url: toplist.coverUrl,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fallbackIcon: Icons.leaderboard_outlined,
+                  ),
                   Positioned(
                     left: 8,
                     right: 8,
@@ -227,6 +227,7 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentSong = ref.watch(currentSongProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.toplist.name, overflow: TextOverflow.ellipsis),
@@ -267,6 +268,7 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
                     return BrowseTrackTile(
                       track: track,
                       index: index,
+                      isCurrent: isCurrentBrowseTrack(currentSong, track),
                       onTap:
                           () => RemotePlayback.importAndPlay(
                             context,

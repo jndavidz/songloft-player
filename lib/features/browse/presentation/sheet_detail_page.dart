@@ -8,9 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../player/presentation/providers/player_provider.dart';
+import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import '../data/remote_playback.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
@@ -102,6 +105,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final currentSong = ref.watch(currentSongProvider);
     final theme = Theme.of(context);
     final sheet = _sheet;
     final meta = <String>[
@@ -127,25 +131,11 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
+                    BrowseCover(
+                      url: sheet.coverUrl,
+                      size: 112,
                       borderRadius: BorderRadius.circular(8),
-                      child:
-                          sheet.coverUrl != null && sheet.coverUrl!.isNotEmpty
-                              ? Image.network(
-                                sheet.coverUrl!,
-                                width: 112,
-                                height: 112,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (_, _, _) => const ColoredBox(
-                                      color: Color(0x1A808080),
-                                    ),
-                              )
-                              : const SizedBox(
-                                width: 112,
-                                height: 112,
-                                child: ColoredBox(color: Color(0x1A808080)),
-                              ),
+                      fallbackIcon: Icons.queue_music_outlined,
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
@@ -235,6 +225,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
                   return BrowseTrackTile(
                     track: track,
                     index: index,
+                    isCurrent: isCurrentBrowseTrack(currentSong, track),
                     onTap:
                         () => RemotePlayback.importAndPlay(
                           context,

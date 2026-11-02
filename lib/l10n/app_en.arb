@@ -2947,5 +2947,6 @@
   "browseAddToPlaylist": "Add to playlist",
   "browseKeywordRequired": "Please enter a keyword",
   "browseOfflineHint": "Connect to the server to use this feature",
-  "browseComingSoon": "Coming soon"
+  "browseComingSoon": "Coming soon",
+  "browseClearPlayHistory": "Clear all play history"
 }

@@ -12,6 +12,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/song.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
+import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 
 class BrowseCommentsSheet extends ConsumerStatefulWidget {
@@ -220,24 +221,11 @@ class _CommentTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              ClipOval(
-                child:
-                    comment.avatar != null && comment.avatar!.isNotEmpty
-                        ? Image.network(
-                          comment.avatar!,
-                          width: 28,
-                          height: 28,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (_, _, _) =>
-                                  const ColoredBox(color: Color(0x1A808080)),
-                        )
-                        : Container(
-                          width: 28,
-                          height: 28,
-                          color: const Color(0x1A808080),
-                          child: const Icon(Icons.person, size: 16),
-                        ),
+              BrowseCover(
+                url: comment.avatar,
+                size: 28,
+                circle: true,
+                fallbackIcon: Icons.person_outline,
               ),
               const SizedBox(width: 8),
               Expanded(
