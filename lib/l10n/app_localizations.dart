@@ -8735,6 +8735,240 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'在首页显示「我的电台」，选择保存在本机。'**
   String get settingsHomeShowRadiosDesc;
+
+  /// No description provided for @browseSearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索在线音乐'**
+  String get browseSearchHint;
+
+  /// No description provided for @browseDiscoverTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'在线发现'**
+  String get browseDiscoverTitle;
+
+  /// No description provided for @discoverRecommend.
+  ///
+  /// In zh, this message translates to:
+  /// **'推荐歌单'**
+  String get discoverRecommend;
+
+  /// No description provided for @discoverToplists.
+  ///
+  /// In zh, this message translates to:
+  /// **'榜单'**
+  String get discoverToplists;
+
+  /// No description provided for @discoverPlayHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'播放历史'**
+  String get discoverPlayHistory;
+
+  /// No description provided for @discoverLocalMusic.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地音乐'**
+  String get discoverLocalMusic;
+
+  /// No description provided for @browseTabTracks.
+  ///
+  /// In zh, this message translates to:
+  /// **'单曲'**
+  String get browseTabTracks;
+
+  /// No description provided for @browseTabAlbums.
+  ///
+  /// In zh, this message translates to:
+  /// **'专辑'**
+  String get browseTabAlbums;
+
+  /// No description provided for @browseTabArtists.
+  ///
+  /// In zh, this message translates to:
+  /// **'歌手'**
+  String get browseTabArtists;
+
+  /// No description provided for @browseTabSheets.
+  ///
+  /// In zh, this message translates to:
+  /// **'歌单'**
+  String get browseTabSheets;
+
+  /// No description provided for @browseSearchHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索历史'**
+  String get browseSearchHistory;
+
+  /// No description provided for @browseClearHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空搜索历史'**
+  String get browseClearHistory;
+
+  /// No description provided for @browseHistoryEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无搜索历史'**
+  String get browseHistoryEmpty;
+
+  /// No description provided for @browseSearchEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到与「{keyword}」相关的内容'**
+  String browseSearchEmpty(String keyword);
+
+  /// No description provided for @browseLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败'**
+  String get browseLoadFailed;
+
+  /// No description provided for @browseRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get browseRetry;
+
+  /// No description provided for @browseUnsupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'该源暂不支持此内容'**
+  String get browseUnsupported;
+
+  /// No description provided for @browsePlayFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'点播失败，请稍后重试'**
+  String get browsePlayFailed;
+
+  /// No description provided for @browsePlayAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'播放全部'**
+  String get browsePlayAll;
+
+  /// No description provided for @browseTrackCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 首'**
+  String browseTrackCount(int count);
+
+  /// No description provided for @browsePublishedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'发行时间'**
+  String get browsePublishedAt;
+
+  /// No description provided for @browseCompany.
+  ///
+  /// In zh, this message translates to:
+  /// **'发行公司'**
+  String get browseCompany;
+
+  /// No description provided for @browseArtistTopSongs.
+  ///
+  /// In zh, this message translates to:
+  /// **'热门单曲'**
+  String get browseArtistTopSongs;
+
+  /// No description provided for @browseArtistAlbums.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部专辑'**
+  String get browseArtistAlbums;
+
+  /// No description provided for @browseRecentEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有播放记录'**
+  String get browseRecentEmpty;
+
+  /// No description provided for @browseLocalEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地音乐为空'**
+  String get browseLocalEmpty;
+
+  /// No description provided for @browseLocalEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描本地音乐文件夹后，歌曲会出现在这里'**
+  String get browseLocalEmptyHint;
+
+  /// No description provided for @browseGoScan.
+  ///
+  /// In zh, this message translates to:
+  /// **'去扫描'**
+  String get browseGoScan;
+
+  /// No description provided for @browseComments.
+  ///
+  /// In zh, this message translates to:
+  /// **'评论'**
+  String get browseComments;
+
+  /// No description provided for @browseCommentsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有评论'**
+  String get browseCommentsEmpty;
+
+  /// No description provided for @browseCommentsHot.
+  ///
+  /// In zh, this message translates to:
+  /// **'热门评论'**
+  String get browseCommentsHot;
+
+  /// No description provided for @browseCommentsLatest.
+  ///
+  /// In zh, this message translates to:
+  /// **'最新评论'**
+  String get browseCommentsLatest;
+
+  /// No description provided for @browseSourceLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'来源：{source}'**
+  String browseSourceLabel(String source);
+
+  /// No description provided for @browseSheetCreator.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建者：{creator}'**
+  String browseSheetCreator(String creator);
+
+  /// No description provided for @browsePlayCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 次播放'**
+  String browsePlayCount(int count);
+
+  /// No description provided for @browseAddToPlaylist.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入歌单'**
+  String get browseAddToPlaylist;
+
+  /// No description provided for @browseKeywordRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入搜索关键词'**
+  String get browseKeywordRequired;
+
+  /// No description provided for @browseOfflineHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要连接服务器后使用'**
+  String get browseOfflineHint;
+
+  /// No description provided for @browseComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'即将上线'**
+  String get browseComingSoon;
 }
 
 class _AppLocalizationsDelegate

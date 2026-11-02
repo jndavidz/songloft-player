@@ -5126,4 +5126,131 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsHomeShowRadiosDesc =>
       'Mostrar Mis radios en inicio. Esta opción se guarda en este dispositivo.';
+
+  @override
+  String get browseSearchHint => '搜索在线音乐';
+
+  @override
+  String get browseDiscoverTitle => '在线发现';
+
+  @override
+  String get discoverRecommend => '推荐歌单';
+
+  @override
+  String get discoverToplists => '榜单';
+
+  @override
+  String get discoverPlayHistory => '播放历史';
+
+  @override
+  String get discoverLocalMusic => '本地音乐';
+
+  @override
+  String get browseTabTracks => '单曲';
+
+  @override
+  String get browseTabAlbums => '专辑';
+
+  @override
+  String get browseTabArtists => '歌手';
+
+  @override
+  String get browseTabSheets => '歌单';
+
+  @override
+  String get browseSearchHistory => '搜索历史';
+
+  @override
+  String get browseClearHistory => '清空搜索历史';
+
+  @override
+  String get browseHistoryEmpty => '暂无搜索历史';
+
+  @override
+  String browseSearchEmpty(String keyword) {
+    return '未找到与「$keyword」相关的内容';
+  }
+
+  @override
+  String get browseLoadFailed => '加载失败';
+
+  @override
+  String get browseRetry => '重试';
+
+  @override
+  String get browseUnsupported => '该源暂不支持此内容';
+
+  @override
+  String get browsePlayFailed => '点播失败，请稍后重试';
+
+  @override
+  String get browsePlayAll => '播放全部';
+
+  @override
+  String browseTrackCount(int count) {
+    return '$count 首';
+  }
+
+  @override
+  String get browsePublishedAt => '发行时间';
+
+  @override
+  String get browseCompany => '发行公司';
+
+  @override
+  String get browseArtistTopSongs => '热门单曲';
+
+  @override
+  String get browseArtistAlbums => '全部专辑';
+
+  @override
+  String get browseRecentEmpty => '还没有播放记录';
+
+  @override
+  String get browseLocalEmpty => '本地音乐为空';
+
+  @override
+  String get browseLocalEmptyHint => '扫描本地音乐文件夹后，歌曲会出现在这里';
+
+  @override
+  String get browseGoScan => '去扫描';
+
+  @override
+  String get browseComments => '评论';
+
+  @override
+  String get browseCommentsEmpty => '还没有评论';
+
+  @override
+  String get browseCommentsHot => '热门评论';
+
+  @override
+  String get browseCommentsLatest => '最新评论';
+
+  @override
+  String browseSourceLabel(String source) {
+    return '来源：$source';
+  }
+
+  @override
+  String browseSheetCreator(String creator) {
+    return '创建者：$creator';
+  }
+
+  @override
+  String browsePlayCount(int count) {
+    return '$count 次播放';
+  }
+
+  @override
+  String get browseAddToPlaylist => '加入歌单';
+
+  @override
+  String get browseKeywordRequired => '请输入搜索关键词';
+
+  @override
+  String get browseOfflineHint => '需要连接服务器后使用';
+
+  @override
+  String get browseComingSoon => '即将上线';
 }

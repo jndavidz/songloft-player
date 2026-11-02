@@ -8,6 +8,8 @@ import '../../../../core/utils/color_extraction.dart';
 import '../../../../core/utils/url_helper.dart';
 import '../../../settings/presentation/providers/song_cache_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/widgets/add_to_playlist_modal.dart';
+import '../../../browse/presentation/browse_comments_sheet.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../domain/player_state.dart';
 import '../providers/player_provider.dart';
@@ -567,6 +569,21 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
           PopupSpeedControl(
             speed: state.speed,
             onSpeedChanged: notifier.setSpeed,
+          ),
+          IconButton(
+            onPressed:
+                () => AddToPlaylistModal.show(
+                  context,
+                  songIds: [state.currentSong!.id],
+                ),
+            icon: const Icon(Icons.playlist_add, size: 20),
+            tooltip: AppLocalizations.of(context).browseAddToPlaylist,
+          ),
+          IconButton(
+            onPressed:
+                () => BrowseCommentsSheet.show(context, state.currentSong!),
+            icon: const Icon(Icons.comment_outlined, size: 20),
+            tooltip: AppLocalizations.of(context).browseComments,
           ),
           IconButton(
             onPressed: () => QueueBottomSheet.show(context),

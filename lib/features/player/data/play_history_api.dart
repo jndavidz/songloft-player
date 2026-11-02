@@ -52,4 +52,31 @@ class PlayHistoryApi {
       queryParameters: {..._contextQuery(context), 'song_id': songId},
     );
   }
+
+  /// 跨上下文查询最近播放（按歌曲去重、全局倒序，供曲库「播放历史」页）。
+  Future<List<PlayHistoryEntry>> getRecentHistory({
+    int? limit,
+    int? offset,
+  }) async {
+    final query = <String, dynamic>{};
+    if (limit != null && limit > 0) query['limit'] = limit;
+    if (offset != null && offset > 0) query['offset'] = offset;
+
+    final response = await dio.get<Map<String, dynamic>>(
+      '${AppConfig.apiPrefix}/play-history/recent',
+      queryParameters: query,
+    );
+    final items = response.data?['items'] as List<dynamic>? ?? const [];
+    return items
+        .map((e) => PlayHistoryEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// 清空全部上下文的播放历史（最近播放页的全局清空），返回删除条数。
+  Future<int> clearRecentHistory() async {
+    final response = await dio.delete<Map<String, dynamic>>(
+      '${AppConfig.apiPrefix}/play-history/recent',
+    );
+    return (response.data?['deleted'] as num?)?.toInt() ?? 0;
+  }
 }

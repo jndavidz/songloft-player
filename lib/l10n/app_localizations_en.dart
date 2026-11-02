@@ -5039,4 +5039,132 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsHomeShowRadiosDesc =>
       'Show My Radios on the home page. This choice stays on this device.';
+
+  @override
+  String get browseSearchHint => 'Search online music';
+
+  @override
+  String get browseDiscoverTitle => 'Discover';
+
+  @override
+  String get discoverRecommend => 'Recommended';
+
+  @override
+  String get discoverToplists => 'Toplists';
+
+  @override
+  String get discoverPlayHistory => 'Play history';
+
+  @override
+  String get discoverLocalMusic => 'Local music';
+
+  @override
+  String get browseTabTracks => 'Songs';
+
+  @override
+  String get browseTabAlbums => 'Albums';
+
+  @override
+  String get browseTabArtists => 'Artists';
+
+  @override
+  String get browseTabSheets => 'Playlists';
+
+  @override
+  String get browseSearchHistory => 'Search history';
+
+  @override
+  String get browseClearHistory => 'Clear search history';
+
+  @override
+  String get browseHistoryEmpty => 'No search history yet';
+
+  @override
+  String browseSearchEmpty(String keyword) {
+    return 'Nothing found for \"$keyword\"';
+  }
+
+  @override
+  String get browseLoadFailed => 'Failed to load';
+
+  @override
+  String get browseRetry => 'Retry';
+
+  @override
+  String get browseUnsupported => 'This source is not supported';
+
+  @override
+  String get browsePlayFailed => 'Playback failed, please try again';
+
+  @override
+  String get browsePlayAll => 'Play all';
+
+  @override
+  String browseTrackCount(int count) {
+    return '$count tracks';
+  }
+
+  @override
+  String get browsePublishedAt => 'Released';
+
+  @override
+  String get browseCompany => 'Company';
+
+  @override
+  String get browseArtistTopSongs => 'Top songs';
+
+  @override
+  String get browseArtistAlbums => 'Albums';
+
+  @override
+  String get browseRecentEmpty => 'No play history yet';
+
+  @override
+  String get browseLocalEmpty => 'No local music';
+
+  @override
+  String get browseLocalEmptyHint =>
+      'Songs will appear here after you scan local music folders';
+
+  @override
+  String get browseGoScan => 'Scan now';
+
+  @override
+  String get browseComments => 'Comments';
+
+  @override
+  String get browseCommentsEmpty => 'No comments yet';
+
+  @override
+  String get browseCommentsHot => 'Hot comments';
+
+  @override
+  String get browseCommentsLatest => 'Latest comments';
+
+  @override
+  String browseSourceLabel(String source) {
+    return 'Source: $source';
+  }
+
+  @override
+  String browseSheetCreator(String creator) {
+    return 'Creator: $creator';
+  }
+
+  @override
+  String browsePlayCount(int count) {
+    return '$count plays';
+  }
+
+  @override
+  String get browseAddToPlaylist => 'Add to playlist';
+
+  @override
+  String get browseKeywordRequired => 'Please enter a keyword';
+
+  @override
+  String get browseOfflineHint => 'Connect to the server to use this feature';
+
+  @override
+  String get browseComingSoon => 'Coming soon';
 }

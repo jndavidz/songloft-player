@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/constants.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/responsive.dart';
 import '../../../core/utils/web_image_tuning.dart';
@@ -19,6 +21,7 @@ import '../../settings/presentation/providers/settings_provider.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import '../../playlist/presentation/providers/playlist_view_provider.dart';
 import '../../playlist/presentation/widgets/playlist_browse_view.dart';
+import '../../browse/presentation/widgets/discover_header.dart';
 import 'providers/songs_provider.dart';
 import 'song_edit_page.dart';
 import '../../../shared/widgets/manage_tags_modal.dart';
@@ -339,6 +342,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     final content = _buildContent(context, state, selected);
 
+    // 曲库顶部的「在线发现」区（票 01）：搜索框 + 四入口，常驻于视图切换之上。
+    final discoverHeader = DiscoverHeader(onSelectView: _selectView);
+
     if (context.useWideLayout) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,13 +358,22 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           ),
           const VerticalDivider(width: 1, thickness: 1),
-          Expanded(child: content),
+          Expanded(
+            child: Column(
+              children: [
+                discoverHeader,
+                const Divider(height: 1),
+                Expanded(child: content),
+              ],
+            ),
+          ),
         ],
       );
     }
 
     return Column(
       children: [
+        discoverHeader,
         LibraryViewSwitcher(
           viewKeys: displayKeys,
           selectedKey: selected ?? '',
@@ -1347,6 +1362,24 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(songsListProvider);
     final isSearching = state.keyword.isNotEmpty;
+    final isEmptyLocalView =
+        !isSearching &&
+        _selectedViewKey == 'local' &&
+        state.type == AppConstants.songTypeLocal;
+
+    // 本地音乐视图空态：给扫描引导（票 04）——其余视图维持原空态。
+    if (isEmptyLocalView) {
+      return EmptyState(
+        icon: Icons.library_music,
+        title: l10n.browseLocalEmpty,
+        subtitle: l10n.browseLocalEmptyHint,
+        action: OutlinedButton.icon(
+          onPressed: () => context.push(AppRoutes.settings),
+          icon: const Icon(Icons.folder_open),
+          label: Text(l10n.browseGoScan),
+        ),
+      );
+    }
 
     return EmptyState(
       icon: isSearching ? Icons.search_off : Icons.library_music,
