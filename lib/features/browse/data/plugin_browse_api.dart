@@ -105,7 +105,10 @@ class PluginBrowseApi {
   }
 
   /// 歌手详情（source ∈ netease/kugou；其余源插件端 501）。
-  Future<BrowseArtist> artistInfo({required String id, String source = 'netease'}) async {
+  Future<BrowseArtist> artistInfo({
+    required String id,
+    String source = 'netease',
+  }) async {
     final data = await _post('artist/info', {'id': id, 'source': source});
     return BrowseArtist.fromJson(
       data['artist'] as Map<String, dynamic>? ?? const {},

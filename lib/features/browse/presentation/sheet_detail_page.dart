@@ -17,10 +17,6 @@ import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
-/// 播放全部的单次导入上限：与插件 /import 的批量上限同量级，
-/// 避免超长歌单一次压死 /songs/remote。
-const int kSheetPlayAllCap = 300;
-
 void pushSheetDetail(BuildContext context, BrowseSheet sheet) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => SheetDetailPage(sheet: sheet)),
@@ -95,7 +91,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
     if (_info.tracks.isEmpty || _isPlayingAll) return;
     setState(() => _isPlayingAll = true);
     try {
-      final tracks = _info.tracks.take(kSheetPlayAllCap).toList();
+      final tracks = _info.tracks.take(kPlayAllImportCap).toList();
       final started = await RemotePlayback.importAndPlay(context, ref, tracks);
       if (!started) return;
       // 后台补齐剩余页（gotchas §六）：队列先建、批次追加

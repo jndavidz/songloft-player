@@ -18,6 +18,9 @@ import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
 
+/// 歌手单曲补齐的每页条数（须 ≤ 插件 artist/works 的 limit 上限 50）。
+const int kArtistWorksPageSize = 30;
+
 void pushArtistDetail(BuildContext context, BrowseArtist artist) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => ArtistDetailPage(artist: artist)),
@@ -44,6 +47,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
   bool _worksLoading = false;
   bool _worksLoadingMore = false;
   bool _worksEnd = false;
+  bool _isPlayingAll = false;
   int _worksPage = 1;
 
   @override
@@ -56,7 +60,10 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
   Future<void> _loadInfo() async {
     try {
       final api = ref.read(pluginBrowseApiProvider);
-      final info = await api.artistInfo(id: widget.artist.id, source: widget.artist.source ?? 'netease');
+      final info = await api.artistInfo(
+        id: widget.artist.id,
+        source: widget.artist.source ?? 'netease',
+      );
       if (!mounted) return;
       setState(() => _info = info);
     } catch (_) {
@@ -114,6 +121,41 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
     _loadWorks(reset: true);
   }
 
+  /// 播放全部（热门单曲）：先播已加载页，后台按页补齐到歌手曲目总数。
+  /// 总数未知（入口未带 music_count）时不补齐，只播已加载部分。
+  Future<void> _playAllSongs() async {
+    if (_tracks.isEmpty || _isPlayingAll) return;
+    setState(() => _isPlayingAll = true);
+    try {
+      final tracks = _tracks.take(kPlayAllImportCap).toList();
+      final started = await RemotePlayback.importAndPlay(context, ref, tracks);
+      if (!started) return;
+      final artist = _info ?? widget.artist;
+      final id = widget.artist.id;
+      final source = widget.artist.source ?? 'netease';
+      RemotePlayback.startBackgroundCatchUp(
+        ref,
+        total: artist.musicCount > 0 ? artist.musicCount : tracks.length,
+        alreadyLoaded: tracks.length,
+        fetchTracks: (offset, limit) async {
+          // 插件 artist/works 的 limit 上限 50：固定 30 保持 offset↔分页换算对齐
+          final works = await ref
+              .read(pluginBrowseApiProvider)
+              .artistWorks(
+                id: id,
+                type: 'music',
+                source: source,
+                page: offset ~/ kArtistWorksPageSize + 1,
+                limit: kArtistWorksPageSize,
+              );
+          return works.tracks;
+        },
+      );
+    } finally {
+      if (mounted) setState(() => _isPlayingAll = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -122,7 +164,25 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(artist.name)),
+      appBar: AppBar(
+        title: Text(artist.name),
+        actions: [
+          if (!_worksAlbumMode)
+            IconButton(
+              tooltip: l10n.browsePlayAll,
+              onPressed:
+                  _tracks.isEmpty || _isPlayingAll ? null : _playAllSongs,
+              icon:
+                  _isPlayingAll
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.play_arrow_rounded),
+            ),
+        ],
+      ),
       body: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n.metrics.pixels >= n.metrics.maxScrollExtent - 200 &&

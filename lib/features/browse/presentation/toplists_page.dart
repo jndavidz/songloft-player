@@ -182,7 +182,9 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   bool _isEnd = false;
+  bool _isPlayingAll = false;
   int _page = 1;
+  int? _total;
   Object? _error;
 
   @override
@@ -210,6 +212,7 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
       setState(() {
         if (reset) _tracks.clear();
         _tracks.addAll(res.items);
+        _total = res.total ?? _total;
         _isEnd = res.isEnd;
         if (!res.isEnd) _page = page;
         _isLoading = false;
@@ -225,12 +228,52 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
     }
   }
 
+  Future<void> _playAll() async {
+    if (_tracks.isEmpty || _isPlayingAll) return;
+    setState(() => _isPlayingAll = true);
+    try {
+      final tracks = _tracks.take(kPlayAllImportCap).toList();
+      final started = await RemotePlayback.importAndPlay(context, ref, tracks);
+      if (!started) return;
+      // 后台补齐剩余页（gotchas §六）：队列先建、批次追加
+      final id = widget.toplist.id;
+      RemotePlayback.startBackgroundCatchUp(
+        ref,
+        total: _total ?? tracks.length,
+        alreadyLoaded: tracks.length,
+        fetchTracks: (offset, limit) async {
+          final res = await ref
+              .read(pluginBrowseApiProvider)
+              .toplistDetail(id: id, page: offset ~/ limit + 1, limit: limit);
+          return res.items;
+        },
+      );
+    } finally {
+      if (mounted) setState(() => _isPlayingAll = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final currentSong = ref.watch(currentSongProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.toplist.name, overflow: TextOverflow.ellipsis),
+        actions: [
+          IconButton(
+            tooltip: l10n.browsePlayAll,
+            onPressed: _tracks.isEmpty || _isPlayingAll ? null : _playAll,
+            icon:
+                _isPlayingAll
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Icon(Icons.play_arrow_rounded),
+          ),
+        ],
       ),
       body: NotificationListener<ScrollNotification>(
         onNotification: (n) {

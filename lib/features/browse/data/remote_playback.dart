@@ -18,6 +18,10 @@ import '../../library/presentation/providers/songs_provider.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import 'browse_models.dart';
 
+/// 播放全部的首屏导入上限：与插件 /import 的批量上限同量级，
+/// 避免超长歌单/榜单一次压死 /songs/remote（剩余走后台补齐）。
+const int kPlayAllImportCap = 300;
+
 /// 后台补齐的单次导入总量上限（防超长歌单/榜单一次压死 /songs/remote）。
 const int kCatchUpCap = 500;
 
@@ -93,20 +97,23 @@ class RemotePlayback {
     WidgetRef ref, {
     required int total,
     required int alreadyLoaded,
-    required Future<List<BrowseTrack>?> Function(int offset, int limit) fetchTracks,
+    required Future<List<BrowseTrack>?> Function(int offset, int limit)
+    fetchTracks,
   }) {
     final capped = total > kCatchUpCap ? kCatchUpCap : total;
     if (capped <= alreadyLoaded) return;
-    ref.read(playerStateProvider.notifier).loadRemainingQueue(
-      total: capped,
-      alreadyLoaded: alreadyLoaded,
-      fetch: (offset, limit) async {
-        final tracks = await fetchTracks(offset, limit);
-        if (tracks == null || tracks.isEmpty) return const <Song>[];
-        final songs = await importTracks(ref, tracks);
-        return songs ?? const <Song>[];
-      },
-    );
+    ref
+        .read(playerStateProvider.notifier)
+        .loadRemainingQueue(
+          total: capped,
+          alreadyLoaded: alreadyLoaded,
+          fetch: (offset, limit) async {
+            final tracks = await fetchTracks(offset, limit);
+            if (tracks == null || tracks.isEmpty) return const <Song>[];
+            final songs = await importTracks(ref, tracks);
+            return songs ?? const <Song>[];
+          },
+        );
   }
 
   static void _showError(BuildContext context) {

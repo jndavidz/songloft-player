@@ -436,13 +436,6 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
     );
   }
 
-  Widget _thumbFallback(IconData icon) => Container(
-    width: 48,
-    height: 48,
-    decoration: const BoxDecoration(color: Color(0x1A808080)),
-    child: Icon(icon, size: 22),
-  );
-
   // ---------- 搜索历史面板（票 02） ----------
 
   Widget _buildHistoryPanel(BuildContext context) {

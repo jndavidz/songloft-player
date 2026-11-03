@@ -13,13 +13,12 @@ import 'package:songloft_flutter/features/browse/presentation/search_page.dart';
 import 'package:songloft_flutter/features/player/domain/player_state.dart';
 import 'package:songloft_flutter/features/player/presentation/providers/player_provider.dart';
 import 'package:songloft_flutter/l10n/app_localizations.dart';
-import 'package:songloft_flutter/shared/models/song.dart';
 
 /// 最小化 PlayerNotifier 替身：currentSong 供「正在播放」标识匹配；
 /// 播放行为在点播链测试范围外（RemotePlayback 的 playPlaylist 不在 fake 内触发）。
 class _FakePlayer extends PlayerNotifier {
   @override
-  PlayerState build() => PlayerState();
+  PlayerState build() => const PlayerState();
 }
 
 class _FakeBrowseApi implements PluginBrowseApi {
@@ -50,9 +49,7 @@ class _FakeBrowseApi implements PluginBrowseApi {
           type: type,
           isEnd: true,
           source: 'netease',
-          artists: const [
-            BrowseArtist(id: '2', name: '歌手B'),
-          ],
+          artists: const [BrowseArtist(id: '2', name: '歌手B')],
         );
       case 'sheet':
         return BrowseSearchResponse(
@@ -95,11 +92,11 @@ void main() {
           pluginBrowseApiProvider.overrideWithValue(fake),
           playerStateProvider.overrideWith(_FakePlayer.new),
         ],
-        child: MaterialApp(
-          locale: const Locale('zh'),
+        child: const MaterialApp(
+          locale: Locale('zh'),
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const BrowseSearchPage(),
+          home: BrowseSearchPage(),
         ),
       ),
     );
