@@ -121,6 +121,7 @@ class _AlbumDetailPageState extends ConsumerState<AlbumDetailPage> {
     final currentSong = ref.watch(currentSongProvider);
     final theme = Theme.of(context);
     final meta = <String>[
+      browsePlatformLabel(album.source),
       if (album.publishTime != null)
         '${l10n.browsePublishedAt}: ${_formatPublishTime(album.publishTime!)}',
       if (album.company != null && album.company!.isNotEmpty)

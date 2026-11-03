@@ -4,6 +4,9 @@
 /// `POST /api/v1/songs/remote`（`dedup_key` 由插件下发、重复点播不产生重复行），
 /// 拿到宿主 song id 后走既有 `playPlaylist` 播放；音质档位 hint 由
 /// audio_service 的 buildSongUrl 按歌曲类型与设置自动附带，此处不复制映射。
+///
+/// 播放统一挂 `('browse', 'kwqq')` 播放上下文：后端只认 type=play 且带
+/// context_type/context_key 的上报才落播放历史，缺了就永远空（2026-11 修复）。
 
 library;
 
@@ -15,8 +18,12 @@ import '../../../shared/models/song.dart';
 import '../../../shared/utils/responsive_snackbar.dart';
 import '../../../shared/widgets/add_to_playlist_modal.dart';
 import '../../library/presentation/providers/songs_provider.dart';
+import '../../player/domain/playback_context.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import 'browse_models.dart';
+
+/// 曲库在线浏览的播放上下文（播放历史按此归属；与歌单/分面上下文并列）。
+const PlaybackContext kBrowsePlaybackContext = PlaybackContext('browse', 'kwqq');
 
 /// 播放全部的首屏导入上限：与插件 /import 的批量上限同量级，
 /// 避免超长歌单/榜单一次压死 /songs/remote（剩余走后台补齐）。
@@ -44,7 +51,7 @@ class RemotePlayback {
     final safeIndex = startIndex.clamp(0, songs.length - 1);
     await ref
         .read(playerStateProvider.notifier)
-        .playPlaylist(songs, startIndex: safeIndex);
+        .playPlaylist(songs, startIndex: safeIndex, context: kBrowsePlaybackContext);
     return true;
   }
 

@@ -196,7 +196,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // 主应用路由（使用 ShellRoute 包含导航和播放器）
+      // navigatorKey 供底部导航切 tab 时清命令式压栈页（见 shell_layout.dart 注）。
       ShellRoute(
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) => ShellLayout(child: child),
         routes: [
           // 首页

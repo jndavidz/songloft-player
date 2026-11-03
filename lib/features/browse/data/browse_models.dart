@@ -8,6 +8,23 @@ library;
 
 import 'dart:convert';
 
+/// 上游来源平台标识 → 中文简称（品牌名，不进 l10n）。
+const Map<String, String> kBrowsePlatformLabels = {
+  'kuwo': '酷我',
+  'kugou': '酷狗',
+  'qq': 'QQ',
+  'qianqian': '千千',
+  'netease': '网易云',
+  'migu': '咪咕',
+  'bilibili': '哔哩哔哩',
+};
+
+/// 平台中文简称；未知 source 原样返回，缺省给 '未知'。
+String browsePlatformLabel(String? source) {
+  if (source == null || source.isEmpty) return '未知';
+  return kBrowsePlatformLabels[source] ?? source;
+}
+
 /// 在线音乐条目（多源聚合单曲 / 专辑曲目 / 歌单曲目 / 榜单曲目共用）。
 class BrowseTrack {
   final String title;
@@ -433,15 +450,21 @@ class BrowseSheetInfo {
       );
 }
 
-/// 推荐标签响应（pinned 热门 + grouped 全量分类）。
-class BrowseRecommendTags {
+/// 单平台的推荐标签集（pinned 热门 + grouped 全量分类）。
+class BrowsePlatformTags {
+  final String source;
   final List<BrowseTag> pinned;
   final List<BrowseTagGroup> groups;
 
-  const BrowseRecommendTags({required this.pinned, required this.groups});
+  const BrowsePlatformTags({
+    required this.source,
+    required this.pinned,
+    required this.groups,
+  });
 
-  factory BrowseRecommendTags.fromJson(Map<String, dynamic> json) =>
-      BrowseRecommendTags(
+  factory BrowsePlatformTags.fromJson(Map<String, dynamic> json) =>
+      BrowsePlatformTags(
+        source: json['source'] as String? ?? 'netease',
         pinned:
             (json['pinned'] as List<dynamic>? ?? [])
                 .map((e) => BrowseTag.fromJson(e as Map<String, dynamic>))
@@ -451,6 +474,41 @@ class BrowseRecommendTags {
                 .map((e) => BrowseTagGroup.fromJson(e as Map<String, dynamic>))
                 .toList(),
       );
+}
+
+/// 推荐标签响应（多平台：platforms 逐平台 pinned + grouped 全量分类）。
+///
+/// 兼容旧插件（只回顶层 pinned/categories 的 netease 单源形状）：
+/// platforms 缺省时收拢为一个 netease 平台。
+class BrowseRecommendTags {
+  final List<BrowsePlatformTags> platforms;
+
+  const BrowseRecommendTags({required this.platforms});
+
+  factory BrowseRecommendTags.fromJson(Map<String, dynamic> json) {
+    final platformList =
+        (json['platforms'] as List<dynamic>?)
+            ?.map((e) => BrowsePlatformTags.fromJson(e as Map<String, dynamic>))
+            .toList();
+    if (platformList != null && platformList.isNotEmpty) {
+      return BrowseRecommendTags(platforms: platformList);
+    }
+    return BrowseRecommendTags(
+      platforms: [
+        BrowsePlatformTags(
+          source: 'netease',
+          pinned:
+              (json['pinned'] as List<dynamic>? ?? [])
+                  .map((e) => BrowseTag.fromJson(e as Map<String, dynamic>))
+                  .toList(),
+          groups:
+              (json['categories'] as List<dynamic>? ?? [])
+                  .map((e) => BrowseTagGroup.fromJson(e as Map<String, dynamic>))
+                  .toList(),
+        ),
+      ],
+    );
+  }
 }
 
 /// 评论响应（热评优先；首页 hot 仅在 page=1 出现）。

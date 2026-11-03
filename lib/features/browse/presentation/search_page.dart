@@ -367,6 +367,19 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                     _tracks,
                     startIndex: index,
                   ),
+              // 专辑名可点：插件 album/info 支持 name+artist 精装二段式（无 id）。
+              onAlbumTap:
+                  (track.album != null && track.album!.isNotEmpty)
+                      ? () => pushAlbumDetail(
+                        context,
+                        BrowseAlbum(
+                          id: '',
+                          name: track.album!,
+                          artist: track.artist,
+                          source: track.source,
+                        ),
+                      )
+                      : null,
               onAddToPlaylist:
                   () => RemotePlayback.showAddToPlaylist(context, ref, [track]),
             );
@@ -383,7 +396,11 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
-                '${album.artist}${album.trackCount > 0 ? ' · ${album.trackCount}' : ''}',
+                [
+                  browsePlatformLabel(album.source),
+                  if (album.artist.isNotEmpty) album.artist,
+                  if (album.trackCount > 0) '${album.trackCount}',
+                ].join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -402,14 +419,15 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              subtitle:
-                  artist.alias != null
-                      ? Text(
-                        artist.alias!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                      : null,
+              subtitle: Text(
+                [
+                  browsePlatformLabel(artist.source),
+                  if (artist.alias != null && artist.alias!.isNotEmpty)
+                    artist.alias!,
+                ].join(' · '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               onTap: () => pushArtistDetail(context, artist),
             );
           case BrowseSearchType.sheet:
@@ -425,7 +443,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
-                '${sheet.creator} · ${sheet.trackCount}',
+                '${browsePlatformLabel(sheet.source)} · ${sheet.creator} · ${sheet.trackCount}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

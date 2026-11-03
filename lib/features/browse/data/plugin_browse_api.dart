@@ -133,21 +133,23 @@ class PluginBrowseApi {
     return BrowseArtistWorks.fromJson(data);
   }
 
-  /// 歌单详情（曲目分页；page=1 时附歌单元数据）。
+  /// 歌单详情（曲目分页；page=1 时附歌单元数据；source 决定上游通道）。
   Future<BrowseSheetInfo> sheetInfo({
     required String id,
+    String source = 'netease',
     int page = 1,
     int limit = 50,
   }) async {
     final data = await _post('sheet/info', {
       'id': id,
+      'source': source,
       'page': page,
       'limit': limit,
     });
     return BrowseSheetInfo.fromJson(data);
   }
 
-  /// 平台榜单列表。
+  /// 平台榜单列表（多源聚合，条目各带 source）。
   Future<List<BrowseToplist>> toplists() async {
     final data = await _post('toplists', const {});
     return (data['items'] as List<dynamic>? ?? [])
@@ -155,14 +157,16 @@ class PluginBrowseApi {
         .toList();
   }
 
-  /// 榜单详情（榜单 id 即平台歌单 id）。
+  /// 榜单详情（netease 榜单 id 即平台歌单 id；kugou 为 rankid）。
   Future<BrowsePage<BrowseTrack>> toplistDetail({
     required String id,
+    String source = 'netease',
     int page = 1,
     int limit = 50,
   }) async {
     final data = await _post('toplist/detail', {
       'id': id,
+      'source': source,
       'page': page,
       'limit': limit,
     });
@@ -176,20 +180,22 @@ class PluginBrowseApi {
     );
   }
 
-  /// 推荐歌单标签（pinned + 分组）。
+  /// 推荐歌单标签（多平台：platforms 逐平台 pinned + 分组）。
   Future<BrowseRecommendTags> recommendTags() async {
     final data = await _post('recommend/tags', const {});
     return BrowseRecommendTags.fromJson(data);
   }
 
-  /// 某分类下的推荐歌单列表。
+  /// 某平台某分类下的推荐歌单列表。
   Future<BrowsePage<BrowseSheet>> recommendSheets({
     required String cat,
+    String source = 'netease',
     int page = 1,
     int limit = 30,
   }) async {
     final data = await _post('recommend/sheets', {
       'cat': cat,
+      'source': source,
       'page': page,
       'limit': limit,
     });

@@ -29,6 +29,16 @@ import '../utils/responsive_snackbar.dart';
 import 'active_destinations.dart';
 import 'adaptive_scaffold.dart';
 
+/// ShellRoute 内嵌 Navigator 的 key（app_router.dart 挂到 ShellRoute.navigatorKey）。
+///
+/// 底部导航切 tab 时先用它 popUntil 清掉命令式压栈页（曲库搜索/详情等）。
+/// go_router 新版在 go() 换 pages 时通常会连带弹出压栈页（widget test 已验证），
+/// 但这是 pages diff 的隐式行为而非契约；显式 popUntil 保证「切 tab 落在目标
+/// tab 根页面」语义恒成立，不依赖该实现细节。
+final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'shell-navigator',
+);
+
 /// ShellRoute 的布局组件
 /// 整合 AdaptiveScaffold 和路由导航
 class ShellLayout extends ConsumerStatefulWidget {
@@ -390,6 +400,8 @@ class _ShellLayoutState extends ConsumerState<ShellLayout> {
       destinations: activeDest.destinations,
       onDestinationSelected: (index) {
         if (index >= 0 && index < activeDest.indexToRoute.length) {
+          // 切 tab 前清掉 shell 内嵌 Navigator 上的命令式压栈页（见 shellNavigatorKey 注）
+          shellNavigatorKey.currentState?.popUntil((r) => r.isFirst);
           context.go(activeDest.indexToRoute[index]);
         }
       },

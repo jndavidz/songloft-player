@@ -215,7 +215,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
                           Text(artist.name, style: theme.textTheme.titleLarge),
                           const SizedBox(height: 4),
                           Text(
-                            '${l10n.browseTabAlbums} ${artist.albumCount} · ${l10n.browseTabTracks} ${artist.musicCount}',
+                            '${browsePlatformLabel(artist.source)} · ${l10n.browseTabAlbums} ${artist.albumCount} · ${l10n.browseTabTracks} ${artist.musicCount}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

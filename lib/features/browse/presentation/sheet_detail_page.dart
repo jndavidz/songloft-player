@@ -48,6 +48,8 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
 
   BrowseSheet get _sheet => _info.sheet ?? widget.sheet;
 
+  String get _source => _info.sheet?.source ?? widget.sheet.source ?? 'netease';
+
   Future<void> _load({bool reset = false}) async {
     if (reset) {
       setState(() {
@@ -63,6 +65,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
       final api = ref.read(pluginBrowseApiProvider);
       final info = await api.sheetInfo(
         id: _sheet.id,
+        source: _source,
         page: reset ? 1 : _page + 1,
       );
       if (!mounted) return;
@@ -98,6 +101,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
       final total = _info.total ?? tracks.length;
       final loaded = tracks.length;
       final id = _sheet.id;
+      final source = _source;
       RemotePlayback.startBackgroundCatchUp(
         ref,
         total: total,
@@ -105,7 +109,12 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
         fetchTracks: (offset, limit) async {
           final info = await ref
               .read(pluginBrowseApiProvider)
-              .sheetInfo(id: id, page: offset ~/ limit + 1, limit: limit);
+              .sheetInfo(
+                id: id,
+                source: source,
+                page: offset ~/ limit + 1,
+                limit: limit,
+              );
           return info.tracks;
         },
       );
@@ -121,6 +130,7 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
     final theme = Theme.of(context);
     final sheet = _sheet;
     final meta = <String>[
+      browsePlatformLabel(sheet.source),
       if (sheet.creator.isNotEmpty) l10n.browseSheetCreator(sheet.creator),
       if ((sheet.trackCount > 0)) l10n.browseTrackCount(sheet.trackCount),
       if (sheet.playCount > 0) l10n.browsePlayCount(sheet.playCount),

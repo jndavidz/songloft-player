@@ -73,29 +73,77 @@ class _ToplistsPageState extends ConsumerState<ToplistsPage> {
               )
               : RefreshIndicator(
                 onRefresh: _load,
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 240,
-                    mainAxisSpacing: AppSpacing.md,
-                    crossAxisSpacing: AppSpacing.md,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemCount: _toplists!.length,
-                  itemBuilder: (context, index) {
-                    final tl = _toplists![index];
-                    return _ToplistCard(
-                      toplist: tl,
-                      onTap:
-                          () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => ToplistDetailPage(toplist: tl),
-                            ),
-                          ),
-                    );
-                  },
-                ),
+                child: _buildGrouped(context),
               ),
+    );
+  }
+
+  /// 按平台分组展示（保持插件聚合顺序：netease 在前），每组内一排 5 个小卡。
+  Widget _buildGrouped(BuildContext context) {
+    // 分组保持首次出现顺序
+    final order = <String>[];
+    final groups = <String, List<BrowseToplist>>{};
+    for (final tl in _toplists!) {
+      final key = tl.source ?? '';
+      if (!groups.containsKey(key)) {
+        groups[key] = [];
+        order.add(key);
+      }
+      groups[key]!.add(tl);
+    }
+    final singleGroup = order.length <= 1;
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      children: [
+        for (final source in order) ...[
+          if (!singleGroup)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.md, 8, AppSpacing.md, 8),
+              child: Text(
+                browsePlatformLabel(source),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+          _ToplistGrid(
+            toplists: groups[source]!,
+            onTap:
+                (tl) => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => ToplistDetailPage(toplist: tl),
+                  ),
+                ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// 一排 5 个的小榜单卡：小封面 + 榜单名，多平台时不浪费纵向空间。
+class _ToplistGrid extends StatelessWidget {
+  final List<BrowseToplist> toplists;
+  final ValueChanged<BrowseToplist> onTap;
+
+  const _ToplistGrid({required this.toplists, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        mainAxisSpacing: AppSpacing.md,
+        crossAxisSpacing: AppSpacing.sm,
+        childAspectRatio: 0.62,
+      ),
+      itemCount: toplists.length,
+      itemBuilder: (context, index) {
+        final tl = toplists[index];
+        return _ToplistCard(toplist: tl, onTap: () => onTap(tl));
+      },
     );
   }
 }
@@ -117,49 +165,21 @@ class _ToplistCard extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  BrowseCover(
-                    url: toplist.coverUrl,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fallbackIcon: Icons.leaderboard_outlined,
-                  ),
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    bottom: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        toplist.updateFrequency ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              borderRadius: BorderRadius.circular(6),
+              child: BrowseCover(
+                url: toplist.coverUrl,
+                width: double.infinity,
+                height: double.infinity,
+                fallbackIcon: Icons.leaderboard_outlined,
               ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             toplist.name,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.labelSmall,
           ),
         ],
       ),
@@ -207,7 +227,11 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
     try {
       final api = ref.read(pluginBrowseApiProvider);
       final page = reset ? 1 : _page + 1;
-      final res = await api.toplistDetail(id: widget.toplist.id, page: page);
+      final res = await api.toplistDetail(
+        id: widget.toplist.id,
+        source: widget.toplist.source ?? 'netease',
+        page: page,
+      );
       if (!mounted) return;
       setState(() {
         if (reset) _tracks.clear();
@@ -237,6 +261,7 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
       if (!started) return;
       // 后台补齐剩余页（gotchas §六）：队列先建、批次追加
       final id = widget.toplist.id;
+      final source = widget.toplist.source ?? 'netease';
       RemotePlayback.startBackgroundCatchUp(
         ref,
         total: _total ?? tracks.length,
@@ -244,7 +269,12 @@ class _ToplistDetailPageState extends ConsumerState<ToplistDetailPage> {
         fetchTracks: (offset, limit) async {
           final res = await ref
               .read(pluginBrowseApiProvider)
-              .toplistDetail(id: id, page: offset ~/ limit + 1, limit: limit);
+              .toplistDetail(
+                id: id,
+                source: source,
+                page: offset ~/ limit + 1,
+                limit: limit,
+              );
           return res.items;
         },
       );
