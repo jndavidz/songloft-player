@@ -56,7 +56,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
   Future<void> _loadInfo() async {
     try {
       final api = ref.read(pluginBrowseApiProvider);
-      final info = await api.artistInfo(id: widget.artist.id);
+      final info = await api.artistInfo(id: widget.artist.id, source: widget.artist.source ?? 'netease');
       if (!mounted) return;
       setState(() => _info = info);
     } catch (_) {
@@ -83,6 +83,7 @@ class _ArtistDetailPageState extends ConsumerState<ArtistDetailPage> {
       final works = await api.artistWorks(
         id: widget.artist.id,
         type: _worksAlbumMode ? 'album' : 'music',
+        source: widget.artist.source ?? 'netease',
         page: reset ? 1 : _worksPage + 1,
       );
       if (!mounted) return;

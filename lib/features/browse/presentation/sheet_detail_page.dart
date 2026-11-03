@@ -96,7 +96,23 @@ class _SheetDetailPageState extends ConsumerState<SheetDetailPage> {
     setState(() => _isPlayingAll = true);
     try {
       final tracks = _info.tracks.take(kSheetPlayAllCap).toList();
-      await RemotePlayback.importAndPlay(context, ref, tracks);
+      final started = await RemotePlayback.importAndPlay(context, ref, tracks);
+      if (!started) return;
+      // 后台补齐剩余页（gotchas §六）：队列先建、批次追加
+      final total = _info.total ?? tracks.length;
+      final loaded = tracks.length;
+      final id = _sheet.id;
+      RemotePlayback.startBackgroundCatchUp(
+        ref,
+        total: total,
+        alreadyLoaded: loaded,
+        fetchTracks: (offset, limit) async {
+          final info = await ref
+              .read(pluginBrowseApiProvider)
+              .sheetInfo(id: id, page: offset ~/ limit + 1, limit: limit);
+          return info.tracks;
+        },
+      );
     } finally {
       if (mounted) setState(() => _isPlayingAll = false);
     }

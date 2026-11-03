@@ -18,6 +18,9 @@ import '../../library/presentation/providers/songs_provider.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import 'browse_models.dart';
 
+/// 后台补齐的单次导入总量上限（防超长歌单/榜单一次压死 /songs/remote）。
+const int kCatchUpCap = 500;
+
 class RemotePlayback {
   RemotePlayback._();
 
@@ -79,6 +82,30 @@ class RemotePlayback {
     await AddToPlaylistModal.show(
       context,
       songIds: songs.map((s) => s.id).toList(),
+    );
+  }
+
+  /// 分页源的后台补齐（gotchas §六 语义）：[loaded] 首屏已入库的曲目之外，
+  /// 由 [fetchTracks] 按页拉取剩余曲目，导入（dedup 幂等）后逐批追加到当前队列。
+  /// 必须在 playPlaylist 之后调用（沿用刚建立的播放代次；用户切歌自动作废）。
+  /// [total] 上限 [kCatchUpCap]，防超长列表一次压死 /songs/remote。
+  static void startBackgroundCatchUp(
+    WidgetRef ref, {
+    required int total,
+    required int alreadyLoaded,
+    required Future<List<BrowseTrack>?> Function(int offset, int limit) fetchTracks,
+  }) {
+    final capped = total > kCatchUpCap ? kCatchUpCap : total;
+    if (capped <= alreadyLoaded) return;
+    ref.read(playerStateProvider.notifier).loadRemainingQueue(
+      total: capped,
+      alreadyLoaded: alreadyLoaded,
+      fetch: (offset, limit) async {
+        final tracks = await fetchTracks(offset, limit);
+        if (tracks == null || tracks.isEmpty) return const <Song>[];
+        final songs = await importTracks(ref, tracks);
+        return songs ?? const <Song>[];
+      },
     );
   }
 

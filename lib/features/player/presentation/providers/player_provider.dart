@@ -855,6 +855,23 @@ class PlayerNotifier extends Notifier<PlayerState> {
     }
   }
 
+  /// 通用后台队列补齐（在线浏览等外部场景）：[fetch] 由调用方提供（按 offset/limit
+  /// 拉一批已入库的 Song），逐批追加到当前队列尾部；播放代次过期自动停止。
+  void loadRemainingQueue({
+    required int total,
+    required int alreadyLoaded,
+    required FetchPage fetch,
+  }) {
+    final generation = _loadGeneration;
+    _queueLoader.loadRemaining(
+      generation: generation,
+      totalCount: total,
+      alreadyLoaded: alreadyLoaded,
+      fetch: fetch,
+      onBatch: addToPlaylist,
+    );
+  }
+
   /// 添加到当前播放列表
   void addToPlaylist(List<Song> songs) {
     if (songs.isEmpty) return;
