@@ -138,7 +138,8 @@ void main() {
   test('control and asynchronous disconnect failures are captured', () async {
     await service.castTo(device.info.URLBase, 'http://server/song.mp3');
     device.failures.addAll(['Pause', 'Stop']);
-    await expectLater(service.pause(), throwsException);
+    // 语义拒绝不抛给 UI：重试耗尽后如实返回 false（日志保留原始错误）。
+    expect(await service.pause(), isFalse);
     service.disconnect();
     await Future<void>.delayed(Duration.zero);
     final log = logs.join('\n');

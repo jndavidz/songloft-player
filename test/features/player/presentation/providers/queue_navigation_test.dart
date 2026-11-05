@@ -114,6 +114,7 @@ class _DlnaTransport implements DlnaService {
     String url, {
     String title = '',
     PlayType mime = AudioMime.mp3,
+    String? fallbackUrl,
   }) async {
     if (fail) throw StateError('device rejected the song');
     titles.add(title);

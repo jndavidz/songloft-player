@@ -89,6 +89,8 @@ class UrlHelper {
   /// [audioTrack] 非空且 >= 0 时追加 `track=N`（audio-relative index），让后端抽取该音轨
   /// 播放（Web 双音轨切换，songloft-org/songloft#298）；此时**不再附加 format**——容器由后端
   /// 据音轨编码决定（AAC → m4a 无损 remux，否则 → mp3），避免与抽轨容器判定冲突。
+  /// [forceFormat] 非空时无条件追加 `format=<值>`：DLNA 投屏给只认 MP3 的渲染器
+  /// （如 songloft-plugin-miot 虚拟接收器）时要求服务端实时转码，与歌曲原格式无关。
   static String buildSongUrl(
     String url, {
     String? songFormat,
@@ -97,11 +99,14 @@ class UrlHelper {
     bool hlsDirect = false,
     int? audioTrack,
     bool normalize = false,
+    String? forceFormat,
   }) {
     var result = buildResourceUrl(url);
     if (result.isEmpty) return '';
     if (audioTrack != null && audioTrack >= 0) {
       result += '${result.contains('?') ? '&' : '?'}track=$audioTrack';
+    } else if (forceFormat != null && forceFormat.isNotEmpty) {
+      result += '${result.contains('?') ? '&' : '?'}format=$forceFormat';
     } else {
       final transcode = AudioFormatHelper.getTranscodeFormat(songFormat);
       if (transcode != null) {

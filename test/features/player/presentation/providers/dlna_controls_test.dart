@@ -60,7 +60,25 @@ class _Service extends DlnaService {
     String url, {
     String title = '',
     PlayType mime = AudioMime.mp3,
+    String? fallbackUrl,
   }) async => commands.add('cast:${title.isEmpty ? url : title}');
+
+  bool _remotePlaying = true;
+
+  // 假服务不持有真实 _activeDevice；设备驱动逻辑由 dlna_transport_confirm_test 覆盖，
+  // 这里只验证 provider 编排：togglePlayback 的返回值为 null 时 UI 不翻转。
+  @override
+  Future<bool?> togglePlayback() async {
+    if (_remotePlaying) {
+      commands.add('pause');
+      _remotePlaying = false;
+      return false;
+    }
+    commands.add('play');
+    if (!confirm) return null;
+    _remotePlaying = true;
+    return true;
+  }
 
   @override
   Future<bool> pause() async {

@@ -51,6 +51,32 @@ _CastArgs _castArgsFor(Song song) {
   );
 }
 
+/// MP3 兜底参数：只认 MP3 的渲染器（songloft-plugin-miot 虚拟接收器会把 FLAC/WAV
+/// 以 714「Only MP3 audio supported」拒绝）要求服务端实时转码成 MP3 后再投。
+/// 真实格式首选参数不受影响（小爱音箱 Pro 等原生支持 FLAC 的 DMR 仍走原格式）。
+_CastArgs _castArgsForMp3(Song song) => (
+  url: UrlHelper.buildSongUrl(
+    song.url!,
+    songFormat: song.format,
+    forceFormat: 'mp3',
+  ),
+  mime: AudioMime.mp3,
+);
+
+/// 首投参数是否需要 MP3 兜底：视频/电台流不兜底，已是 MP3 则无需再转；
+/// 只对 Songloft 自己托管的曲目（`/api/v1/songs/...`）追加 `format=mp3`，
+/// 外部直链加这个参数没有服务端转码语义。
+bool _needsMp3Fallback(Song song) {
+  final url = song.url;
+  if (url == null || song.isVideo || !url.contains('/api/v1/songs/')) {
+    return false;
+  }
+  final effective =
+      AudioFormatHelper.getTranscodeFormat(song.format) ??
+      (song.format ?? '').toLowerCase();
+  return effective != 'mp3' && effective != 'hls' && effective != 'm3u8';
+}
+
 /// 视频 mime：优先按文件扩展名判断真实容器（视频 mp4 的 song.format 会被后端归一化为 m4a，不可靠）。
 VideoMime _videoMime(Song song) {
   var ext = (song.format ?? '').toLowerCase();
@@ -189,6 +215,10 @@ class DlnaNotifier extends Notifier<DlnaState> {
     try {
       final args = _castArgsFor(song);
       final url = await _toCastReachableUrl(args.url);
+      final fallbackUrl =
+          _needsMp3Fallback(song)
+              ? await _toCastReachableUrl(_castArgsForMp3(song).url)
+              : null;
       await _serialize(() async {
         if (generation != _generation) return;
         await _service.castTo(
@@ -196,6 +226,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
           url,
           title: song.title,
           mime: args.mime,
+          fallbackUrl: fallbackUrl,
         );
         if (generation != _generation) return;
         await _audioHandler.pause();
@@ -219,8 +250,11 @@ class DlnaNotifier extends Notifier<DlnaState> {
       // 避免「图标已变播放、设备其实没恢复」这种状态分叉。
       _playingSub?.cancel();
       _playingSub = _service.playingStream.listen((playing) {
-        if (!state.isCasting || state.isPlaying == playing) return;
-        state = state.copyWith(isPlaying: playing);
+        if (state.isCasting && state.isPlaying != playing) {
+          state = state.copyWith(isPlaying: playing);
+        }
+        // 主界面播放/暂停图标跟随设备真实态（投屏时本地音频已暂停）。
+        ref.read(playerStateProvider.notifier).syncCastingPlaying(playing);
       });
 
       state = state.copyWith(
@@ -231,6 +265,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
         duration: Duration(milliseconds: (song.duration * 1000).round()),
       );
       ref.read(playerStateProvider.notifier).recordCastingPlayback(song);
+      ref.read(playerStateProvider.notifier).syncCastingPlaying(true);
     } catch (e) {
       if (generation != _generation) return;
       dlnaLog('castToDevice failed device=${device.id} song=${song.id}: $e');
@@ -247,6 +282,10 @@ class DlnaNotifier extends Notifier<DlnaState> {
     try {
       final args = _castArgsFor(song);
       final url = await _toCastReachableUrl(args.url);
+      final fallbackUrl =
+          _needsMp3Fallback(song)
+              ? await _toCastReachableUrl(_castArgsForMp3(song).url)
+              : null;
       await _serialize(() async {
         if (generation != _generation || !state.isCasting) return;
         await _service.castTo(
@@ -254,6 +293,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
           url,
           title: song.title,
           mime: args.mime,
+          fallbackUrl: fallbackUrl,
         );
       });
       if (generation != _generation || !state.isCasting) return;
@@ -264,6 +304,7 @@ class DlnaNotifier extends Notifier<DlnaState> {
         error: () => null,
       );
       ref.read(playerStateProvider.notifier).recordCastingPlayback(song);
+      ref.read(playerStateProvider.notifier).syncCastingPlaying(true);
     } catch (e) {
       if (generation != _generation) return;
       dlnaLog('castSong failed device=${device.id} song=${song.id}: $e');
@@ -317,15 +358,25 @@ class DlnaNotifier extends Notifier<DlnaState> {
     try {
       await _serialize(() async {
         if (!state.isCasting) return;
-        final playing = state.isPlaying;
-        // 返回的是「设备已确认」的真实结果（DlnaService 内部有回读+补偿）：
-        // 未确认时保持原状态，下一次点击仍下发同一意图，而不是翻转成相反指令。
-        final confirmed =
-            playing ? await _service.pause() : await _service.play();
-        if (!state.isCasting || !confirmed) return;
-        state = state.copyWith(isPlaying: !playing);
+        dlnaLog(
+          '[toggle] ui request localPlaying=${state.isPlaying} '
+          'device=${state.activeDevice?.id}',
+        );
+        // 方向由**设备回读态**决定（DlnaService.togglePlayback 内先读 TransportState）：
+        // 本地 isPlaying 可能滞后于设备，若按本地态下发会出现「点播放实际发 Pause」。
+        // 返回 null = 会话失效或动作未确认，此时保持 UI 原状，下次点击重试。
+        final target = await _service.togglePlayback();
+        if (!state.isCasting) return;
+        if (target == null) {
+          dlnaLog('[toggle] ui unconfirmed (device state unchanged)');
+          return;
+        }
+        state = state.copyWith(isPlaying: target);
+        ref.read(playerStateProvider.notifier).syncCastingPlaying(target);
+        dlnaLog('[toggle] ui applied isPlaying=$target');
       });
     } catch (e) {
+      dlnaLog('[toggle] ui error: $e');
       state = state.copyWith(error: () => e.toString());
     }
   }
@@ -354,5 +405,9 @@ class DlnaNotifier extends Notifier<DlnaState> {
       position: Duration.zero,
       duration: Duration.zero,
     );
+    // 投屏结束：本地播放态复位为暂停（此时音频并未恢复播放）。
+    ref
+        .read(playerStateProvider.notifier)
+        .syncCastingPlaying(false, force: true);
   }
 }

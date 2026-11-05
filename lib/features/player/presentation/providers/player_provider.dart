@@ -934,6 +934,17 @@ class PlayerNotifier extends Notifier<PlayerState> {
     _refreshNextSelection();
   }
 
+  /// 投屏期间以设备真实播放态为准同步本地播放态。
+  ///
+  /// 音频自身在投屏时已暂停，这里只驱动播放/暂停图标与投屏进度 UI，
+  /// 避免「图标显示暂停、设备其实已暂停，再点一下才恢复」的状态分叉。
+  /// [force] 用于断开投屏后强制复位（此时 DLNA 已不在投屏态）。
+  void syncCastingPlaying(bool playing, {bool force = false}) {
+    if (!force && !ref.read(dlnaStateProvider).isCasting) return;
+    if (state.isPlaying == playing) return;
+    state = state.copyWith(isPlaying: playing);
+  }
+
   /// 投屏失败时放弃本次历史导航，保留最后实际听过的位置。
   void recordCastingFailure(Song song) {
     if (state.currentSong?.id != song.id ||
