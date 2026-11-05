@@ -25,6 +25,22 @@ String browsePlatformLabel(String? source) {
   return kBrowsePlatformLabels[source] ?? source;
 }
 
+/// 平台展示顺序（推荐歌单 / 榜单统一）：网易云 → QQ → 酷狗 → 酷我。
+const List<String> kBrowsePlatformOrder = ['netease', 'qq', 'kugou', 'kuwo'];
+
+/// 按 [kBrowsePlatformOrder] 归一排序；顺序表外的平台（migu 等）保持原顺序追加在后。
+List<String> orderBrowsePlatforms(Iterable<String> sources) {
+  final ordered = <String>[
+    for (final s in kBrowsePlatformOrder)
+      if (sources.contains(s)) s,
+  ];
+  final rest = <String>[];
+  for (final s in sources) {
+    if (!kBrowsePlatformOrder.contains(s) && !rest.contains(s)) rest.add(s);
+  }
+  return [...ordered, ...rest];
+}
+
 /// 在线音乐条目（多源聚合单曲 / 专辑曲目 / 歌单曲目 / 榜单曲目共用）。
 class BrowseTrack {
   final String title;
@@ -83,6 +99,20 @@ class BrowseTrack {
   };
 }
 
+/// 发行时间兼容上游三种形态：毫秒/秒时间戳（num）、数字字符串、'YYYY-MM-DD' 日期串。
+/// 插件与门面对该字段的规范不统一（musicdl 原样透传字符串），严格 `as num?` 会抛
+/// 类型错误并让整页专辑解析失败，故在边界做归一。
+int? _parsePublishTime(dynamic value) {
+  if (value is num) return value.toInt();
+  if (value is String && value.isNotEmpty) {
+    final numeric = int.tryParse(value);
+    if (numeric != null) return numeric;
+    final date = DateTime.tryParse(value);
+    if (date != null) return date.millisecondsSinceEpoch;
+  }
+  return null;
+}
+
 /// 在线专辑条目（搜索结果 / 歌手作品列表）。
 class BrowseAlbum {
   final String id;
@@ -113,7 +143,7 @@ class BrowseAlbum {
     artist: json['artist'] as String? ?? '',
     coverUrl: json['cover_url'] as String?,
     trackCount: (json['track_count'] as num?)?.toInt() ?? 0,
-    publishTime: (json['publish_time'] as num?)?.toInt(),
+    publishTime: _parsePublishTime(json['publish_time']),
     company: json['company'] as String?,
     description: json['description'] as String?,
     source: json['source'] as String?,
@@ -503,7 +533,9 @@ class BrowseRecommendTags {
                   .toList(),
           groups:
               (json['categories'] as List<dynamic>? ?? [])
-                  .map((e) => BrowseTagGroup.fromJson(e as Map<String, dynamic>))
+                  .map(
+                    (e) => BrowseTagGroup.fromJson(e as Map<String, dynamic>),
+                  )
                   .toList(),
         ),
       ],
