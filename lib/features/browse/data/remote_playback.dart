@@ -23,7 +23,10 @@ import '../../player/presentation/providers/player_provider.dart';
 import 'browse_models.dart';
 
 /// 曲库在线浏览的播放上下文（播放历史按此归属；与歌单/分面上下文并列）。
-const PlaybackContext kBrowsePlaybackContext = PlaybackContext('browse', 'kwqq');
+const PlaybackContext kBrowsePlaybackContext = PlaybackContext(
+  'browse',
+  'kwqq',
+);
 
 /// 播放全部的首屏导入上限：与插件 /import 的批量上限同量级，
 /// 避免超长歌单/榜单一次压死 /songs/remote（剩余走后台补齐）。
@@ -51,7 +54,11 @@ class RemotePlayback {
     final safeIndex = startIndex.clamp(0, songs.length - 1);
     await ref
         .read(playerStateProvider.notifier)
-        .playPlaylist(songs, startIndex: safeIndex, context: kBrowsePlaybackContext);
+        .playPlaylist(
+          songs,
+          startIndex: safeIndex,
+          context: kBrowsePlaybackContext,
+        );
     return true;
   }
 

@@ -129,10 +129,7 @@ class _BrowseTrackTileState extends State<BrowseTrackTile> {
               : RichText(
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  style: subtitleStyle,
-                  children: spans,
-                ),
+                text: TextSpan(style: subtitleStyle, children: spans),
               ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

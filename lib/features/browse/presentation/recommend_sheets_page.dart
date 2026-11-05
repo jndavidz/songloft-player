@@ -1,6 +1,9 @@
-/// 推荐歌单页（票 12；2026-11 多源改版）：顶部两段式——第一段平台选择、
-/// 第二段该平台标签（Wrap 换行，不再横向拉动）→ 点击标签拉取该类歌单列表
-/// → 点击歌单进歌单详情页。标签/歌单均来自插件多源聚合（netease/kugou）。
+/// 推荐歌单页（票 12；2026-11 四分区改版）：
+/// ① 顶部平台切换（网易云 / QQ / 酷狗 / 酷我，顺序统一）；
+/// ② 该平台一级分类（默认 + 分组），只占一行，点击后在第三分区展开；
+/// ③ 二级分类（选中分类下的标签），只占一行；
+/// ④ 歌单列表，每行 4 个，标题固定 2 行高，歌曲数落在封面右下角。
+/// 标签/歌单均来自插件多源聚合。
 
 library;
 
@@ -28,6 +31,9 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
   Object? _tagsError;
 
   String? _selectedSource;
+
+  /// 当前一级分类；null = 「默认」（不带 cat，拉该平台全部热门歌单）。
+  BrowseTagGroup? _selectedGroup;
   String? _selectedTag;
   final List<BrowseSheet> _sheets = [];
   bool _sheetsLoading = false;
@@ -36,8 +42,19 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
   int _page = 1;
   Object? _sheetsError;
 
+  /// 平台按全站统一顺序展示（插件返回顺序不作数，避免各端不一致）。
+  List<BrowsePlatformTags> get _platforms {
+    final platforms = _tags?.platforms ?? const <BrowsePlatformTags>[];
+    final order = orderBrowsePlatforms(platforms.map((p) => p.source));
+    return [
+      for (final s in order)
+        for (final p in platforms)
+          if (p.source == s) p,
+    ];
+  }
+
   BrowsePlatformTags? get _currentPlatform {
-    final platforms = _tags?.platforms ?? const [];
+    final platforms = _platforms;
     for (final p in platforms) {
       if (p.source == _selectedSource) return p;
     }
@@ -56,8 +73,9 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
       final tags = await api.recommendTags();
       if (!mounted) return;
       setState(() => _tags = tags);
-      if (_selectedSource == null && tags.platforms.isNotEmpty) {
-        _selectPlatform(tags.platforms.first.source);
+      final platforms = _platforms;
+      if (_selectedSource == null && platforms.isNotEmpty) {
+        _selectPlatform(platforms.first.source);
       }
     } catch (e) {
       if (!mounted) return;
@@ -65,20 +83,26 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
     }
   }
 
-  /// 该平台默认标签：pinned 首个，否则首个分组首个，再否则空（cat='' 全部）。
-  String? _defaultTagFor(BrowsePlatformTags platform) {
-    if (platform.pinned.isNotEmpty) return platform.pinned.first.id;
-    for (final g in platform.groups) {
-      if (g.tags.isNotEmpty) return g.tags.first.id;
-    }
-    return null;
-  }
-
   Future<void> _selectPlatform(String source) async {
-    final platform = _tags!.platforms.firstWhere((p) => p.source == source);
     setState(() {
       _selectedSource = source;
-      _selectedTag = _defaultTagFor(platform);
+      _selectedGroup = null; // 切平台回到「默认」
+      _selectedTag = null;
+      _sheets.clear();
+      _sheetsEnd = false;
+      _page = 1;
+      _sheetsLoading = true;
+      _sheetsError = null;
+    });
+    await _fetchSheets(reset: true);
+  }
+
+  /// 选一级分类：null = 默认（cat=''）；有分组时默认选中该分类第一个标签。
+  Future<void> _selectGroup(BrowseTagGroup? group) async {
+    setState(() {
+      _selectedGroup = group;
+      _selectedTag =
+          group != null && group.tags.isNotEmpty ? group.tags.first.id : null;
       _sheets.clear();
       _sheetsEnd = false;
       _page = 1;
@@ -113,7 +137,7 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
         page: page,
       );
       if (!mounted) return;
-      if (cat != _selectedTag || source != _selectedSource) {
+      if (cat != (_selectedTag ?? '') || source != _selectedSource) {
         return; // 分类/平台已切换，丢弃过期响应
       }
       setState(() {
@@ -153,7 +177,8 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
                 children: [
                   _buildPlatformBar(context),
                   const Divider(height: 1),
-                  _buildTagArea(context),
+                  _buildGroupBar(context),
+                  _buildTagBar(context),
                   const Divider(height: 1),
                   Expanded(child: _buildSheetList(context)),
                 ],
@@ -161,71 +186,91 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
     );
   }
 
-  /// 第一段：平台选择（选中平台只看该平台标签）。
+  /// 分区一：平台切换（一行横向滚动，顺序固定）。
   Widget _buildPlatformBar(BuildContext context) {
-    final platforms = _tags!.platforms;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.md, 8, AppSpacing.md, 4),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 4,
+    final platforms = _platforms;
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(AppSpacing.md, 8, AppSpacing.md, 8),
         children: [
-          for (final p in platforms)
+          for (final p in platforms) ...[
             ChoiceChip(
               label: Text(browsePlatformLabel(p.source)),
               selected: p.source == _selectedSource,
               visualDensity: VisualDensity.compact,
               onSelected: (_) => _selectPlatform(p.source),
             ),
+            const SizedBox(width: 8),
+          ],
         ],
       ),
     );
   }
 
-  /// 第二段：当前平台的标签，Wrap 换行竖排（不再横向滚动）。
-  /// pinned 置顶在前，分组带小标题；区域限高、超高竖向滚动。
-  Widget _buildTagArea(BuildContext context) {
+  /// 分区二：一级分类（默认 + 平台分组），只占一行。
+  Widget _buildGroupBar(BuildContext context) {
     final platform = _currentPlatform;
     if (platform == null) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-
-    Widget tagChip(BrowseTag tag) {
-      final selected = tag.id == _selectedTag;
-      return ChoiceChip(
-        label: Text(tag.title),
-        selected: selected,
-        visualDensity: VisualDensity.compact,
-        onSelected: (_) => _selectTag(tag.id),
-      );
-    }
-
-    final children = <Widget>[
-      for (final t in platform.pinned) tagChip(t),
-      for (final g in platform.groups)
-        if (g.tags.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(
-              g.title,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+    final groups = platform.groups.where((g) => g.tags.isNotEmpty).toList();
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(AppSpacing.md, 4, AppSpacing.md, 4),
+        children: [
+          _groupChip(
+            label: '默认',
+            group: null,
+            selected: _selectedGroup == null,
           ),
-          for (final t in g.tags) tagChip(t),
+          for (final g in groups) ...[
+            const SizedBox(width: 8),
+            _groupChip(
+              label: g.title.isNotEmpty ? g.title : '分类',
+              group: g,
+              selected: _selectedGroup == g,
+            ),
+          ],
         ],
-    ];
+      ),
+    );
+  }
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 220),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.md, 6, AppSpacing.md, 8),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 6,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: children,
-        ),
+  Widget _groupChip({
+    required String label,
+    required BrowseTagGroup? group,
+    required bool selected,
+  }) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      visualDensity: VisualDensity.compact,
+      onSelected: (_) => _selectGroup(group),
+    );
+  }
+
+  /// 分区三：二级分类（当前一级分类下的标签），只占一行；默认分类下不显示。
+  Widget _buildTagBar(BuildContext context) {
+    final group = _selectedGroup;
+    if (group == null || group.tags.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(AppSpacing.md, 2, AppSpacing.md, 4),
+        children: [
+          for (final tag in group.tags) ...[
+            FilterChip(
+              label: Text(tag.title),
+              selected: tag.id == _selectedTag,
+              visualDensity: VisualDensity.compact,
+              onSelected: (_) => _selectTag(tag.id),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ],
       ),
     );
   }
@@ -267,11 +312,12 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
       },
       child: GridView.builder(
         padding: const EdgeInsets.all(AppSpacing.md),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
           mainAxisSpacing: AppSpacing.md,
-          crossAxisSpacing: AppSpacing.md,
-          childAspectRatio: 0.75,
+          crossAxisSpacing: 8,
+          // 封面 1:1 + 固定 2 行标题区，按 4 列卡片取长宽比。
+          childAspectRatio: 0.68,
         ),
         itemCount: _sheets.length + (_sheetsEnd ? 0 : 1),
         itemBuilder: (context, index) {
@@ -286,7 +332,6 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
           final sheet = _sheets[index];
           return _SheetCard(
             sheet: sheet,
-            showSource: _tags!.platforms.length > 1,
             onTap: () => pushSheetDetail(context, sheet),
           );
         },
@@ -297,16 +342,9 @@ class _RecommendSheetsPageState extends ConsumerState<RecommendSheetsPage> {
 
 class _SheetCard extends StatelessWidget {
   final BrowseSheet sheet;
-
-  /// 多平台时在封面角标来源平台。
-  final bool showSource;
   final VoidCallback onTap;
 
-  const _SheetCard({
-    required this.sheet,
-    this.showSource = false,
-    required this.onTap,
-  });
+  const _SheetCard({required this.sheet, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -330,66 +368,37 @@ class _SheetCard extends StatelessWidget {
                     height: double.infinity,
                     fallbackIcon: Icons.queue_music_outlined,
                   ),
-                  if (showSource)
-                    Positioned(
-                      top: 6,
-                      left: 6,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.45),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          browsePlatformLabel(sheet.source),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
                   if (sheet.playCount > 0)
                     Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.45),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          _compactCount(sheet.playCount),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
+                      top: 4,
+                      right: 4,
+                      child: _Badge(text: _compactCount(sheet.playCount)),
+                    ),
+                  // 歌曲数量固定在封面右下角（标题区不再显示，保持封面尺寸一致）。
+                  if (sheet.trackCount > 0)
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: _Badge(
+                        text: l10n.browseTrackCount(sheet.trackCount),
+                        icon: Icons.music_note,
                       ),
                     ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            sheet.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall,
-          ),
-          if (sheet.trackCount > 0)
-            Text(
-              l10n.browseTrackCount(sheet.trackCount),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          const SizedBox(height: 4),
+          // 标题区固定 2 行高：1 行与 2 行标题的卡片封面尺寸保持一致。
+          SizedBox(
+            height: 32,
+            child: Text(
+              sheet.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall,
             ),
+          ),
         ],
       ),
     );
@@ -399,5 +408,37 @@ class _SheetCard extends StatelessWidget {
     if (n >= 100000000) return '${(n / 100000000).toStringAsFixed(1)}亿';
     if (n >= 10000) return '${(n / 10000).toStringAsFixed(1)}万';
     return '$n';
+  }
+}
+
+class _Badge extends StatelessWidget {
+  final String text;
+  final IconData? icon;
+
+  const _Badge({required this.text, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 11, color: Colors.white),
+            const SizedBox(width: 2),
+          ],
+          Text(
+            text,
+            style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+    );
   }
 }

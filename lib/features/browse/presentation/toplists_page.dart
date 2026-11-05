@@ -27,6 +27,7 @@ class ToplistsPage extends ConsumerStatefulWidget {
 class _ToplistsPageState extends ConsumerState<ToplistsPage> {
   List<BrowseToplist>? _toplists;
   Object? _error;
+  String? _selectedSource;
 
   @override
   void initState() {
@@ -43,16 +44,40 @@ class _ToplistsPageState extends ConsumerState<ToplistsPage> {
       final api = ref.read(pluginBrowseApiProvider);
       final lists = await api.toplists();
       if (!mounted) return;
-      setState(() => _toplists = lists);
+      setState(() {
+        _toplists = lists;
+        if (_selectedSource == null && lists.isNotEmpty) {
+          _selectedSource = lists.first.source;
+        }
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e);
     }
   }
 
+  /// 平台分组：顺序统一为 网易云 / QQ / 酷狗 / 酷我。
+  Map<String, List<BrowseToplist>> _groups() {
+    final groups = <String, List<BrowseToplist>>{};
+    for (final tl in _toplists ?? const <BrowseToplist>[]) {
+      groups.putIfAbsent(tl.source ?? '', () => []).add(tl);
+    }
+    final ordered = <String, List<BrowseToplist>>{};
+    for (final s in orderBrowsePlatforms(groups.keys)) {
+      ordered[s] = groups[s]!;
+    }
+    return ordered;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final groups = _groups();
+    final sources = groups.keys.toList();
+    final selected =
+        groups.containsKey(_selectedSource)
+            ? _selectedSource!
+            : (sources.isNotEmpty ? sources.first : null);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.discoverToplists)),
       body:
@@ -71,51 +96,58 @@ class _ToplistsPageState extends ConsumerState<ToplistsPage> {
                 emptyTitle: l10n.discoverToplists,
                 emptyIcon: Icons.leaderboard_outlined,
               )
-              : RefreshIndicator(
-                onRefresh: _load,
-                child: _buildGrouped(context),
+              : Column(
+                children: [
+                  if (sources.length > 1) ...[
+                    _buildPlatformBar(sources, selected),
+                    const Divider(height: 1),
+                  ],
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _load,
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                        ),
+                        children: [
+                          _ToplistGrid(
+                            toplists: groups[selected] ?? const [],
+                            onTap:
+                                (tl) => Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder:
+                                        (_) => ToplistDetailPage(toplist: tl),
+                                  ),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
     );
   }
 
-  /// 按平台分组展示（保持插件聚合顺序：netease 在前），每组内一排 5 个小卡。
-  Widget _buildGrouped(BuildContext context) {
-    // 分组保持首次出现顺序
-    final order = <String>[];
-    final groups = <String, List<BrowseToplist>>{};
-    for (final tl in _toplists!) {
-      final key = tl.source ?? '';
-      if (!groups.containsKey(key)) {
-        groups[key] = [];
-        order.add(key);
-      }
-      groups[key]!.add(tl);
-    }
-    final singleGroup = order.length <= 1;
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      children: [
-        for (final source in order) ...[
-          if (!singleGroup)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.md, 8, AppSpacing.md, 8),
-              child: Text(
-                browsePlatformLabel(source),
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
+  /// 顶部平台按钮：网易云 / QQ / 酷狗 / 酷我，点击只看该平台榜单。
+  Widget _buildPlatformBar(List<String> sources, String? selected) {
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(AppSpacing.md, 8, AppSpacing.md, 8),
+        children: [
+          for (final source in sources) ...[
+            ChoiceChip(
+              label: Text(browsePlatformLabel(source)),
+              selected: source == selected,
+              visualDensity: VisualDensity.compact,
+              onSelected: (_) => setState(() => _selectedSource = source),
             ),
-          _ToplistGrid(
-            toplists: groups[source]!,
-            onTap:
-                (tl) => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => ToplistDetailPage(toplist: tl),
-                  ),
-                ),
-          ),
+            const SizedBox(width: 8),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -134,10 +166,11 @@ class _ToplistGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+        crossAxisCount: 4,
         mainAxisSpacing: AppSpacing.md,
         crossAxisSpacing: AppSpacing.sm,
-        childAspectRatio: 0.62,
+        // 封面 1:1 + 固定 2 行标题区，标题 1 行/2 行的卡片封面尺寸一致。
+        childAspectRatio: 0.68,
       ),
       itemCount: toplists.length,
       itemBuilder: (context, index) {
@@ -175,11 +208,15 @@ class _ToplistCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            toplist.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelSmall,
+          // 固定 2 行标题高度：避免 1 行标题的卡片封面被拉大。
+          SizedBox(
+            height: 32,
+            child: Text(
+              toplist.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall,
+            ),
           ),
         ],
       ),

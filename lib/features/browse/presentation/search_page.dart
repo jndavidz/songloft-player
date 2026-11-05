@@ -399,7 +399,10 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                 [
                   browsePlatformLabel(album.source),
                   if (album.artist.isNotEmpty) album.artist,
-                  if (album.trackCount > 0) '${album.trackCount}',
+                  if (album.trackCount > 0)
+                    AppLocalizations.of(
+                      context,
+                    ).homeSongCountShort(album.trackCount),
                 ].join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
