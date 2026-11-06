@@ -17,6 +17,9 @@ class PlayControls extends StatelessWidget {
   final bool showGlow;
   final bool useRoundedRect;
 
+  /// true = 播放/暂停键不画底板，图标直接浮在背景上（播放页盘面风格）。
+  final bool flat;
+
   const PlayControls({
     super.key,
     required this.isPlaying,
@@ -30,6 +33,7 @@ class PlayControls extends StatelessWidget {
     this.isBuffering = false,
     this.showGlow = false,
     this.useRoundedRect = false,
+    this.flat = false,
   });
 
   @override
@@ -77,6 +81,44 @@ class PlayControls extends StatelessWidget {
     final theme = Theme.of(context);
     final borderRadius =
         useRoundedRect ? AppRadius.xxlAll : BorderRadius.circular(size);
+
+    if (flat) {
+      return Semantics(
+        button: true,
+        label:
+            isBuffering
+                ? AppLocalizations.of(context).playerBufferingSemantic
+                : (isPlaying
+                    ? AppLocalizations.of(context).playerPause
+                    : AppLocalizations.of(context).playerPlay),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child:
+              isBuffering
+                  ? Padding(
+                    padding: EdgeInsets.all(size * 0.28),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  )
+                  : IconButton(
+                    onPressed: isPlaying ? onPause : onPlay,
+                    iconSize: iconSize * 1.15,
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+        ),
+      );
+    }
 
     Widget button;
 

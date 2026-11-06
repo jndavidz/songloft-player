@@ -18,6 +18,7 @@ import '../providers/player_provider.dart';
 import '../queue_page.dart';
 import '../providers/audio_track_provider.dart';
 import 'audio_track_control.dart';
+import 'compact_lyrics.dart';
 import 'lyrics_view.dart';
 import 'player_backdrop.dart';
 import 'song_meta_chips.dart';
@@ -64,7 +65,6 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
     final state = ref.watch(activePlaybackStateProvider);
     final notifier = ref.read(playerStateProvider.notifier);
     final theme = Theme.of(context);
-    final size = MediaQuery.sizeOf(context);
 
     // 播放列表被清空时，自动关闭全屏播放器并返回上一页
     ref.listen<PlayerState>(playerStateProvider, (previous, next) {
@@ -99,117 +99,62 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
       backgroundColor: theme.colorScheme.surface,
       body: PlayerBackdrop(
         palette: palette,
+        splitControl: true,
         child: SafeArea(
           child: Column(
             children: [
               // 顶部工具栏
               _buildTopBar(context, notifier, state),
-              const SizedBox(height: 16),
-              // 封面（黑胶盘）/歌词：点击切换，不再左右滑动
+              // 歌曲名 / 歌手 / 元数据：移到唱盘上方
+              _buildSongHeader(context, song),
+              // 唱盘（下方常驻两行歌词）↔ 歌词页：点击唱盘切换，不再左右滑动
               Expanded(
-                flex: 4,
-                child: Column(
+                child: IndexedStack(
+                  index: _currentPage,
                   children: [
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          // 舞台取可用区域与屏宽的较小值，给唱臂溢出留 8% 余量。
-                          final stage =
-                              math.min(constraints.maxHeight, size.width) *
-                              0.88;
-                          return IndexedStack(
-                            index: _currentPage,
-                            children: [
-                              // 页面1：视频歌曲渲染画面（支持的平台），否则黑胶盘
-                              Center(
-                                child: VideoStage(
-                                  song: song,
-                                  width: stage,
-                                  height: stage,
-                                  fallback: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () => _showPage(1),
-                                    child: _buildVinyl(
-                                      context,
-                                      song,
-                                      stage * 0.92,
-                                      palette: palette,
-                                      isPlaying: state.isPlaying,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // 页面2：歌词（点击空白区返回封面）
-                              LyricsScreenAwake(
-                                visible: _currentPage == 1,
-                                child: LyricsView(
-                                  currentPosition: state.currentTime,
-                                  onSeek: notifier.seek,
-                                  song: song,
-                                  editable: true,
-                                  scrubEnabled:
-                                      !song.isLive &&
-                                      state.duration > Duration.zero &&
-                                      song.duration > 0,
-                                  onTapBackground: () => _showPage(0),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                    // 唱盘页的 Ticker（旋转 / 星光）在歌词页时静音。
+                    TickerMode(
+                      enabled: _currentPage == 0,
+                      child: _buildDiscPage(context, song, palette, state),
+                    ),
+                    LyricsScreenAwake(
+                      visible: _currentPage == 1,
+                      child: LyricsView(
+                        currentPosition: state.currentTime,
+                        onSeek: notifier.seek,
+                        song: song,
+                        editable: true,
+                        scrubEnabled:
+                            !song.isLive &&
+                            state.duration > Duration.zero &&
+                            song.duration > 0,
+                        onTapBackground: () => _showPage(0),
                       ),
                     ),
-                    // 页面指示器
-                    const SizedBox(height: 12),
-                    _buildPageIndicator(theme),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
-              // 歌曲信息
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Column(
-                  children: [
-                    Text(
-                      song.title,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      song.artist ??
-                          AppLocalizations.of(context).playerUnknownArtist,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    SongMetaChips(song: song),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              // 进度条
+              const SizedBox(height: 10),
+              // 进度条：细线，浅灰轨道 / 深灰已播
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: PlayerProgressBar(
                   position: state.currentTime,
                   duration: state.duration,
                   onSeek: notifier.seek,
+                  thin: true,
+                  activeColor: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.62,
+                  ),
+                  inactiveColor: theme.colorScheme.onSurface.withValues(
+                    alpha: 0.16,
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               // 主控制行（播放模式 + 上一首/播放/下一首 + 收藏）
               _buildControlsRow(context, state, notifier),
-              const SizedBox(height: 20),
+              const SizedBox(height: 6),
               // 工具行（投屏 + 音量 + 队列 + 更多）
               _buildToolBar(context, state, notifier),
               const SizedBox(height: AppSpacing.md),
@@ -220,26 +165,103 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
     );
   }
 
-  /// 构建页面指示器（小圆点）
-  Widget _buildPageIndicator(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(2, (index) {
-        final isActive = index == _currentPage;
-        return Container(
-          width: isActive ? 8 : 6,
-          height: isActive ? 8 : 6,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color:
-                isActive
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.3),
+  /// 歌名 / 歌手 / 元数据（唱盘上方）。
+  Widget _buildSongHeader(BuildContext context, Song song) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.md,
+        AppSpacing.xl,
+        0,
+      ),
+      child: Column(
+        children: [
+          Text(
+            song.title,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
-        );
-      }),
+          const SizedBox(height: 6),
+          Text(
+            song.artist ?? AppLocalizations.of(context).playerUnknownArtist,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          SongMetaChips(song: song),
+        ],
+      ),
     );
+  }
+
+  /// 唱盘页：盘面 + 下方常驻两行歌词。
+  Widget _buildDiscPage(
+    BuildContext context,
+    Song song,
+    CoverPalette? palette,
+    PlayerState state,
+  ) {
+    final theme = Theme.of(context);
+    final size = MediaQuery.sizeOf(context);
+    return Column(
+      children: [
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // 舞台取可用区域与屏宽的较小值，给唱臂溢出留余量。
+              final stage = math.min(constraints.maxHeight, size.width) * 0.88;
+              return Center(
+                child: VideoStage(
+                  song: song,
+                  width: stage,
+                  height: stage,
+                  fallback: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _showPage(1),
+                    child: _buildVinyl(
+                      context,
+                      song,
+                      stage * 0.92,
+                      palette: palette,
+                      isPlaying: state.isPlaying,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: CompactLyrics(activeColor: _lyricInk(palette, theme)),
+        ),
+        const SizedBox(height: 2),
+      ],
+    );
+  }
+
+  /// 逐字歌词的目标色：封面同色系、更浅（浅色主题压低亮度保证可读）。
+  Color _lyricInk(CoverPalette? palette, ThemeData theme) {
+    final base =
+        palette?.lightVibrantColor ??
+        palette?.vibrantColor ??
+        palette?.dominantColor;
+    if (base == null) return theme.colorScheme.primary;
+    final hsl = HSLColor.fromColor(base);
+    final dark = theme.brightness == Brightness.dark;
+    return hsl
+        .withSaturation(math.max(hsl.saturation, 0.34))
+        .withLightness(dark ? 0.78 : 0.42)
+        .toColor();
   }
 
   Widget _buildTopBar(
@@ -445,14 +467,20 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
   }) {
     final theme = Theme.of(context);
     final dpr = MediaQuery.devicePixelRatioOf(context);
-    // label 只占盘心一半直径，解码宽度按 label 实际像素取，避免大图解码。
-    final decodeWidth = (diameter * 0.5 * dpr).clamp(64.0, 1024.0).round();
+    // label 只占盘心一部分直径，解码宽度按 label 实际像素取，避免大图解码。
+    final decodeWidth =
+        (diameter * VinylDisc.labelRatio * dpr).clamp(64.0, 1024.0).round();
 
     final glowColor = palette?.vibrantColor ?? palette?.dominantColor;
     final coverUrl = song.coverUrl;
     final resolvedCover =
         coverUrl != null && coverUrl.isNotEmpty
             ? UrlHelper.buildCoverUrl(coverUrl, width: decodeWidth)
+            : null;
+    // 折射层用更小的封面副本（96px 解码后烘焙），与 label 解耦，避免二次放大。
+    final refractionUrl =
+        coverUrl != null && coverUrl.isNotEmpty
+            ? UrlHelper.buildCoverUrl(coverUrl, width: 128)
             : null;
 
     return Container(
@@ -470,6 +498,8 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
         coverUrl: resolvedCover,
         title: song.title,
         coverDecodeWidth: decodeWidth,
+        tintColor: glowColor,
+        refractionUrl: refractionUrl,
       ),
     );
   }
@@ -506,8 +536,7 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
             onPrev: notifier.playPrev,
             onNext: notifier.playNext,
             size: 76,
-            showGlow: true,
-            useRoundedRect: true,
+            flat: true,
           ),
           const SizedBox(width: 8),
           // 收藏

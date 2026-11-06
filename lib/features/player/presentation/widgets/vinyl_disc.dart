@@ -1,20 +1,23 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-/// 黑胶唱片视觉。
+/// 黑胶唱片视觉（酷狗概念版观感）：近透明白玻璃盘体 + 封面折射 + 星光 + 白色唱臂。
 ///
 /// 分层原则（性能红线）：
-/// - 盘体 / 沟槽 / 高光 / 唱臂都是**静态**层，各自 `RepaintBoundary` 缓存，不进旋转子树；
-/// - 只有盘心 label（专辑封面或默认 label）参与旋转，且旋转层内部再包一层 `RepaintBoundary`，
-///   使每帧只做合成层变换（`RenderTransform` + `needsCompositing`），不触发重绘；
-/// - 发光/阴影一律由调用方放在本组件**之外**，绝不能进旋转子树（否则每帧重算 blur）。
+/// - 盘体 / 沟槽 / 高光 / 星光 / 唱臂都是**静态**层，各自 `RepaintBoundary` 缓存，不进旋转子树；
+/// - 旋转子树内只有「封面折射层（预烘焙纹理）」与「盘心 label」，且内部再包一层
+///   `RepaintBoundary`，使每帧只做合成层变换（`RenderTransform` + `needsCompositing`），
+///   不触发重绘；
+/// - 封面折射的颜色来自封面：低分辨率封面在加载完成时**一次性**烘焙成「模糊 + 半透明」
+///   的静态 `ui.Image`，运行时该层只做一次 `drawImageRect`，绝不每帧重算 blur；
+/// - 发光/阴影一律由调用方放在本组件**之外**，绝不能进旋转子树。
 ///
 /// 启停由 [isPlaying] 决定；[isPlaying] 应由 `activePlaybackStateProvider` 提供
 /// （投屏时它是 dlna 实际状态），不要用本机 `playerStateProvider`。
-/// 暂停采用指数趋近缓停（时间常数约 0.17s），不是 `stop()` 硬停；停稳后 Ticker 自行停止，
-/// 不再产生任何帧。
+/// 暂停采用指数趋近缓停（时间常数约 0.17s），不是 `stop()` 硬停；停稳后 Ticker 自行停止。
 class VinylDisc extends StatefulWidget {
   const VinylDisc({
     super.key,
@@ -25,12 +28,18 @@ class VinylDisc extends StatefulWidget {
     this.coverDecodeWidth = 512,
     this.period = const Duration(seconds: 7),
     this.showTonearm = true,
+    this.tintColor,
+    this.refractionUrl,
+    this.showSparkles = true,
   });
+
+  /// 盘心（专辑封面）直径 / 盘体直径。
+  static const double labelRatio = 0.54;
 
   /// 是否应旋转（跟随实际发声设备的播放态）。
   final bool isPlaying;
 
-  /// 盘体直径（label 直径为其一半）。
+  /// 盘体直径。
   final double diameter;
 
   /// 封面地址；为空 / 加载失败时回退到「默认黑胶盘」label。
@@ -48,18 +57,32 @@ class VinylDisc extends StatefulWidget {
   /// 是否绘制唱臂。
   final bool showTonearm;
 
+  /// 封面主色：用于盘体薄纱折射（无折射图时的兜底色相）。
+  final Color? tintColor;
+
+  /// 低分辨率封面地址：加载后烘焙为旋转的折射纹理（无则只用 [tintColor] 兜底）。
+  final String? refractionUrl;
+
+  /// 是否绘制星光层（测试 / 低性能场景可关）。
+  final bool showSparkles;
+
   @override
   State<VinylDisc> createState() => _VinylDiscState();
 }
 
-class _VinylDiscState extends State<VinylDisc>
-    with SingleTickerProviderStateMixin {
+class _VinylDiscState extends State<VinylDisc> with TickerProviderStateMixin {
   static const _spinReduction = 0.0025;
+  static const _sparklePeriod = Duration(milliseconds: 3800);
 
   final ValueNotifier<double> _angle = ValueNotifier<double>(0);
   late final Ticker _ticker;
+  late final AnimationController _sparkle;
   double _rate = 0;
   Duration? _lastElapsed;
+
+  ui.Image? _refraction;
+  ImageStream? _refractionStream;
+  ImageStreamListener? _refractionListener;
 
   @override
   void initState() {
@@ -67,6 +90,15 @@ class _VinylDiscState extends State<VinylDisc>
     _rate = widget.isPlaying ? 1 : 0;
     _ticker = createTicker(_onTick);
     if (widget.isPlaying) _ticker.start();
+    // 星光：错峰明灭，整圈 3.8s 一个呼吸周期；TickerMode 关闭时自动静音。
+    // 暂停态不重复（保留一个静态相位），避免页面空闲时仍在申请帧。
+    _sparkle = AnimationController(vsync: this, duration: _sparklePeriod);
+    if (widget.isPlaying) {
+      _sparkle.repeat();
+    } else {
+      _sparkle.value = 0.42;
+    }
+    _listenRefraction();
   }
 
   @override
@@ -77,6 +109,80 @@ class _VinylDiscState extends State<VinylDisc>
       // 由播放转暂停：Ticker 继续跑到 rate 衰减为 0 再停，实现缓停。
       _lastElapsed = null;
       if (!_ticker.isActive) _ticker.start();
+      if (widget.isPlaying) {
+        _sparkle.repeat();
+      } else {
+        _sparkle.stop();
+        _sparkle.value = 0.42;
+      }
+    }
+    if (widget.refractionUrl != oldWidget.refractionUrl) {
+      _detachRefraction();
+      _refraction?.dispose();
+      _refraction = null;
+      _listenRefraction();
+    }
+  }
+
+  void _detachRefraction() {
+    final stream = _refractionStream;
+    final listener = _refractionListener;
+    if (stream != null && listener != null) stream.removeListener(listener);
+    _refractionStream = null;
+    _refractionListener = null;
+  }
+
+  void _listenRefraction() {
+    final url = widget.refractionUrl;
+    if (url == null || url.isEmpty) return;
+    final provider = ResizeImage(NetworkImage(url), width: 96, height: 96);
+    final stream = provider.resolve(ImageConfiguration.empty);
+    final listener = ImageStreamListener(
+      (info, _) => _bakeRefraction(info.image),
+      onError:
+          (error, stack) =>
+              debugPrint('[VinylDisc] refraction image failed: $error'),
+    );
+    _refractionStream = stream;
+    _refractionListener = listener;
+    stream.addListener(listener);
+  }
+
+  /// 把低分辨率封面一次性烘焙成「模糊 + 半透明」纹理。
+  ///
+  /// 只在封面变化时执行一次；运行时该层仅做一次 `drawImageRect`，
+  /// 因此旋转时不会产生任何 blur 重算。
+  Future<void> _bakeRefraction(ui.Image source) async {
+    try {
+      const double side = 160;
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      canvas.drawImageRect(
+        source,
+        Rect.fromLTWH(0, 0, source.width.toDouble(), source.height.toDouble()),
+        const Rect.fromLTWH(0, 0, side, side),
+        Paint()
+          ..imageFilter = ui.ImageFilter.blur(
+            sigmaX: 14,
+            sigmaY: 14,
+            tileMode: TileMode.decal,
+          )
+          ..colorFilter = const ColorFilter.mode(
+            Color(0x66FFFFFF),
+            BlendMode.modulate,
+          ),
+      );
+      final picture = recorder.endRecording();
+      final baked = await picture.toImage(side.toInt(), side.toInt());
+      picture.dispose();
+      if (!mounted) {
+        baked.dispose();
+        return;
+      }
+      _refraction?.dispose();
+      setState(() => _refraction = baked);
+    } catch (error) {
+      debugPrint('[VinylDisc] refraction bake failed: $error');
     }
   }
 
@@ -111,6 +217,9 @@ class _VinylDiscState extends State<VinylDisc>
 
   @override
   void dispose() {
+    _detachRefraction();
+    _refraction?.dispose();
+    _sparkle.dispose();
     _ticker.dispose();
     _angle.dispose();
     super.dispose();
@@ -119,7 +228,7 @@ class _VinylDiscState extends State<VinylDisc>
   @override
   Widget build(BuildContext context) {
     final d = widget.diameter;
-    final labelSize = d * 0.5;
+    final labelSize = d * VinylDisc.labelRatio;
 
     return SizedBox.square(
       dimension: d,
@@ -128,73 +237,70 @@ class _VinylDiscState extends State<VinylDisc>
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          // 静态盘体：一次绘制 + 缓存，不参与旋转。
-          const Positioned.fill(
-            child: RepaintBoundary(
-              child: CustomPaint(painter: _VinylBodyPainter(labelRatio: 0.5)),
-            ),
-          ),
-          // 旋转层：仅盘心 label（封面 / 默认 label）。
-          SizedBox.square(
-            dimension: labelSize,
-            child: DecoratedBox(
-              decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: ClipOval(
-                child: ValueListenableBuilder<double>(
-                  valueListenable: _angle,
-                  builder:
-                      (context, degrees, child) => Transform.rotate(
-                        key: const ValueKey('vinyl-label-rotation'),
-                        angle: degrees * math.pi / 180,
-                        child: child,
-                      ),
-                  child: RepaintBoundary(
-                    child: _VinylLabel(
-                      coverUrl: widget.coverUrl,
-                      title: widget.title,
-                      coverDecodeWidth: widget.coverDecodeWidth,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // 中心轴孔（静态，盖在 label 上）。
+          // 静态盘体（近透明白玻璃 + 封面薄纱 + 沟槽 + 静态高光），不参与旋转。
           Positioned.fill(
-            child: IgnorePointer(
-              child: Center(
-                child: Container(
-                  width: d * 0.026,
-                  height: d * 0.026,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF07070A),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      width: 1,
-                    ),
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: _VinylBodyPainter(tint: widget.tintColor),
+              ),
+            ),
+          ),
+          // 星光：独立层、固定方位、不随盘转动。
+          if (widget.showSparkles)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: RepaintBoundary(
+                  child: CustomPaint(painter: _SparklePainter(_sparkle)),
+                ),
+              ),
+            ),
+          // 旋转层：封面折射 + 盘心 label。
+          Positioned.fill(
+            child: ValueListenableBuilder<double>(
+              valueListenable: _angle,
+              builder:
+                  (context, degrees, child) => Transform.rotate(
+                    key: const ValueKey('vinyl-label-rotation'),
+                    angle: degrees * math.pi / 180,
+                    child: child,
                   ),
+              child: RepaintBoundary(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (_refraction != null)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _RefractionPainter(image: _refraction!),
+                        ),
+                      ),
+                    SizedBox.square(
+                      dimension: labelSize,
+                      child: ClipOval(
+                        child: _VinylLabel(
+                          coverUrl: widget.coverUrl,
+                          title: widget.title,
+                          coverDecodeWidth: widget.coverDecodeWidth,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
+          // 唱臂（静态层，仅姿态过渡时重绘）。
           if (widget.showTonearm)
-            Positioned(
-              top: -d * 0.10,
-              right: -d * 0.02,
+            Positioned.fill(
               child: IgnorePointer(
-                child: SizedBox.square(
-                  dimension: d * 0.58,
-                  child: TweenAnimationBuilder<double>(
-                    key: const ValueKey('vinyl-tonearm'),
-                    tween: Tween<double>(end: widget.isPlaying ? 1 : 0),
-                    duration: const Duration(milliseconds: 520),
-                    curve: Curves.easeOutCubic,
-                    builder:
-                        (context, pose, _) => CustomPaint(
-                          painter: VinylTonearmPainter(pose: pose),
-                        ),
-                  ),
+                child: TweenAnimationBuilder<double>(
+                  key: const ValueKey('vinyl-tonearm'),
+                  tween: Tween<double>(end: widget.isPlaying ? 1 : 0),
+                  duration: const Duration(milliseconds: 360),
+                  curve: Curves.easeOutCubic,
+                  builder:
+                      (context, pose, _) =>
+                          CustomPaint(painter: VinylTonearmPainter(pose: pose)),
                 ),
               ),
             ),
@@ -272,7 +378,7 @@ class _VinylLabel extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.14),
+              color: Colors.white.withValues(alpha: 0.30),
               width: 1.2,
             ),
           ),
@@ -282,62 +388,95 @@ class _VinylLabel extends StatelessWidget {
   }
 }
 
-/// 盘体：同心沟槽 + 外缘导引带 + 静态高光。径向对称，本身不需要旋转。
+/// 盘体：近透明白玻璃 + 封面主色薄纱 + 同心沟槽 + 静态高光。径向对称，不需要旋转。
 class _VinylBodyPainter extends CustomPainter {
-  const _VinylBodyPainter({required this.labelRatio});
+  const _VinylBodyPainter({this.tint});
 
-  final double labelRatio;
+  final Color? tint;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final r = size.shortestSide / 2;
-    final labelR = r * labelRatio;
+    final labelR = r * VinylDisc.labelRatio;
 
+    // 近透明白玻璃：几乎不压暗背景，靠极低不透明度白叠出亚克力质感。
     canvas.drawCircle(
       center,
       r,
       Paint()
         ..shader = const RadialGradient(
           colors: [
-            Color(0xFF2C2C37),
-            Color(0xFF17171E),
-            Color(0xFF2A2A34),
-            Color(0xFF0B0B10),
+            Color(0x33FFFFFF),
+            Color(0x1FFFFFFF),
+            Color(0x0FFFFFFF),
+            Color(0x06FFFFFF),
           ],
-          stops: [0.0, 0.45, 0.72, 1.0],
+          stops: [0.0, 0.40, 0.74, 1.0],
         ).createShader(Rect.fromCircle(center: center, radius: r)),
     );
 
-    // 沟槽：约 2.4px 间距，亮暗交替，模拟反射差异。
+    // 封面主色薄纱：静态底色调，真正的「随盘转动」由旋转层折射纹理负责。
+    final coverTint = tint;
+    if (coverTint != null) {
+      canvas.drawCircle(
+        center,
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: const Alignment(-0.56, -0.52),
+            radius: 0.85,
+            colors: [
+              coverTint.withValues(alpha: 0.20),
+              coverTint.withValues(alpha: 0.0),
+            ],
+          ).createShader(Rect.fromCircle(center: center, radius: r)),
+      );
+      canvas.drawCircle(
+        center,
+        r,
+        Paint()
+          ..shader = RadialGradient(
+            center: const Alignment(0.64, 0.56),
+            radius: 0.88,
+            colors: [
+              coverTint.withValues(alpha: 0.16),
+              coverTint.withValues(alpha: 0.0),
+            ],
+          ).createShader(Rect.fromCircle(center: center, radius: r)),
+      );
+    }
+
+    // 沟槽：约 2.4px 间距的白色亮线 + 极淡暗线，撑出层次而不是压黑盘面。
     final groovePaint = Paint()..style = PaintingStyle.stroke;
     var i = 0;
     for (var radius = labelR + 3; radius < r - 1.5; radius += 2.4, i++) {
+      final bright = i.isEven;
       groovePaint
         ..color =
-            i.isEven
-                ? Colors.white.withValues(alpha: 0.045)
-                : Colors.black.withValues(alpha: 0.18)
-        ..strokeWidth = 1;
+            bright
+                ? Colors.white.withValues(alpha: 0.12)
+                : Colors.white.withValues(alpha: 0.045)
+        ..strokeWidth = bright ? 1.0 : 1.2;
       canvas.drawCircle(center, radius, groovePaint);
     }
 
-    // 外缘导引带（唱片最外侧的一圈亮边）。
+    // 外缘导引带：参考图中最外侧的白色亮边比较明显。
     canvas.drawCircle(
       center,
-      r - 1.5,
+      r - 1.2,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.2
-        ..color = Colors.white.withValues(alpha: 0.10),
+        ..strokeWidth = 1.6
+        ..color = Colors.white.withValues(alpha: 0.30),
     );
     canvas.drawCircle(
       center,
-      r - 4.5,
+      r - 3.6,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
-        ..color = Colors.black.withValues(alpha: 0.55),
+        ..color = Colors.white.withValues(alpha: 0.08),
     );
 
     // 静态高光：左上到右下的弧形反射（不随盘转动，符合真实打光）。
@@ -351,7 +490,7 @@ class _VinylBodyPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.06
         ..strokeCap = StrokeCap.round
-        ..color = Colors.white.withValues(alpha: 0.06),
+        ..color = Colors.white.withValues(alpha: 0.10),
     );
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: r - 10),
@@ -362,96 +501,263 @@ class _VinylBodyPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.03
         ..strokeCap = StrokeCap.round
-        ..color = Colors.black.withValues(alpha: 0.35),
+        ..color = Colors.black.withValues(alpha: 0.06),
     );
+
+    // 斜向玻璃反光（静态层）。
+    canvas.save();
+    canvas.clipPath(
+      Path()..addOval(Rect.fromCircle(center: center, radius: r)),
+    );
+    canvas.drawRect(
+      Rect.fromCircle(center: center, radius: r),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.12),
+            Colors.white.withValues(alpha: 0.0),
+            Colors.white.withValues(alpha: 0.0),
+            Colors.white.withValues(alpha: 0.05),
+          ],
+          stops: const [0.0, 0.34, 0.64, 1.0],
+        ).createShader(Rect.fromCircle(center: center, radius: r)),
+    );
+    canvas.restore();
   }
 
   @override
-  bool shouldRepaint(_VinylBodyPainter oldDelegate) =>
-      oldDelegate.labelRatio != labelRatio;
+  bool shouldRepaint(_VinylBodyPainter oldDelegate) => oldDelegate.tint != tint;
 }
 
-/// 唱臂：支点在右上，播放时压到盘面，暂停时抬起更换唱片。
-/// pose 0 = 抬起（暂停），1 = 落针（播放）。
+/// 封面折射层：画进旋转子树，随盘转动把封面色块真实位移。
+///
+/// 纹理已在加载时预烘焙（模糊 + 半透明），此处只做一次 `drawImageRect` + 圆环裁剪；
+/// 旋转由外层 `Transform` 完成，因此不会每帧重算模糊。
+class _RefractionPainter extends CustomPainter {
+  const _RefractionPainter({required this.image});
+
+  final ui.Image image;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final r = size.shortestSide / 2;
+    final labelR = r * VinylDisc.labelRatio;
+
+    // 只让沟槽环带透出封面色彩（盘心由封面本身覆盖，外侧留白边）。
+    final annulus =
+        Path()
+          ..fillType = PathFillType.evenOdd
+          ..addOval(Rect.fromCircle(center: center, radius: r - 1))
+          ..addOval(Rect.fromCircle(center: center, radius: labelR));
+    canvas.save();
+    canvas.clipPath(annulus);
+    final side = r * 2.5;
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromCenter(center: center, width: side, height: side),
+      Paint(),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_RefractionPainter oldDelegate) =>
+      oldDelegate.image != image;
+}
+
+/// 星光：24 颗点状高光，各自错峰明灭（整圈不同步），位置固定不随盘转。
+class _SparklePainter extends CustomPainter {
+  _SparklePainter(this.progress) : super(repaint: progress);
+
+  final Animation<double> progress;
+
+  static const int count = 24;
+  static const double periodSec = 3.8;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final r = size.shortestSide / 2;
+    final t = progress.value * periodSec;
+
+    final core = Paint();
+    final halo = Paint();
+    for (var i = 0; i < count; i++) {
+      final angle = (i / count) * math.pi * 2 + (i % 5) * 0.31;
+      final radiusFraction = (78 + (i * 17) % 42) / 131.0;
+      final delay = (i * 0.23) % periodSec;
+      final phase = ((t + delay) % periodSec) / periodSec;
+      final opacity = _fade(phase);
+      if (opacity <= 0.02) continue;
+      final scale = _scale(phase);
+      final offset = Offset(
+        center.dx + math.cos(angle) * r * radiusFraction,
+        center.dy + math.sin(angle) * r * radiusFraction,
+      );
+      final coreRadius = r * 0.0085 * scale;
+      halo
+        ..color = Colors.white.withValues(alpha: 0.16 * opacity)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(offset, coreRadius * 3.0, halo);
+      core
+        ..color = Colors.white.withValues(alpha: 0.95 * opacity)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(offset, coreRadius, core);
+    }
+  }
+
+  static double _lerp(double a, double b, double t) =>
+      a + (b - a) * t.clamp(0.0, 1.0);
+
+  static double _fade(double t) {
+    if (t < 0.38) return _lerp(0, 0.92, t / 0.38);
+    if (t < 0.62) return _lerp(0.92, 0.35, (t - 0.38) / 0.24);
+    return _lerp(0.35, 0, (t - 0.62) / 0.38);
+  }
+
+  static double _scale(double t) {
+    if (t < 0.38) return _lerp(0.6, 1.0, t / 0.38);
+    if (t < 0.62) return _lerp(1.0, 0.85, (t - 0.38) / 0.24);
+    return _lerp(0.85, 0.6, (t - 0.62) / 0.38);
+  }
+
+  // 重绘由 [Animation] 的 Listenable 驱动，无其他状态。
+  @override
+  bool shouldRepaint(_SparklePainter oldDelegate) => false;
+}
+
+/// 唱臂：白色杆体 + 灰色边缘阴影，支点在右上。
+/// pose 0 = 抬起（暂停，落点贴盘缘 ≈0.98R），1 = 落针（播放，落点沟槽环带中线 ≈0.76R）。
 @visibleForTesting
 class VinylTonearmPainter extends CustomPainter {
   const VinylTonearmPainter({required this.pose});
 
   final double pose;
 
+  /// 支点（相对盘体方形，右上角外侧）。
+  static const Offset pivotFraction = Offset(0.962, 0.115);
+
+  /// 臂长（相对盘体直径）。
+  static const double armLengthFraction = 0.3053;
+
+  /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
+  static const double playingDegrees = 18.0;
+  static const double pausedDegrees = -4.0;
+
+  /// 当前姿态下唱针落点（供测试断言「播放落沟槽中线、暂停贴盘缘」）。
+  @visibleForTesting
+  static Offset tipPosition(Size size, double pose) {
+    final w = size.shortestSide;
+    final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
+    final armLength = w * armLengthFraction;
+    final radians = _radians(pose);
+    return pivot +
+        Offset(-armLength * math.sin(radians), armLength * math.cos(radians));
+  }
+
+  static double _radians(double pose) =>
+      (pausedDegrees + pose * (playingDegrees - pausedDegrees)) * math.pi / 180;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final pivot = Offset(size.width * 0.72, size.height * 0.16);
-    final armLength = size.width * 0.62;
-    // 基准约 -145°（左下方向），播放时再向盘心压 24°。
-    final angle = -math.pi * 0.82 + pose * (math.pi * 0.135);
+    final w = size.shortestSide;
+    final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
+    final armLength = w * armLengthFraction;
+    final radians = _radians(pose);
 
     canvas.save();
     canvas.translate(pivot.dx, pivot.dy);
-    canvas.rotate(angle);
+    canvas.rotate(radians);
 
-    // 配重（支点另一侧）
+    // 配重块（支点上方）。
+    final weightCenter = Offset(0, -armLength * 0.14);
+    final weightRadius = w * 0.021;
     canvas.drawCircle(
-      Offset(-armLength * 0.20, 0),
-      size.width * 0.045,
-      Paint()..color = const Color(0xFF9AA0AA),
+      weightCenter + Offset(w * 0.004, w * 0.006),
+      weightRadius,
+      Paint()..color = Colors.black.withValues(alpha: 0.22),
     );
     canvas.drawCircle(
-      Offset(-armLength * 0.20, 0),
-      size.width * 0.028,
-      Paint()..color = const Color(0xFF4A4E57),
+      weightCenter,
+      weightRadius,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Color(0xFFC9CFD7), Color(0xFF98A1AC)],
+        ).createShader(
+          Rect.fromCircle(center: weightCenter, radius: weightRadius),
+        ),
     );
 
-    // 臂杆
+    // 灰色边缘阴影（杆体右侧），随后是白色杆体。
+    canvas.drawLine(
+      Offset(w * 0.012, 0),
+      Offset(w * 0.012, armLength),
+      Paint()
+        ..color = Colors.black.withValues(alpha: 0.26)
+        ..strokeWidth = w * 0.020
+        ..strokeCap = StrokeCap.round,
+    );
+    final rodWidth = w * 0.0153;
     canvas.drawLine(
       Offset.zero,
-      Offset(-armLength, 0),
+      Offset(0, armLength),
       Paint()
-        ..strokeWidth = size.width * 0.028
+        ..strokeWidth = rodWidth
         ..strokeCap = StrokeCap.round
         ..shader = const LinearGradient(
-          colors: [Color(0xFF8E939C), Color(0xFFE4E7EB)],
-        ).createShader(
-          Rect.fromLTWH(-armLength, 0, armLength, size.width * 0.03),
-        ),
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [Colors.white, Color(0xFFF3F5F8), Color(0xFFD3D8DF)],
+        ).createShader(Rect.fromLTWH(-rodWidth / 2, 0, rodWidth, armLength)),
     );
 
-    // 唱头
+    // 唱头：白色小方块 + 灰色阴影。
+    final headRect = Rect.fromCenter(
+      center: Offset(0, armLength),
+      width: w * 0.050,
+      height: w * 0.036,
+    );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(-armLength, 0),
-          width: armLength * 0.16,
-          height: size.width * 0.075,
-        ),
-        Radius.circular(size.width * 0.018),
+        headRect.translate(w * 0.004, w * 0.006),
+        Radius.circular(w * 0.011),
       ),
-      Paint()..color = const Color(0xFF2A2D34),
+      Paint()..color = Colors.black.withValues(alpha: 0.24),
     );
-    // 唱针
-    canvas.drawCircle(
-      Offset(-armLength - armLength * 0.035, 0),
-      size.width * 0.012,
-      Paint()..color = const Color(0xFFD8DCE2),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.011)),
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Color(0xFFD6DBE2)],
+        ).createShader(headRect),
     );
 
     canvas.restore();
 
-    // 支点轴座
+    // 支点轴座（不随杆旋转）。
+    final pivotRadius = w * 0.0286;
     canvas.drawCircle(
-      pivot,
-      size.width * 0.055,
-      Paint()..color = const Color(0xFF1A1C22),
+      pivot + Offset(w * 0.005, w * 0.007),
+      pivotRadius,
+      Paint()..color = Colors.black.withValues(alpha: 0.20),
     );
     canvas.drawCircle(
       pivot,
-      size.width * 0.042,
-      Paint()..color = const Color(0xFF3C404A),
-    );
-    canvas.drawCircle(
-      pivot,
-      size.width * 0.020,
-      Paint()..color = const Color(0xFF8E939C),
+      pivotRadius,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Color(0xFFCFD5DE), Color(0xFF9AA3AE)],
+        ).createShader(Rect.fromCircle(center: pivot, radius: pivotRadius)),
     );
   }
 

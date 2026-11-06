@@ -12,6 +12,9 @@ class PlayerProgressBar extends StatefulWidget {
   final Color? activeColor;
   final Color? inactiveColor;
 
+  /// true = 细线版（轨道 2.4、滑块 4.5），用于播放页浅灰/深灰进度条。
+  final bool thin;
+
   const PlayerProgressBar({
     super.key,
     required this.position,
@@ -20,6 +23,7 @@ class PlayerProgressBar extends StatefulWidget {
     this.mini = false,
     this.activeColor,
     this.inactiveColor,
+    this.thin = false,
   });
 
   @override
@@ -126,12 +130,14 @@ class _PlayerProgressBarState extends State<PlayerProgressBar> {
         Expanded(
           child: SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(
-                enabledThumbRadius: 6,
-                pressedElevation: 4,
+              trackHeight: widget.thin ? 2.4 : 4,
+              thumbShape: RoundSliderThumbShape(
+                enabledThumbRadius: widget.thin ? 4.5 : 6,
+                pressedElevation: widget.thin ? 0 : 4,
               ),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+              overlayShape: RoundSliderOverlayShape(
+                overlayRadius: widget.thin ? 12 : 14,
+              ),
               activeTrackColor: widget.activeColor ?? theme.colorScheme.primary,
               inactiveTrackColor:
                   widget.inactiveColor ??

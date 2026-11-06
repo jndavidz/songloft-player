@@ -9,7 +9,16 @@ class PlayerBackdrop extends StatelessWidget {
   final CoverPalette? palette;
   final Widget child;
 
-  const PlayerBackdrop({super.key, this.palette, required this.child});
+  /// true = 分两块：上半播放区「顶部显色 → 向下变浅」的竖向渐变，
+  /// 平滑过渡到底部控制区的近白 / 浅灰底色（[PlayerBackdropColors.control]）。
+  final bool splitControl;
+
+  const PlayerBackdrop({
+    super.key,
+    this.palette,
+    this.splitControl = false,
+    required this.child,
+  });
 
   static PlayerBackdropColors colorsOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_BackdropScope>()?.colors ??
@@ -17,21 +26,41 @@ class PlayerBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = PlayerBackdropColors.fromTheme(Theme.of(context), palette);
+    final colors = PlayerBackdropColors.fromTheme(
+      Theme.of(context),
+      palette,
+      splitControl,
+    );
+    final animated = AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: splitControl ? Alignment.topCenter : Alignment.topLeft,
+          end: splitControl ? Alignment.bottomCenter : Alignment.bottomRight,
+          colors: colors.background,
+          stops: colors.stops,
+        ),
+      ),
+      child: child,
+    );
     return _BackdropScope(
       colors: colors,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: colors.background,
-          ),
-        ),
-        child: child,
-      ),
+      child:
+          splitControl
+              // 底部先铺控制区底色，渐变层叠在上面淡出到同一个颜色，接缝无硬边。
+              ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    color: colors.control,
+                  ),
+                  animated,
+                ],
+              )
+              : animated,
     );
   }
 }
@@ -41,15 +70,27 @@ class PlayerBackdropColors {
   final Color active;
   final Color secondary;
 
+  /// 控制区（进度条 / 播放键 / 工具栏）底色：浅色主题近白，深色主题为相对更亮的浅灰。
+  final Color control;
+
+  /// 是否分块渐变（[background] 为 4 段，[stops] 与之对应）。
+  final bool split;
+
   const PlayerBackdropColors({
     required this.background,
     required this.active,
     required this.secondary,
+    this.control = Colors.transparent,
+    this.split = false,
   });
+
+  /// 分块模式的停止点：上部显色，约 2/3 处抵达控制区底色并保持到尾。
+  List<double>? get stops => split ? const [0.0, 0.34, 0.66, 1.0] : null;
 
   factory PlayerBackdropColors.fromTheme(
     ThemeData theme, [
     CoverPalette? palette,
+    bool splitControl = false,
   ]) {
     final scheme = theme.colorScheme;
     final extension = theme.extension<SongloftThemeExtension>();
@@ -71,8 +112,50 @@ class PlayerBackdropColors {
     Color tint(Color color, double opacity) =>
         Color.alphaBlend(color.withValues(alpha: opacity), scheme.surface);
     final coverOpacity = dark ? .24 : .28;
-    final background =
+    // 分块模式的控制区底色：深色主题抬亮到「相对浅灰」，不做近黑。
+    final control =
         highContrast
+            ? scheme.surface
+            : dark
+            ? Color.alphaBlend(
+              Colors.white.withValues(alpha: 0.16),
+              scheme.surface,
+            )
+            : Color.alphaBlend(
+              Colors.white.withValues(alpha: 0.95),
+              scheme.surface,
+            );
+    final controlTinted =
+        highContrast || palette == null
+            ? control
+            : Color.alphaBlend(
+              top.withValues(alpha: dark ? .05 : .035),
+              control,
+            );
+    final splitBackground =
+        highContrast
+            ? [scheme.surface, scheme.surface, scheme.surface, scheme.surface]
+            : [
+              // 顶部最显色，向下逐渐变浅直到等于控制区底色。
+              Color.alphaBlend(
+                top.withValues(alpha: dark ? .38 : .32),
+                controlTinted,
+              ),
+              Color.lerp(
+                Color.alphaBlend(
+                  top.withValues(alpha: dark ? .38 : .32),
+                  controlTinted,
+                ),
+                controlTinted,
+                .55,
+              )!,
+              controlTinted,
+              controlTinted,
+            ];
+    final background =
+        splitControl
+            ? splitBackground
+            : highContrast
             ? [scheme.surface, scheme.surface]
             : [
               tint(top, palette == null ? (dark ? .18 : .12) : coverOpacity),
@@ -91,6 +174,8 @@ class PlayerBackdropColors {
             ];
     return PlayerBackdropColors(
       background: background,
+      control: splitControl ? controlTinted : Colors.transparent,
+      split: splitControl,
       active: _readable(
         scheme.primary,
         scheme.onSurface,

@@ -92,4 +92,24 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect(_armPose(tester), closeTo(0.0, 1e-6));
   });
+
+  test('唱臂落点半径：播放落沟槽环带中线，暂停贴盘缘', () {
+    const size = Size(220, 220);
+    const center = Offset(110, 110);
+    const radius = 110.0;
+
+    final playing =
+        (VinylTonearmPainter.tipPosition(size, 1) - center).distance / radius;
+    final paused =
+        (VinylTonearmPainter.tipPosition(size, 0) - center).distance / radius;
+
+    // 沟槽环带 label(0.54R) → 盘缘(1.0R)，中线约 0.77R。
+    expect(playing, inInclusiveRange(0.70, 0.82));
+    // 暂停时几乎贴住盘体边缘。
+    expect(paused, inInclusiveRange(0.94, 1.02));
+
+    // 落点都在盘心右侧（不是盘心里侧）。
+    expect(VinylTonearmPainter.tipPosition(size, 1).dx, greaterThan(center.dx));
+    expect(VinylTonearmPainter.tipPosition(size, 0).dx, greaterThan(center.dx));
+  });
 }
