@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/utils/responsive_snackbar.dart';
 import '../../../shared/widgets/song_tile.dart';
 import '../../player/domain/play_history_entry.dart';
+import '../../player/domain/playback_context.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import '../../player/presentation/providers/play_history_provider.dart';
 import 'widgets/browse_state_view.dart';
@@ -109,7 +110,11 @@ class _RecentPlaysPageState extends ConsumerState<RecentPlaysPage> {
     final songs = _entries.map((e) => e.song).toList();
     ref
         .read(playerStateProvider.notifier)
-        .playPlaylist(songs, startIndex: index);
+        .playPlaylist(
+          songs,
+          startIndex: index,
+          context: PlaybackContext.recentBrowse,
+        );
   }
 
   @override

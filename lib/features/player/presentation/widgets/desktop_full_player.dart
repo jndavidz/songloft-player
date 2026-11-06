@@ -9,6 +9,7 @@ import '../../../../core/utils/color_extraction.dart';
 import '../../../../core/utils/url_helper.dart';
 import '../../../settings/presentation/providers/song_cache_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/song.dart';
 import '../../../../shared/widgets/add_to_playlist_modal.dart';
 import '../../../browse/presentation/browse_comments_sheet.dart';
 import '../../../../shared/widgets/favorite_button.dart';
@@ -26,9 +27,10 @@ import 'popup_controls.dart';
 import 'progress_bar.dart';
 import '../utils/full_player_route.dart';
 import '../utils/player_song_actions.dart';
-import 'vinyl_ring.dart';
+import 'vinyl_disc.dart';
 import 'video_player_surface.dart';
 import 'video_stage.dart';
+import 'song_meta_chips.dart';
 import '../../../dlna/presentation/widgets/cast_button.dart';
 import 'volume_control.dart';
 
@@ -41,25 +43,12 @@ class DesktopFullPlayer extends ConsumerStatefulWidget {
 }
 
 class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
-    with SingleTickerProviderStateMixin, FullPlayerAutoExit {
-  /// 唱片环旋转动画控制器
-  late final AnimationController _rotationController;
-
+    with FullPlayerAutoExit {
   @override
   void initState() {
     super.initState();
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 28),
-    );
     // Web 冷加载 /player 但无队列可恢复时，短暂等待异步恢复；仍无歌曲则退出。
     scheduleFullPlayerAutoExit();
-  }
-
-  @override
-  void dispose() {
-    _rotationController.dispose();
-    super.dispose();
   }
 
   @override
@@ -79,22 +68,7 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
       }
       // 异步恢复出歌曲后，取消冷加载兜底退出
       if (next.hasSong) cancelFullPlayerAutoExit();
-      // 控制唱片环旋转动画
-      if (next.isPlaying && !_rotationController.isAnimating) {
-        _rotationController.repeat();
-      } else if (!next.isPlaying && _rotationController.isAnimating) {
-        _rotationController.stop();
-      }
     });
-
-    // 初始播放状态动画
-    if (state.isPlaying && !_rotationController.isAnimating) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && state.isPlaying && !_rotationController.isAnimating) {
-          _rotationController.repeat();
-        }
-      });
-    }
 
     if (!state.hasSong) {
       debugPrint('[Player] DesktopFullPlayer: no song, hiding');
@@ -158,14 +132,12 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
                                     song: song,
                                     width: effectiveCover,
                                     height: effectiveCover,
-                                    fallback: VinylRing(
-                                      rotationAnimation: _rotationController,
-                                      child: _buildCover(
-                                        context,
-                                        coverUrl,
-                                        effectiveCover,
-                                        palette: palette,
-                                      ),
+                                    fallback: _buildVinyl(
+                                      context,
+                                      song,
+                                      effectiveCover * 0.9,
+                                      palette: palette,
+                                      isPlaying: state.isPlaying,
                                     ),
                                   ),
                                   const SizedBox(height: 24),
@@ -207,6 +179,8 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.center,
                                         ),
+                                        const SizedBox(height: 8),
+                                        SongMetaChips(song: song),
                                       ],
                                     ),
                                   ),
@@ -226,6 +200,10 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
                             onSeek: notifier.seek,
                             song: song,
                             editable: true,
+                            scrubEnabled:
+                                !song.isLive &&
+                                state.duration > Duration.zero &&
+                                song.duration > 0,
                           ),
                         ),
                       ),
@@ -436,46 +414,37 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
     );
   }
 
-  /// 封面构建
-  Widget _buildCover(
+  /// 黑胶盘（封面缺失时由 VinylDisc 内部回退默认 label）
+  Widget _buildVinyl(
     BuildContext context,
-    String? coverUrl,
-    double size, {
+    Song song,
+    double diameter, {
     CoverPalette? palette,
+    bool isPlaying = false,
   }) {
     final theme = Theme.of(context);
     final glowColor = palette?.vibrantColor ?? palette?.dominantColor;
+    final coverUrl = song.coverUrl;
+    final resolvedCover =
+        coverUrl != null && coverUrl.isNotEmpty
+            ? UrlHelper.buildCoverUrl(coverUrl, width: 300)
+            : null;
 
     return Container(
-      width: size,
-      height: size,
       decoration: BoxDecoration(
-        borderRadius: AppRadius.xlAll,
-        color: theme.colorScheme.surfaceContainerHighest,
+        shape: BoxShape.circle,
+        // 发光在最外层（旋转子树之外），避免每帧重算 blur。
         boxShadow:
             glowColor != null
                 ? AppEffects.primaryGlow(glowColor)
                 : AppEffects.softGlow(theme.colorScheme.onSurface),
       ),
-      clipBehavior: Clip.antiAlias,
-      child:
-          coverUrl != null
-              ? ExcludeSemantics(
-                child: Image.network(
-                  UrlHelper.buildCoverUrl(coverUrl, width: 300),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _buildPlaceholder(theme, size),
-                ),
-              )
-              : _buildPlaceholder(theme, size),
-    );
-  }
-
-  Widget _buildPlaceholder(ThemeData theme, double size) {
-    return Icon(
-      Icons.music_note_rounded,
-      size: size * 0.4,
-      color: theme.colorScheme.onSurfaceVariant,
+      child: VinylDisc(
+        isPlaying: isPlaying,
+        diameter: diameter,
+        coverUrl: resolvedCover,
+        title: song.title,
+      ),
     );
   }
 

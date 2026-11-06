@@ -1,5 +1,7 @@
-/// 曲库顶部「在线发现」区（票 01）：顶部搜索框（kwqq 源标识）+
-/// 「推荐歌单 / 榜单 / 播放历史 / 本地音乐」四入口，MusicFree 信息架构。
+/// 曲库顶部「在线发现」区（票 01）：四入口（推荐歌单 / 榜单 / 播放历史 / 本地音乐），
+/// MusicFree 信息架构。搜索框已上收为曲库页唯一的真实输入框（含「曲库 / 在线」作用域胶囊），
+/// 这里不再放伪搜索框，只保留发现入口。
+///
 /// 既有库内浏览视图（分类聚合/文件夹/标签）保留，本区叠在其上方常驻。
 
 library;
@@ -10,7 +12,6 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../recent_plays_page.dart';
 import '../recommend_sheets_page.dart';
-import '../search_page.dart';
 import '../toplists_page.dart';
 
 class DiscoverHeader extends StatelessWidget {
@@ -22,102 +23,49 @@ class DiscoverHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.sm,
+        AppSpacing.xs,
         AppSpacing.md,
         AppSpacing.xs,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // 顶部搜索框（带 kwqq 源标识，点击进入在线搜索页）
-          InkWell(
-            borderRadius: BorderRadius.circular(AppSpacing.xl),
+          _Entry(
+            icon: Icons.explore_outlined,
+            label: l10n.discoverRecommend,
             onTap:
                 () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => const BrowseSearchPage(),
+                    builder: (_) => const RecommendSheetsPage(),
                   ),
                 ),
-            child: InputDecorator(
-              decoration: InputDecoration(
-                hintText: l10n.browseSearchHint,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.xl),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                isDense: true,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'kwqq',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              ),
-            ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          // 四入口宫格
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _Entry(
-                icon: Icons.explore_outlined,
-                label: l10n.discoverRecommend,
-                onTap:
-                    () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const RecommendSheetsPage(),
-                      ),
-                    ),
-              ),
-              _Entry(
-                icon: Icons.leaderboard_outlined,
-                label: l10n.discoverToplists,
-                onTap:
-                    () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const ToplistsPage(),
-                      ),
-                    ),
-              ),
-              _Entry(
-                icon: Icons.history,
-                label: l10n.discoverPlayHistory,
-                onTap:
-                    () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const RecentPlaysPage(),
-                      ),
-                    ),
-              ),
-              _Entry(
-                icon: Icons.library_music_outlined,
-                label: l10n.discoverLocalMusic,
-                onTap: () => onSelectView('local'),
-              ),
-            ],
+          _Entry(
+            icon: Icons.leaderboard_outlined,
+            label: l10n.discoverToplists,
+            onTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const ToplistsPage()),
+                ),
+          ),
+          _Entry(
+            icon: Icons.history,
+            label: l10n.discoverPlayHistory,
+            onTap:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const RecentPlaysPage(),
+                  ),
+                ),
+          ),
+          _Entry(
+            icon: Icons.library_music_outlined,
+            label: l10n.discoverLocalMusic,
+            onTap: () => onSelectView('local'),
           ),
         ],
       ),

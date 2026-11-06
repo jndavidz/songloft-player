@@ -18,9 +18,11 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_view.dart';
 import '../../settings/data/settings_api.dart';
 import '../../settings/presentation/providers/settings_provider.dart';
+import '../../player/domain/playback_context.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import '../../playlist/presentation/providers/playlist_view_provider.dart';
 import '../../playlist/presentation/widgets/playlist_browse_view.dart';
+import '../../browse/presentation/search_page.dart';
 import '../../browse/presentation/widgets/discover_header.dart';
 import 'providers/songs_provider.dart';
 import 'song_edit_page.dart';
@@ -50,10 +52,22 @@ class LibraryPage extends ConsumerStatefulWidget {
   ConsumerState<LibraryPage> createState() => _LibraryPageState();
 }
 
+/// 曲库搜索作用域：框内胶囊切换。
+enum _SearchScope {
+  /// 曲库：keyword 下发当前（扁平）视图，本地过滤。
+  library,
+
+  /// 在线：带词跳在线搜索页（kwqq 门面）。
+  online,
+}
+
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
   Timer? _debounceTimer;
+
+  /// 当前搜索作用域（曲库 / 在线）。
+  _SearchScope _scope = _SearchScope.library;
 
   /// 当前选中的视图 key（null 时在 build 里回退到第一个可见视图）。
   String? _selectedViewKey;
@@ -275,7 +289,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Future<void> _playAll(SongsListState state) async {
     final total = await ref
         .read(playerStateProvider.notifier)
-        .playAllSongs(keyword: state.keyword, type: state.type);
+        .playAllSongs(
+          keyword: state.keyword,
+          type: state.type,
+          context: PlaybackContext.libraryBrowse,
+        );
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     if (total < 0) {
@@ -342,7 +360,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     final content = _buildContent(context, state, selected);
 
-    // 曲库顶部的「在线发现」区（票 01）：搜索框 + 四入口，常驻于视图切换之上。
+    // 唯一真实搜索框（作用域胶囊：曲库 / 在线），上收自原「伪输入框」位置。
+    final searchBar = _buildUnifiedSearchBar(context, selected, displayKeys);
+
+    // 曲库顶部的「在线发现」区（票 01）：四入口，常驻于视图切换之上。
     final discoverHeader = DiscoverHeader(onSelectView: _selectView);
 
     if (context.useWideLayout) {
@@ -361,6 +382,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Expanded(
             child: Column(
               children: [
+                searchBar,
                 discoverHeader,
                 const Divider(height: 1),
                 Expanded(child: content),
@@ -373,6 +395,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     return Column(
       children: [
+        searchBar,
         discoverHeader,
         LibraryViewSwitcher(
           viewKeys: displayKeys,
@@ -430,7 +453,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
-        _buildSearchBar(context),
         if (state.error != null && state.songs.isNotEmpty)
           Container(
             width: double.infinity,
@@ -1071,38 +1093,156 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
+  /// 唯一真实搜索框：框内胶囊切换「曲库 / 在线」作用域。
+  ///
+  /// - 曲库：关键词下发当前扁平视图（`songsListProvider.search`），行为与旧版一致；
+  ///   若当前是非扁平视图（分类聚合/文件夹/标签/歌单），切回曲库作用域时自动
+  ///   回到第一个扁平视图，避免关键词「无处生效」。
+  /// - 在线：不再本地过滤；回车或右侧箭头带词进入在线搜索页。
+  Widget _buildUnifiedSearchBar(
+    BuildContext context,
+    String? selected,
+    List<String> displayKeys,
+  ) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final horizontalPadding = context.responsive<double>(
       mobile: AppSpacing.md,
       tablet: AppSpacing.lg,
       desktop: AppSpacing.xl,
     );
+    final isOnline = _scope == _SearchScope.online;
+    final hasText = _searchController.text.isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 0),
       child: TextField(
         controller: _searchController,
+        textInputAction:
+            isOnline ? TextInputAction.search : TextInputAction.done,
+        onSubmitted: isOnline ? (_) => _openOnlineSearch() : null,
+        // 在线作用域不发本地过滤；切回曲库时 build 会用当前文本重新下发。
+        onChanged:
+            isOnline
+                ? (_) => setState(() {})
+                : (value) {
+                  setState(() {});
+                  _onSearchChanged(value);
+                },
         decoration: InputDecoration(
-          hintText: l10n.librarySearchHint,
-          prefixIcon: const Icon(Icons.search),
+          hintText: isOnline ? l10n.browseSearchHint : l10n.librarySearchHint,
+          prefixIcon: _buildScopeCapsule(
+            theme: theme,
+            l10n: l10n,
+            isOnline: isOnline,
+            selected: selected,
+            displayKeys: displayKeys,
+          ),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: 0,
+          ),
           suffixIcon:
-              _searchController.text.isNotEmpty
+              isOnline
                   ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    tooltip: l10n.clearSearch,
-                    onPressed: () {
-                      _searchController.clear();
-                      ref.read(songsListProvider.notifier).search('');
-                    },
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    tooltip: l10n.searchScopeOnline,
+                    onPressed: _openOnlineSearch,
                   )
-                  : null,
+                  : (hasText
+                      ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        tooltip: l10n.clearSearch,
+                        onPressed: () {
+                          _searchController.clear();
+                          ref.read(songsListProvider.notifier).search('');
+                          setState(() {});
+                        },
+                      )
+                      : null),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppRadius.xl),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),
-        onChanged: _onSearchChanged,
+      ),
+    );
+  }
+
+  /// 框内作用域胶囊：点击即切换「曲库 ⇄ 在线」。
+  Widget _buildScopeCapsule({
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required bool isOnline,
+    required String? selected,
+    required List<String> displayKeys,
+  }) {
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(left: 6),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap:
+            () => _setScope(
+              isOnline ? _SearchScope.library : _SearchScope.online,
+              selected,
+              displayKeys,
+            ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: colors.primaryContainer,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isOnline ? l10n.searchScopeOnline : l10n.navLibrary,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colors.onPrimaryContainer,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 2),
+              Icon(
+                Icons.expand_more_rounded,
+                size: 14,
+                color: colors.onPrimaryContainer,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _setScope(
+    _SearchScope scope,
+    String? selected,
+    List<String> displayKeys,
+  ) {
+    if (_scope == scope) return;
+    setState(() => _scope = scope);
+    if (scope == _SearchScope.online) return;
+    // 切回曲库：非扁平视图下关键词没有承载列表，自动回到第一个扁平视图。
+    if (selected != null && isFlatLibraryView(selected)) return;
+    String? flatKey;
+    for (final key in displayKeys) {
+      if (isFlatLibraryView(key)) {
+        flatKey = key;
+        break;
+      }
+    }
+    if (flatKey != null) _selectView(flatKey);
+  }
+
+  void _openOnlineSearch() {
+    final keyword = _searchController.text.trim();
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BrowseSearchPage(initialKeyword: keyword),
       ),
     );
   }
@@ -1392,7 +1532,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   void _onSongTap(Song song, int index) {
     final state = ref.read(songsListProvider);
     final notifier = ref.read(playerStateProvider.notifier);
-    notifier.playPlaylist(state.songs, startIndex: index);
+    // 曲库扁平列表点播：服务端没有「本地曲库」专用上下文枚举，
+    // 统一挂 browse（key 自由字符串）→ 才会进播放历史/最近播放。
+    notifier.playPlaylist(
+      state.songs,
+      startIndex: index,
+      context: PlaybackContext.libraryBrowse,
+    );
     if (state.hasMore) {
       notifier.loadRemainingSongsForCurrentPlaylist(
         keyword: state.keyword,

@@ -33,12 +33,21 @@ class LyricsView extends ConsumerStatefulWidget {
   /// 是否允许编辑歌词。即使为 true，也只有 song.type == 'local' 才会显示按钮。
   final bool editable;
 
+  /// 是否允许「长按歌词并上下拖动」按行时间调整播放进度。
+  /// 电台 / 时长未知 / 纯文本歌词场景由调用方置 false。
+  final bool scrubEnabled;
+
+  /// 点击非歌词行的空白区域时触发（用于点按切回封面）。
+  final VoidCallback? onTapBackground;
+
   const LyricsView({
     super.key,
     required this.currentPosition,
     this.onSeek,
     this.song,
     this.editable = false,
+    this.scrubEnabled = false,
+    this.onTapBackground,
   });
 
   @override
@@ -47,10 +56,17 @@ class LyricsView extends ConsumerStatefulWidget {
 
 class _LyricsViewState extends ConsumerState<LyricsView> {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _listKey = GlobalKey();
 
   bool _isUserScrolling = false;
   Timer? _resumeTimer;
   int _lastScrolledIndex = -1;
+
+  /// 长按拖拽进度时落到的歌词行索引（null 表示未在拖拽）。
+  int? _scrubIndex;
+
+  /// ListView 的上下留白（让首尾行也能居中），由 LayoutBuilder 更新。
+  double _verticalPadding = 0;
 
   /// 每行统一高度，随是否含翻译/罗马音在 build 中动态计算。
   /// 保持统一便于用 `index * _lineHeight` 精确定位滚动。
@@ -109,6 +125,78 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
     if (lyricState.currentIndex >= 0) {
       _scrollToLine(lyricState.currentIndex);
     }
+  }
+
+  /// 把拖拽位置换算成歌词行索引；越界钳到有效范围。
+  int? _indexAt(Offset globalPosition) {
+    final box = _listKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !_scrollController.hasClients) return null;
+    final lyrics = ref.read(lyricStateProvider).lyrics;
+    if (lyrics.isEmpty) return null;
+    final local = box.globalToLocal(globalPosition);
+    final y = local.dy - _verticalPadding + _scrollController.offset;
+    return (y / _lineHeight).floor().clamp(0, lyrics.length - 1);
+  }
+
+  void _onScrubStart(LongPressStartDetails details) {
+    final index = _indexAt(details.globalPosition);
+    if (index == null) return;
+    _isUserScrolling = true;
+    _resumeTimer?.cancel();
+    setState(() => _scrubIndex = index);
+  }
+
+  void _onScrubMove(LongPressMoveUpdateDetails details) {
+    if (_scrubIndex == null) return;
+    final index = _indexAt(details.globalPosition);
+    if (index == null || index == _scrubIndex) return;
+    setState(() => _scrubIndex = index);
+  }
+
+  void _onScrubEnd(LongPressEndDetails details) {
+    final index = _scrubIndex;
+    if (index == null) return;
+    final lyrics = ref.read(lyricStateProvider).lyrics;
+    setState(() => _scrubIndex = null);
+    if (index < lyrics.length) widget.onSeek?.call(lyrics[index].time);
+    _isUserScrolling = false;
+    _resumeTimer?.cancel();
+    _resumeTimer = Timer(_resumeDelay, _onResumeAutoScroll);
+  }
+
+  String _formatTime(Duration time) {
+    final minutes = time.inMinutes;
+    final seconds = time.inSeconds.remainder(60);
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// 拖拽进度时的浮层提示：目标行时间，松手后 seek 到该行。
+  Widget _buildScrubHint(ThemeData theme) {
+    final lyrics = ref.read(lyricStateProvider).lyrics;
+    final index = _scrubIndex;
+    if (index == null || index >= lyrics.length) return const SizedBox.shrink();
+    final colors = PlayerBackdrop.colorsOf(context);
+    return Align(
+      alignment: Alignment.topCenter,
+      child: IgnorePointer(
+        child: Container(
+          margin: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.82),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            _formatTime(lyrics[index].time),
+            style: TextStyle(
+              color: colors.active,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   bool get _shouldShowEditButton {
@@ -331,7 +419,12 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
       builder: (context, constraints) {
         final verticalPadding = ((constraints.maxHeight - _lineHeight) / 2)
             .clamp(0.0, double.infinity);
-        return NotificationListener<ScrollNotification>(
+        _verticalPadding = verticalPadding;
+        // 长按拖拽调整进度：仅时间轴歌词 + 有时长 + 调用方允许时启用。
+        final canScrub =
+            widget.scrubEnabled && lyricState.synced && widget.onSeek != null;
+
+        final list = NotificationListener<ScrollNotification>(
           onNotification: (notification) {
             if (notification is ScrollStartNotification) {
               if (notification.dragDetails != null) {
@@ -341,6 +434,7 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
             return false;
           },
           child: ListView.builder(
+            key: _listKey,
             controller: _scrollController,
             padding: EdgeInsets.symmetric(
               vertical: verticalPadding,
@@ -371,6 +465,23 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
                 ),
               );
             },
+          ),
+        );
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTapBackground,
+          onLongPressStart: canScrub ? _onScrubStart : null,
+          onLongPressMoveUpdate: canScrub ? _onScrubMove : null,
+          onLongPressEnd: canScrub ? _onScrubEnd : null,
+          child: SizedBox.expand(
+            child: Stack(
+              children: [
+                Positioned.fill(child: list),
+                if (_scrubIndex != null)
+                  Positioned.fill(child: _buildScrubHint(theme)),
+              ],
+            ),
           ),
         );
       },

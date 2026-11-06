@@ -56,6 +56,7 @@ void main() {
   late HttpServer server;
   final requests = <Uri>[];
   var status = 200;
+  var responseExtra = <String, dynamic>{};
   late String oldBaseUrl;
   late String oldResolvedBaseUrl;
 
@@ -80,6 +81,7 @@ void main() {
     await LyricCacheService().clear();
     requests.clear();
     status = 200;
+    responseExtra = const {};
     oldBaseUrl = AppConfig.baseUrl;
     oldResolvedBaseUrl = AppConfig.resolvedBaseUrl;
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -93,6 +95,7 @@ void main() {
         jsonEncode({
           'lyric': '[00:00.00]saved ${request.uri.pathSegments[3]}',
           'tlyric': '[00:00.00]translation',
+          ...responseExtra,
         }),
       );
       await request.response.close();
@@ -212,4 +215,19 @@ void main() {
       expect(requests, isEmpty);
     },
   );
+
+  httpTest('lxlyric 默认生效：不依赖主歌词内嵌逐字标记', () async {
+    responseExtra = {'lxlyric': '[00:00.00]<00:00.00>逐<00:01.00>字<00:02.00>歌'};
+    final state = await loaded(createContainer(_song(563)));
+    expect(state.lyrics, isNotEmpty);
+    expect(state.lyrics.first.words, isNotNull);
+    expect(state.lyrics.first.words!.length, 3);
+  });
+
+  httpTest('lxlyric 缺失时优雅回退到普通 LRC', () async {
+    final state = await loaded(createContainer(_song(564)));
+    expect(state.lyrics, isNotEmpty);
+    expect(state.lyrics.first.words, isNull);
+    expect(state.lyrics.first.text, 'saved 564');
+  });
 }

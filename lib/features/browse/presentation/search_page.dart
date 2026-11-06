@@ -28,7 +28,10 @@ import 'widgets/browse_track_tile.dart';
 enum BrowseSearchType { music, album, artist, sheet }
 
 class BrowseSearchPage extends ConsumerStatefulWidget {
-  const BrowseSearchPage({super.key});
+  /// 带词进入时直接以该关键词搜索（曲库页「在线」作用域提交时传入）。
+  final String initialKeyword;
+
+  const BrowseSearchPage({super.key, this.initialKeyword = ''});
 
   @override
   ConsumerState<BrowseSearchPage> createState() => _BrowseSearchPageState();
@@ -60,6 +63,14 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _loadHistory();
+    final preset = widget.initialKeyword.trim();
+    if (preset.isNotEmpty) {
+      _searchController.text = preset;
+      _keyword = preset;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _submitSearch(preset);
+      });
+    }
   }
 
   @override

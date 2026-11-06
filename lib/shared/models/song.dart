@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// 歌曲模型
 class Song {
   final int id;
@@ -21,6 +23,13 @@ class Song {
   final int sampleRate;
   final String? sourceUrl;
   final String? sourceCoverUrl;
+
+  /// 音源插件入口标识（如 `kwqq`），远程歌曲用于展示「播放来源」。
+  final String pluginEntryPath;
+
+  /// 上游音源元数据（远程歌曲通常是 JSON 字符串，含 `source` 平台标识等）。
+  final Map<String, dynamic>? sourceData;
+
   final bool isLive;
   final bool isVideo; // 是否含真实视频轨（后端 ffprobe 探测），据此渲染画面/选择投屏 mime
   final DateTime addedAt;
@@ -48,6 +57,8 @@ class Song {
     this.sampleRate = 0,
     this.sourceUrl,
     this.sourceCoverUrl,
+    this.pluginEntryPath = '',
+    this.sourceData,
     this.isLive = false,
     this.isVideo = false,
     required this.addedAt,
@@ -77,6 +88,8 @@ class Song {
       sampleRate: json['sample_rate'] as int? ?? 0,
       sourceUrl: json['source_url'] as String?,
       sourceCoverUrl: json['source_cover_url'] as String?,
+      pluginEntryPath: json['plugin_entry_path'] as String? ?? '',
+      sourceData: _parseSourceData(json['source_data']),
       isLive: json['is_live'] as bool? ?? false,
       isVideo: json['is_video'] as bool? ?? false,
       addedAt:
@@ -113,6 +126,8 @@ class Song {
       'sample_rate': sampleRate,
       'source_url': sourceUrl,
       'source_cover_url': sourceCoverUrl,
+      'plugin_entry_path': pluginEntryPath,
+      'source_data': sourceData == null ? null : jsonEncode(sourceData),
       'is_live': isLive,
       'is_video': isVideo,
       'added_at': addedAt.toIso8601String(),
@@ -142,6 +157,8 @@ class Song {
     int? sampleRate,
     String? sourceUrl,
     String? sourceCoverUrl,
+    String? pluginEntryPath,
+    Map<String, dynamic>? sourceData,
     bool? isLive,
     bool? isVideo,
     DateTime? addedAt,
@@ -169,6 +186,8 @@ class Song {
       sampleRate: sampleRate ?? this.sampleRate,
       sourceUrl: sourceUrl ?? this.sourceUrl,
       sourceCoverUrl: sourceCoverUrl ?? this.sourceCoverUrl,
+      pluginEntryPath: pluginEntryPath ?? this.pluginEntryPath,
+      sourceData: sourceData ?? this.sourceData,
       isLive: isLive ?? this.isLive,
       isVideo: isVideo ?? this.isVideo,
       addedAt: addedAt ?? this.addedAt,
@@ -184,6 +203,20 @@ class Song {
 
   @override
   int get hashCode => id.hashCode;
+}
+
+/// `source_data` 后端以 JSON 字符串落库，部分接口也可能直接给对象；两种形态都兼容。
+Map<String, dynamic>? _parseSourceData(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is String && value.isNotEmpty) {
+    try {
+      final decoded = jsonDecode(value);
+      if (decoded is Map<String, dynamic>) return decoded;
+    } catch (_) {
+      return null;
+    }
+  }
+  return null;
 }
 
 /// 标签分类聚合项：某维度的一个取值、歌曲数量、及一首代表歌曲的封面 URL。

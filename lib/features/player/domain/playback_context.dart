@@ -23,6 +23,26 @@ class PlaybackContext {
 
   static const String typePlaylist = 'playlist';
 
+  /// 浏览类上下文：曲库扁平列表 / 文件夹 / 最近播放页 / 插件音源点播。
+  /// 服务端 `browse` 的 key 是自由字符串，这里用固定标识区分具体浏览入口。
+  static const String typeBrowse = 'browse';
+
+  /// 曲库本地扁平列表（全部/本地/网络/电台）的点播上下文。
+  static const PlaybackContext libraryBrowse = PlaybackContext(
+    typeBrowse,
+    'library',
+  );
+
+  /// 文件夹浏览的点播上下文；[path] 是相对音乐根目录的文件夹路径（根用空串）。
+  static PlaybackContext folder(String path) =>
+      PlaybackContext(typeBrowse, 'folder:${path.isEmpty ? '/' : path}');
+
+  /// 「最近播放」页点播的上下文（重播同样会再记一条历史）。
+  static const PlaybackContext recentBrowse = PlaybackContext(
+    typeBrowse,
+    'recent',
+  );
+
   /// 该上下文对应的歌单 ID；非歌单上下文返回 null。
   int? get playlistId => type == typePlaylist ? int.tryParse(key) : null;
 

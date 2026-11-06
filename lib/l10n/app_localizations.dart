@@ -63,7 +63,8 @@ import 'app_localizations_zh.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,7 +72,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -83,18 +85,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('es'),
-    Locale('zh')
+    Locale('zh'),
   ];
 
   /// No description provided for @personalTokenTitle.
@@ -389,7 +392,12 @@ abstract class AppLocalizations {
   ///
   /// In zh, this message translates to:
   /// **'已检查 {checked} 个仓库 · 发现 {found} 个插件 · 过滤 {excluded} 个 · 暂未验证 {failed} 个'**
-  String githubDiscoverySummary(int checked, int found, int excluded, int failed);
+  String githubDiscoverySummary(
+    int checked,
+    int found,
+    int excluded,
+    int failed,
+  );
 
   /// No description provided for @githubDiscoveryIncomplete.
   ///
@@ -5489,7 +5497,13 @@ abstract class AppLocalizations {
   ///
   /// In zh, this message translates to:
   /// **'已处理: {scanned}/{total}, 导入: {imported}, 跳过: {skipped}, 失败: {failed}'**
-  String settingsScanProgressStats(int scanned, int total, int imported, int skipped, int failed);
+  String settingsScanProgressStats(
+    int scanned,
+    int total,
+    int imported,
+    int skipped,
+    int failed,
+  );
 
   /// No description provided for @settingsScanCancelScan.
   ///
@@ -7049,7 +7063,12 @@ abstract class AppLocalizations {
   ///
   /// In zh, this message translates to:
   /// **'导入完成: 新建歌单 {created}, 合并歌单 {merged}, 新建歌曲 {songsCreated}, 匹配歌曲 {songsMatched}'**
-  String settingsImportComplete(Object created, Object merged, Object songsCreated, Object songsMatched);
+  String settingsImportComplete(
+    Object created,
+    Object merged,
+    Object songsCreated,
+    Object songsMatched,
+  );
 
   /// No description provided for @settingsImportFailed.
   ///
@@ -7655,7 +7674,11 @@ abstract class AppLocalizations {
   ///
   /// In zh, this message translates to:
   /// **'当前为{currentChannel}，上传的文件为{uploadChannel} ({version})，确认切换通道并升级？\n\n升级后服务将自动重启。'**
-  String settingsUpgradeUploadConfirmChannelContent(String currentChannel, String uploadChannel, String version);
+  String settingsUpgradeUploadConfirmChannelContent(
+    String currentChannel,
+    String uploadChannel,
+    String version,
+  );
 
   /// No description provided for @settingsUpgradeUploadConfirmNormal.
   ///
@@ -8719,6 +8742,12 @@ abstract class AppLocalizations {
   /// **'搜索在线音乐'**
   String get browseSearchHint;
 
+  /// No description provided for @searchScopeOnline.
+  ///
+  /// In zh, this message translates to:
+  /// **'在线'**
+  String get searchScopeOnline;
+
   /// No description provided for @browseDiscoverTitle.
   ///
   /// In zh, this message translates to:
@@ -8954,7 +8983,8 @@ abstract class AppLocalizations {
   String get browseClearPlayHistory;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -8963,26 +8993,28 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'es', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'es', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'es': return AppLocalizationsEs();
-    case 'zh': return AppLocalizationsZh();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

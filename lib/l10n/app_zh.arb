@@ -3011,6 +3011,7 @@
   "settingsHomeShowRadios": "显示电台区块",
   "settingsHomeShowRadiosDesc": "在首页显示「我的电台」，选择保存在本机。",
   "browseSearchHint": "搜索在线音乐",
+  "searchScopeOnline": "在线",
   "browseDiscoverTitle": "在线发现",
   "discoverRecommend": "推荐歌单",
   "discoverToplists": "榜单",

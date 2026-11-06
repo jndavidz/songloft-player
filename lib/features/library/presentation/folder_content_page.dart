@@ -14,6 +14,7 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_view.dart';
 import '../../../shared/widgets/manage_tags_modal.dart';
 import '../../../shared/mixins/song_list_actions.dart';
+import '../../player/domain/playback_context.dart';
 import '../../player/presentation/providers/player_provider.dart';
 import '../../playlist/presentation/providers/playlist_view_provider.dart';
 import 'providers/folder_provider.dart';
@@ -63,7 +64,13 @@ class _FolderContentPageState extends ConsumerState<FolderContentPage>
         ResponsiveSnackBar.show(context, message: l10n.libraryNoPlayableSongs);
         return;
       }
-      ref.read(playerStateProvider.notifier).playPlaylist(songs, startIndex: 0);
+      ref
+          .read(playerStateProvider.notifier)
+          .playPlaylist(
+            songs,
+            startIndex: 0,
+            context: PlaybackContext.folder(widget.path),
+          );
       if (!mounted) return;
       ResponsiveSnackBar.show(
         context,
@@ -79,7 +86,11 @@ class _FolderContentPageState extends ConsumerState<FolderContentPage>
   void _onSongTap(List<Song> songs, int index) {
     ref
         .read(playerStateProvider.notifier)
-        .playPlaylist(songs, startIndex: index);
+        .playPlaylist(
+          songs,
+          startIndex: index,
+          context: PlaybackContext.folder(widget.path),
+        );
   }
 
   Future<void> _deleteSong(int songId) async {
@@ -139,7 +150,13 @@ class _FolderContentPageState extends ConsumerState<FolderContentPage>
         ResponsiveSnackBar.show(context, message: l10n.libraryNoPlayableSongs);
         return;
       }
-      ref.read(playerStateProvider.notifier).playPlaylist(songs, startIndex: 0);
+      ref
+          .read(playerStateProvider.notifier)
+          .playPlaylist(
+            songs,
+            startIndex: 0,
+            context: PlaybackContext.folder(folderPath),
+          );
       if (!mounted) return;
       ResponsiveSnackBar.show(
         context,

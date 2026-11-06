@@ -1824,6 +1824,7 @@ class PlayerNotifier extends Notifier<PlayerState> {
     String? keyword,
     String? type,
     int startIndex = 0,
+    PlaybackContext? context,
   }) async {
     final songsApi = ref.read(songsApiProvider);
     const firstPageLimit = 10;
@@ -1860,7 +1861,11 @@ class PlayerNotifier extends Notifier<PlayerState> {
         0,
         firstPageSongs.length - 1,
       );
-      await playPlaylist(firstPageSongs, startIndex: safeStartIndex);
+      await playPlaylist(
+        firstPageSongs,
+        startIndex: safeStartIndex,
+        context: context,
+      );
 
       if (total > firstPageSongs.length) {
         // 记录当前代次，传给后台加载任务用于检测是否过期

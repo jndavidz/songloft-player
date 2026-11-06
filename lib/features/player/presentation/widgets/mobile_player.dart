@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:math' as math;
 
 import '../../../../core/backend/run_mode_provider.dart';
 import '../../../../core/theme/app_dimensions.dart';
@@ -8,6 +9,7 @@ import '../../../../core/utils/color_extraction.dart';
 import '../../../../core/utils/url_helper.dart';
 import '../../../settings/presentation/providers/song_cache_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/song.dart';
 import '../../../../shared/widgets/add_to_playlist_modal.dart';
 import '../../../browse/presentation/browse_comments_sheet.dart';
 import '../../../../shared/widgets/favorite_button.dart';
@@ -18,6 +20,7 @@ import '../providers/audio_track_provider.dart';
 import 'audio_track_control.dart';
 import 'lyrics_view.dart';
 import 'player_backdrop.dart';
+import 'song_meta_chips.dart';
 import 'lyrics_screen_awake.dart';
 import 'play_controls.dart';
 import 'popup_controls.dart';
@@ -28,12 +31,12 @@ import '../utils/full_player_route.dart';
 import '../utils/player_song_actions.dart';
 import 'video_player_surface.dart';
 import 'video_stage.dart';
-import 'vinyl_ring.dart';
+import 'vinyl_disc.dart';
 import 'volume_control.dart';
 
 /// 移动端全屏播放器
 class MobilePlayer extends ConsumerStatefulWidget {
-  /// 初始展示的 PageView 页（0: 封面，1: 歌词）。
+  /// 初始展示的页面（0: 封面/黑胶盘，1: 歌词）。
   /// 「打开后自动进入歌词」会传 1 直接落在歌词页。
   final int initialPage;
 
@@ -44,34 +47,16 @@ class MobilePlayer extends ConsumerStatefulWidget {
 }
 
 class _MobilePlayerState extends ConsumerState<MobilePlayer>
-    with SingleTickerProviderStateMixin, FullPlayerAutoExit {
-  /// PageView 控制器
-  late final PageController _pageController;
-
-  /// 当前页面索引（0: 封面, 1: 歌词）
+    with FullPlayerAutoExit {
+  /// 当前页面索引（0: 封面/黑胶盘, 1: 歌词）
   late int _currentPage;
-
-  /// 唱片环旋转动画控制器
-  late final AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
     _currentPage = widget.initialPage;
-    _pageController = PageController(initialPage: widget.initialPage);
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 28),
-    );
     // Web 冷加载 /player 但无队列可恢复时，短暂等待异步恢复；仍无歌曲则退出。
     scheduleFullPlayerAutoExit();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _rotationController.dispose();
-    super.dispose();
   }
 
   @override
@@ -82,7 +67,6 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
     final size = MediaQuery.sizeOf(context);
 
     // 播放列表被清空时，自动关闭全屏播放器并返回上一页
-    // 同时控制封面脉冲动画
     ref.listen<PlayerState>(playerStateProvider, (previous, next) {
       if (previous?.hasSong == true && !next.hasSong) {
         debugPrint('[Player] MobilePlayer: playlist cleared, closing player');
@@ -90,22 +74,7 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
       }
       // 异步恢复出歌曲后，取消冷加载兜底退出
       if (next.hasSong) cancelFullPlayerAutoExit();
-      // 控制唱片环旋转动画
-      if (next.isPlaying && !_rotationController.isAnimating) {
-        _rotationController.repeat();
-      } else if (!next.isPlaying && _rotationController.isAnimating) {
-        _rotationController.stop();
-      }
     });
-
-    // 初始播放状态动画（listen 只响应变化，初始状态需要手动处理）
-    if (state.isPlaying && !_rotationController.isAnimating) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && state.isPlaying && !_rotationController.isAnimating) {
-          _rotationController.repeat();
-        }
-      });
-    }
 
     if (!state.hasSong) {
       debugPrint('[Player] MobilePlayer: no song, hiding');
@@ -123,9 +92,7 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
       );
     }
 
-    final coverUrl = song.coverUrl;
-
-    final paletteAsync = ref.watch(coverColorsProvider(coverUrl));
+    final paletteAsync = ref.watch(coverColorsProvider(song.coverUrl));
     final palette = paletteAsync.value;
 
     return Scaffold(
@@ -138,48 +105,58 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
               // 顶部工具栏
               _buildTopBar(context, notifier, state),
               const SizedBox(height: 16),
-              // 封面/歌词 PageView
+              // 封面（黑胶盘）/歌词：点击切换，不再左右滑动
               Expanded(
                 flex: 4,
                 child: Column(
                   children: [
                     Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentPage = index;
-                          });
-                        },
-                        children: [
-                          // 页面1：视频歌曲渲染画面（支持的平台），否则封面（带唱片环旋转）
-                          Center(
-                            child: VideoStage(
-                              song: song,
-                              width: size.width * 0.75,
-                              height: size.width * 0.75,
-                              fallback: VinylRing(
-                                rotationAnimation: _rotationController,
-                                child: _buildCover(
-                                  context,
-                                  coverUrl,
-                                  size.width * 0.75,
-                                  palette: palette,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // 舞台取可用区域与屏宽的较小值，给唱臂溢出留 8% 余量。
+                          final stage =
+                              math.min(constraints.maxHeight, size.width) *
+                              0.88;
+                          return IndexedStack(
+                            index: _currentPage,
+                            children: [
+                              // 页面1：视频歌曲渲染画面（支持的平台），否则黑胶盘
+                              Center(
+                                child: VideoStage(
+                                  song: song,
+                                  width: stage,
+                                  height: stage,
+                                  fallback: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => _showPage(1),
+                                    child: _buildVinyl(
+                                      context,
+                                      song,
+                                      stage * 0.92,
+                                      palette: palette,
+                                      isPlaying: state.isPlaying,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          // 页面2：歌词
-                          LyricsScreenAwake(
-                            visible: _currentPage == 1,
-                            child: LyricsView(
-                              currentPosition: state.currentTime,
-                              onSeek: notifier.seek,
-                              song: song,
-                              editable: true,
-                            ),
-                          ),
-                        ],
+                              // 页面2：歌词（点击空白区返回封面）
+                              LyricsScreenAwake(
+                                visible: _currentPage == 1,
+                                child: LyricsView(
+                                  currentPosition: state.currentTime,
+                                  onSeek: notifier.seek,
+                                  song: song,
+                                  editable: true,
+                                  scrubEnabled:
+                                      !song.isLive &&
+                                      state.duration > Duration.zero &&
+                                      song.duration > 0,
+                                  onTapBackground: () => _showPage(0),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                     // 页面指示器
@@ -214,6 +191,8 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 8),
+                    SongMetaChips(song: song),
                   ],
                 ),
               ),
@@ -451,49 +430,47 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
     );
   }
 
-  Widget _buildCover(
+  /// 黑色/封面页 ↔ 歌词页切换（点击触发，不再左右滑动）。
+  void _showPage(int page) {
+    if (_currentPage == page) return;
+    setState(() => _currentPage = page);
+  }
+
+  Widget _buildVinyl(
     BuildContext context,
-    String? coverUrl,
-    double size, {
+    Song song,
+    double diameter, {
     CoverPalette? palette,
+    bool isPlaying = false,
   }) {
     final theme = Theme.of(context);
     final dpr = MediaQuery.devicePixelRatioOf(context);
-    final decodeWidth = (size * dpr).clamp(64.0, 1024.0).round();
+    // label 只占盘心一半直径，解码宽度按 label 实际像素取，避免大图解码。
+    final decodeWidth = (diameter * 0.5 * dpr).clamp(64.0, 1024.0).round();
 
     final glowColor = palette?.vibrantColor ?? palette?.dominantColor;
+    final coverUrl = song.coverUrl;
+    final resolvedCover =
+        coverUrl != null && coverUrl.isNotEmpty
+            ? UrlHelper.buildCoverUrl(coverUrl, width: decodeWidth)
+            : null;
 
     return Container(
-      width: size,
-      height: size,
       decoration: BoxDecoration(
-        borderRadius: AppRadius.xlAll,
-        color: theme.colorScheme.surfaceContainerHighest,
+        shape: BoxShape.circle,
+        // 发光在最外层（旋转子树之外），避免每帧重算 blur。
         boxShadow:
             glowColor != null
                 ? AppEffects.primaryGlow(glowColor)
                 : AppEffects.softGlow(theme.colorScheme.onSurface),
       ),
-      clipBehavior: Clip.antiAlias,
-      child:
-          coverUrl != null
-              ? ExcludeSemantics(
-                child: Image.network(
-                  UrlHelper.buildCoverUrl(coverUrl, width: decodeWidth),
-                  fit: BoxFit.cover,
-                  cacheWidth: decodeWidth,
-                  errorBuilder: (_, _, _) => _buildPlaceholder(theme, size),
-                ),
-              )
-              : _buildPlaceholder(theme, size),
-    );
-  }
-
-  Widget _buildPlaceholder(ThemeData theme, double size) {
-    return Icon(
-      Icons.music_note_rounded,
-      size: size * 0.4,
-      color: theme.colorScheme.onSurfaceVariant,
+      child: VinylDisc(
+        isPlaying: isPlaying,
+        diameter: diameter,
+        coverUrl: resolvedCover,
+        title: song.title,
+        coverDecodeWidth: decodeWidth,
+      ),
     );
   }
 

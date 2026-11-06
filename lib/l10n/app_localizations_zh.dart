@@ -66,7 +66,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get githubDiscoveryTokenTitle => 'GitHub Token';
 
   @override
-  String get githubDiscoveryTokenHelp => '保存在当前服务器，连接此服务器的客户端共用。发现请求仍由当前客户端发起。配置 Token 后，GitHub API 直连 api.github.com；GitHub 代理和公开清单请求均不携带 Token。';
+  String get githubDiscoveryTokenHelp =>
+      '保存在当前服务器，连接此服务器的客户端共用。发现请求仍由当前客户端发起。配置 Token 后，GitHub API 直连 api.github.com；GitHub 代理和公开清单请求均不携带 Token。';
 
   @override
   String get githubDiscoveryTokenHint => '输入新的个人访问 Token';
@@ -105,7 +106,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get githubDiscoveryCommunity => '社区';
 
   @override
-  String get githubDiscoveryNotice => '自动发现 GitHub 社区插件，未经 Songloft 审核；格式校验不代表安全审核。';
+  String get githubDiscoveryNotice =>
+      '自动发现 GitHub 社区插件，未经 Songloft 审核；格式校验不代表安全审核。';
 
   @override
   String get githubDiscoverySearch => '搜索插件或 owner/repo';
@@ -137,7 +139,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get githubDiscoveryHelpTitle => 'GitHub 发现说明';
 
   @override
-  String get githubDiscoveryHelp => '搜索公开且未归档的非 fork 仓库，topic 为 songloft-plugin。只展示根 plugin.json 格式合规（根清单哈希可省略或留空）、允许跨 GitHub 仓库的更新清单和发布包和匹配的稳定 Release 中存在 .jsplugin.zip 安装包的插件。仓库更新排序不等于插件发布时间排序。网络失败记为暂未验证，可能因 GitHub 限流而只返回部分结果。源码和安装包未经 Songloft 审核，安装前请查看代码和权限。';
+  String get githubDiscoveryHelp =>
+      '搜索公开且未归档的非 fork 仓库，topic 为 songloft-plugin。只展示根 plugin.json 格式合规（根清单哈希可省略或留空）、允许跨 GitHub 仓库的更新清单和发布包和匹配的稳定 Release 中存在 .jsplugin.zip 安装包的插件。仓库更新排序不等于插件发布时间排序。网络失败记为暂未验证，可能因 GitHub 限流而只返回部分结果。源码和安装包未经 Songloft 审核，安装前请查看代码和权限。';
 
   @override
   String get githubDiscoveryRateLimited => 'GitHub 请求已限流，已验证的插件仍可查看，请稍后重试。';
@@ -157,7 +160,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get githubDiscoveryPending => '仓库暂未验证，请稍后重试。';
 
   @override
-  String githubDiscoverySummary(int checked, int found, int excluded, int failed) {
+  String githubDiscoverySummary(
+    int checked,
+    int found,
+    int excluded,
+    int failed,
+  ) {
     return '已检查 $checked 个仓库 · 发现 $found 个插件 · 过滤 $excluded 个 · 暂未验证 $failed 个';
   }
 
@@ -295,13 +303,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearanceReduceTransparency => '减少透明度';
 
   @override
-  String get appearanceReduceTransparencyDescription => '使用实心背景并关闭玻璃模糊，仅保存在当前设备。';
+  String get appearanceReduceTransparencyDescription =>
+      '使用实心背景并关闭玻璃模糊，仅保存在当前设备。';
 
   @override
   String get appearanceIncreaseContrast => '增强对比度';
 
   @override
-  String get appearanceIncreaseContrastDescription => '提高文字和控件对比度，播放器使用纯色背景，不随封面变化。系统高对比度开启时始终生效。';
+  String get appearanceIncreaseContrastDescription =>
+      '提高文字和控件对比度，播放器使用纯色背景，不随封面变化。系统高对比度开启时始终生效。';
 
   @override
   String get themeModeTitle => '主题模式';
@@ -1556,7 +1566,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePluginWebViewUnsupported => '当前平台暂不支持应用内插件页';
 
   @override
-  String get homePluginWebViewUnsupportedHint => '当前系统缺少应用内 WebView 渲染引擎，插件页暂时只能在浏览器中打开。';
+  String get homePluginWebViewUnsupportedHint =>
+      '当前系统缺少应用内 WebView 渲染引擎，插件页暂时只能在浏览器中打开。';
 
   @override
   String get homePluginUnknownError => '未知错误';
@@ -2567,13 +2578,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsCacheCleanBrowserTitle => '清理浏览器缓存';
 
   @override
-  String get settingsCacheCleanBrowserContent => '将清除所有前端静态资源缓存并刷新页面。不会影响登录状态和服务端数据。';
+  String get settingsCacheCleanBrowserContent =>
+      '将清除所有前端静态资源缓存并刷新页面。不会影响登录状态和服务端数据。';
 
   @override
   String get webUpdateAvailableTitle => '发现新版本';
 
   @override
-  String get webUpdateAvailableContent => '检测到服务端已更新，当前页面仍是旧版本。点击「立即刷新」将清理浏览器缓存并加载最新版本，不会影响登录状态。';
+  String get webUpdateAvailableContent =>
+      '检测到服务端已更新，当前页面仍是旧版本。点击「立即刷新」将清理浏览器缓存并加载最新版本，不会影响登录状态。';
 
   @override
   String get webUpdateAvailableRefresh => '立即刷新';
@@ -2634,7 +2647,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsCacheTranscodeTitle => '缓存转码格式';
 
   @override
-  String get settingsCacheTranscodeDesc => '网络歌曲缓存时统一转码，提升设备兼容性（如小爱音箱无法播放 MKV）；视频类内容开启后将仅缓存音频、投屏无画面';
+  String get settingsCacheTranscodeDesc =>
+      '网络歌曲缓存时统一转码，提升设备兼容性（如小爱音箱无法播放 MKV）；视频类内容开启后将仅缓存音频、投屏无画面';
 
   @override
   String get settingsCacheTranscodeOriginal => '原始（不转码）';
@@ -2690,7 +2704,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsCacheCleanBrowserButton => '清理浏览器缓存';
 
   @override
-  String get settingsCacheDirDialogDesc => '设置服务端音乐缓存的存储目录。留空则使用默认目录。切换目录不会自动迁移旧缓存文件。';
+  String get settingsCacheDirDialogDesc =>
+      '设置服务端音乐缓存的存储目录。留空则使用默认目录。切换目录不会自动迁移旧缓存文件。';
 
   @override
   String get settingsCacheDirLabel => '缓存目录（绝对路径）';
@@ -2791,7 +2806,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsClientDownloadTitle => '下载客户端 App';
 
   @override
-  String get settingsClientDownloadIntro => '相比 Web 界面，原生客户端支持后台播放、本地缓存、锁屏/通知栏媒体控制等能力。';
+  String get settingsClientDownloadIntro =>
+      '相比 Web 界面，原生客户端支持后台播放、本地缓存、锁屏/通知栏媒体控制等能力。';
 
   @override
   String get settingsClientDownloadStandardSection => '标准版 · 连接当前服务器';
@@ -2987,7 +3003,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String settingsScanProgressStats(int scanned, int total, int imported, int skipped, int failed) {
+  String settingsScanProgressStats(
+    int scanned,
+    int total,
+    int imported,
+    int skipped,
+    int failed,
+  ) {
     return '已处理: $scanned/$total, 导入: $imported, 跳过: $skipped, 失败: $failed';
   }
 
@@ -3004,7 +3026,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsScanAutoFingerprint => '扫描后自动计算音频指纹';
 
   @override
-  String get settingsScanAutoFingerprintDesc => '指纹仅用于重复歌曲检测和插件搜索。大音乐库开启后会长时间占用 CPU，关闭时可在「重复歌曲检测」页手动计算';
+  String get settingsScanAutoFingerprintDesc =>
+      '指纹仅用于重复歌曲检测和插件搜索。大音乐库开启后会长时间占用 CPU，关闭时可在「重复歌曲检测」页手动计算';
 
   @override
   String get settingsScanLoadingConfig => '加载中...';
@@ -3045,7 +3068,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsScanTitleSource => '使用文件名作为标题';
 
   @override
-  String get settingsScanTitleSourceFilenameDesc => '歌曲标题使用文件名（不含扩展名），适合文件名已编号的情况';
+  String get settingsScanTitleSourceFilenameDesc =>
+      '歌曲标题使用文件名（不含扩展名），适合文件名已编号的情况';
 
   @override
   String get settingsScanTitleSourceTagDesc => '歌曲标题优先使用音频标签信息';
@@ -3187,7 +3211,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsServersEmptyTitle => '尚未添加服务器';
 
   @override
-  String get settingsServersEmptyHint => '点击右下角「+」添加 API 地址。\n启动时会按顺序探测，优先使用排在前面的可达项。';
+  String get settingsServersEmptyHint =>
+      '点击右下角「+」添加 API 地址。\n启动时会按顺序探测，优先使用排在前面的可达项。';
 
   @override
   String get settingsServersAdd => '添加服务器';
@@ -3222,7 +3247,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsServersDeleteTitle => '删除服务器';
 
   @override
-  String get settingsServersDeleteCurrentConfirm => '此为当前正在使用的服务器，删除后下次启动将重新探测列表中其他项。是否继续？';
+  String get settingsServersDeleteCurrentConfirm =>
+      '此为当前正在使用的服务器，删除后下次启动将重新探测列表中其他项。是否继续？';
 
   @override
   String settingsServersDeleteConfirm(String name) {
@@ -3277,7 +3303,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsServersSelect => '选择';
 
   @override
-  String get settingsServersFixedMusicDirHint => '通过「文件」App 或电脑（Finder / iTunes 文件共享）把音乐放入 Songloft 文件夹，然后重新扫描。';
+  String get settingsServersFixedMusicDirHint =>
+      '通过「文件」App 或电脑（Finder / iTunes 文件共享）把音乐放入 Songloft 文件夹，然后重新扫描。';
 
   @override
   String settingsServersSwitchFailed(String error) {
@@ -3297,7 +3324,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDuplicateDismissError => '关闭提示';
 
   @override
-  String get settingsDuplicateIntro => '通过音频指纹识别内容相同的重复文件。不同文件名、不同格式的同一首歌都能被识别。';
+  String get settingsDuplicateIntro =>
+      '通过音频指纹识别内容相同的重复文件。不同文件名、不同格式的同一首歌都能被识别。';
 
   @override
   String get settingsDuplicateFingerprintStats => '指纹统计';
@@ -3315,7 +3343,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDuplicateUncomputable => '无法计算';
 
   @override
-  String get settingsDuplicateUncomputableHint => '这些文件没有音频轨、已损坏、计算超时或服务端 ffmpeg 不支持其格式，不会被自动重试。可点「仅重试失败项」重试（如服务端升级后），或「重新计算全部指纹」全量重算。';
+  String get settingsDuplicateUncomputableHint =>
+      '这些文件没有音频轨、已损坏、计算超时或服务端 ffmpeg 不支持其格式，不会被自动重试。可点「仅重试失败项」重试（如服务端升级后），或「重新计算全部指纹」全量重算。';
 
   @override
   String get settingsDuplicateViewFailed => '查看失败详情';
@@ -3332,7 +3361,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settingsDuplicateChromaprintMissing => '需要安装 ffmpeg（含 chromaprint 支持）才能使用音频指纹检测。Docker 用户升级到最新镜像即可。';
+  String get settingsDuplicateChromaprintMissing =>
+      '需要安装 ffmpeg（含 chromaprint 支持）才能使用音频指纹检测。Docker 用户升级到最新镜像即可。';
 
   @override
   String get settingsDuplicateStartCompute => '开始计算并检测';
@@ -3545,7 +3575,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsQualityOriginalDesc => '不请求档位：本地原文件直出、网络按源默认';
 
   @override
-  String get settingsQualityTranscodeDesc => '仅对网络歌曲生效：向音源索取该档位、不足取实际最高档；本地歌曲恒原文件直出';
+  String get settingsQualityTranscodeDesc =>
+      '仅对网络歌曲生效：向音源索取该档位、不足取实际最高档；本地歌曲恒原文件直出';
 
   @override
   String get settingsAutoPlayOnLaunchTitle => '打开后自动播放';
@@ -3641,7 +3672,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsNotificationLyricInTitleTitle => '通知栏歌词占用标题行';
 
   @override
-  String get settingsNotificationLyricInTitleDesc => '开启：标题行显示歌词、歌名归副标题；关闭：标题行显示歌名、副标题显示歌词';
+  String get settingsNotificationLyricInTitleDesc =>
+      '开启：标题行显示歌词、歌名归副标题；关闭：标题行显示歌名、副标题显示歌词';
 
   @override
   String get settingsDesktopLyricTitle => '桌面歌词';
@@ -3841,7 +3873,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsImportPathFailed => '无法获取文件路径';
 
   @override
-  String settingsImportComplete(Object created, Object merged, Object songsCreated, Object songsMatched) {
+  String settingsImportComplete(
+    Object created,
+    Object merged,
+    Object songsCreated,
+    Object songsMatched,
+  ) {
     return '导入完成: 新建歌单 $created, 合并歌单 $merged, 新建歌曲 $songsCreated, 匹配歌曲 $songsMatched';
   }
 
@@ -3889,7 +3926,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHlsProxyTitle => 'HLS 电台后端代理';
 
   @override
-  String get settingsHlsProxySubtitle => '开启后服务端拉取电台 m3u8 并代理切片,可绕过 Referer 防盗链 / CORS。所有切片走本机带宽,注意流量成本';
+  String get settingsHlsProxySubtitle =>
+      '开启后服务端拉取电台 m3u8 并代理切片,可绕过 Referer 防盗链 / CORS。所有切片走本机带宽,注意流量成本';
 
   @override
   String get settingsHlsProxyEnabled => '已开启 HLS 代理';
@@ -3901,7 +3939,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsVolumeNormalizeTitle => '音量均衡';
 
   @override
-  String get settingsVolumeNormalizeSubtitle => '启用 EBU R128 响度均衡，消除不同音源之间的音量差异。需要 ffmpeg，会增加 CPU 和首次播放延迟';
+  String get settingsVolumeNormalizeSubtitle =>
+      '启用 EBU R128 响度均衡，消除不同音源之间的音量差异。需要 ffmpeg，会增加 CPU 和首次播放延迟';
 
   @override
   String get settingsVolumeNormalizeEnabled => '已开启音量均衡';
@@ -3913,7 +3952,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsVolumeNormalizeLoudnessTitle => '目标响度 (LUFS)';
 
   @override
-  String get settingsVolumeNormalizeLoudnessSubtitle => '自定义 EBU R128 目标响度，默认 -16。流媒体常用 -14，广播 -23。范围 -40 ~ -5';
+  String get settingsVolumeNormalizeLoudnessSubtitle =>
+      '自定义 EBU R128 目标响度，默认 -16。流媒体常用 -14，广播 -23。范围 -40 ~ -5';
 
   @override
   String get settingsVolumeNormalizeLoudnessInvalid => '请输入 -40 ~ -5 之间的数值';
@@ -3935,13 +3975,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settingsProxyAllowlistDialogDesc => '默认禁止代理内网地址以防 SSRF。若需用本服务器代理内网资源（如仅私网可达的 WebDAV），在此列出允许的地址。';
+  String get settingsProxyAllowlistDialogDesc =>
+      '默认禁止代理内网地址以防 SSRF。若需用本服务器代理内网资源（如仅私网可达的 WebDAV），在此列出允许的地址。';
 
   @override
   String get settingsProxyAllowlistLabel => '允许的地址（每行一个）';
 
   @override
-  String get settingsProxyAllowlistHelper => '每行填一个单 IP（如 192.168.1.100）或 CIDR 网段（如 192.168.1.0/24）。仅影响通用资源代理，不影响其他功能。';
+  String get settingsProxyAllowlistHelper =>
+      '每行填一个单 IP（如 192.168.1.100）或 CIDR 网段（如 192.168.1.0/24）。仅影响通用资源代理，不影响其他功能。';
 
   @override
   String get settingsProxyAllowlistSaved => '已保存私网代理白名单';
@@ -3950,7 +3992,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsInsecureTlsTitle => '忽略 SSL 证书校验';
 
   @override
-  String get settingsInsecureTlsSubtitle => '连接使用自签或无效 HTTPS 证书的服务器时开启。同时对接口请求和音频播放生效';
+  String get settingsInsecureTlsSubtitle =>
+      '连接使用自签或无效 HTTPS 证书的服务器时开启。同时对接口请求和音频播放生效';
 
   @override
   String get settingsInsecureTlsEnabled => '已开启忽略证书校验';
@@ -3962,7 +4005,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsInsecureTlsWarnTitle => '降低安全性';
 
   @override
-  String get settingsInsecureTlsWarnContent => '开启后将接受任意 HTTPS 证书，可能遭受中间人攻击。请仅在信任的内网或自签证书场景使用。确定开启吗？';
+  String get settingsInsecureTlsWarnContent =>
+      '开启后将接受任意 HTTPS 证书，可能遭受中间人攻击。请仅在信任的内网或自签证书场景使用。确定开启吗？';
 
   @override
   String get settingsHttpProxyTitle => 'HTTP 代理';
@@ -3971,7 +4015,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHttpProxyNotConfigured => '未配置（直连）';
 
   @override
-  String get settingsHttpProxyDialogDesc => '设置全局 HTTP 代理，所有后端外发请求（插件下载、升级检查等）将通过此代理转发。留空则直连。';
+  String get settingsHttpProxyDialogDesc =>
+      '设置全局 HTTP 代理，所有后端外发请求（插件下载、升级检查等）将通过此代理转发。留空则直连。';
 
   @override
   String get settingsHttpProxyAddressLabel => '代理地址';
@@ -3997,7 +4042,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGithubProxyTitle => 'GitHub 加速代理';
 
   @override
-  String get settingsGithubProxyDialogDesc => '插件安装/更新、检查更新与客户端下载共用此代理。国内访问 GitHub 较慢时可选择镜像加速。';
+  String get settingsGithubProxyDialogDesc =>
+      '插件安装/更新、检查更新与客户端下载共用此代理。国内访问 GitHub 较慢时可选择镜像加速。';
 
   @override
   String get settingsGithubProxyCustom => '自定义代理';
@@ -4110,7 +4156,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsUpgradeConfirmReset => '确认回退';
 
   @override
-  String get settingsUpgradeConfirmResetContent => '确定要回退到 Docker 镜像的底包版本吗？\n\n回退后服务将自动重启。';
+  String get settingsUpgradeConfirmResetContent =>
+      '确定要回退到 Docker 镜像的底包版本吗？\n\n回退后服务将自动重启。';
 
   @override
   String settingsUpgradeResetFailed(String error) {
@@ -4184,7 +4231,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsUpgradeUploadConfirmChannel => '通道切换确认';
 
   @override
-  String settingsUpgradeUploadConfirmChannelContent(String currentChannel, String uploadChannel, String version) {
+  String settingsUpgradeUploadConfirmChannelContent(
+    String currentChannel,
+    String uploadChannel,
+    String version,
+  ) {
     return '当前为$currentChannel，上传的文件为$uploadChannel ($version)，确认切换通道并升级？\n\n升级后服务将自动重启。';
   }
 
@@ -4694,13 +4745,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deviceCacheDirectoryDefault => '默认（应用内部目录）';
 
   @override
-  String get deviceCacheDirectoryHelp => '选择本机或 SD 卡文件夹，新缓存将保存到这里，文件管理器可直接访问。已有缓存可单独迁移；清空缓存会删除对应文件。';
+  String get deviceCacheDirectoryHelp =>
+      '选择本机或 SD 卡文件夹，新缓存将保存到这里，文件管理器可直接访问。已有缓存可单独迁移；清空缓存会删除对应文件。';
 
   @override
   String get deviceCacheDirectoryUpgrade => '请安装新版客户端 APK 后使用自定义缓存目录。';
 
   @override
-  String get deviceCacheDirectoryUnavailable => '目录不可访问或不可写，请检查 SD 卡并重新选择文件夹授权。缓存记录会保留。';
+  String get deviceCacheDirectoryUnavailable =>
+      '目录不可访问或不可写，请检查 SD 卡并重新选择文件夹授权。缓存记录会保留。';
 
   @override
   String get deviceCacheDirectoryBusy => '缓存任务正在进行，请等待完成后再修改目录或迁移。';
@@ -4718,13 +4771,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deviceCacheMigrate => '迁移已有缓存到当前目录';
 
   @override
-  String get deviceCacheMigrationConfirm => '迁移会停止正在播放的缓存歌曲，并临时占用额外空间。每首复制和保存成功后才删除原文件；取消或失败时，已完成的迁移会保留，其余原文件不会删除。';
+  String get deviceCacheMigrationConfirm =>
+      '迁移会停止正在播放的缓存歌曲，并临时占用额外空间。每首复制和保存成功后才删除原文件；取消或失败时，已完成的迁移会保留，其余原文件不会删除。';
 
   @override
   String get deviceCacheMigrationDone => '缓存迁移完成';
 
   @override
-  String get deviceCacheMigrationFailed => '迁移未完成，请检查目录权限和剩余空间。已完成的迁移会保留，未完成的原缓存仍可用。';
+  String get deviceCacheMigrationFailed =>
+      '迁移未完成，请检查目录权限和剩余空间。已完成的迁移会保留，未完成的原缓存仍可用。';
 
   @override
   String get deviceCacheMigrationCancelled => '迁移已取消，已完成的迁移会保留，其余原缓存未删除。';
@@ -4756,13 +4811,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHomeShowFavorites => '在首页显示收藏';
 
   @override
-  String get settingsHomeShowFavoritesDesc => '仅控制首页卡片，曲库入口、歌曲和收藏功能照常可用。按服务器和账号保存在本机。';
+  String get settingsHomeShowFavoritesDesc =>
+      '仅控制首页卡片，曲库入口、歌曲和收藏功能照常可用。按服务器和账号保存在本机。';
 
   @override
   String get settingsHomeShowRadioFavorites => '在首页显示电台收藏';
 
   @override
-  String get settingsHomeShowRadioFavoritesDesc => '仅控制电台区块中的首页卡片，需开启「显示电台区块」。按服务器和账号保存在本机。';
+  String get settingsHomeShowRadioFavoritesDesc =>
+      '仅控制电台区块中的首页卡片，需开启「显示电台区块」。按服务器和账号保存在本机。';
 
   @override
   String get settingsHomeShowRadios => '显示电台区块';
@@ -4772,6 +4829,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get browseSearchHint => '搜索在线音乐';
+
+  @override
+  String get searchScopeOnline => '在线';
 
   @override
   String get browseDiscoverTitle => '在线发现';

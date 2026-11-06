@@ -2905,6 +2905,7 @@
   "settingsHomeShowRadios": "Show radio section",
   "settingsHomeShowRadiosDesc": "Show My Radios on the home page. This choice stays on this device.",
   "browseSearchHint": "Search online music",
+  "searchScopeOnline": "Online",
   "browseDiscoverTitle": "Discover",
   "discoverRecommend": "Recommended",
   "discoverToplists": "Toplists",

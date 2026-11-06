@@ -12,7 +12,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get personalTokenTitle => 'Tokens de acceso permanentes';
 
   @override
-  String get personalTokenHelp => 'Válido hasta su revocación. Acceso de administrador a las API de negocio, excepto la gestión de tokens.';
+  String get personalTokenHelp =>
+      'Válido hasta su revocación. Acceso de administrador a las API de negocio, excepto la gestión de tokens.';
 
   @override
   String get personalTokenCreate => 'Crear token';
@@ -24,7 +25,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get personalTokenPermanent => 'Sin caducidad';
 
   @override
-  String get personalTokenOnce => 'El token completo solo se muestra una vez. Cópialo y guárdalo antes de cerrar.';
+  String get personalTokenOnce =>
+      'El token completo solo se muestra una vez. Cópialo y guárdalo antes de cerrar.';
 
   @override
   String get personalTokenCopy => 'Copiar token';
@@ -36,10 +38,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get personalTokenCopied => 'Copiado';
 
   @override
-  String get personalTokenCopyFailed => 'No se pudo copiar. Selecciona y copia el token manualmente.';
+  String get personalTokenCopyFailed =>
+      'No se pudo copiar. Selecciona y copia el token manualmente.';
 
   @override
-  String get personalTokenFailed => 'La operación falló. Comprueba que el servidor admite tokens permanentes y reinténtalo.';
+  String get personalTokenFailed =>
+      'La operación falló. Comprueba que el servidor admite tokens permanentes y reinténtalo.';
 
   @override
   String get personalTokenDone => 'Listo';
@@ -54,7 +58,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get personalTokenNeverUsed => 'Sin usar';
 
   @override
-  String get personalTokenRevokeHelp => 'Las siguientes solicitudes de este dispositivo se rechazarán inmediatamente. Los demás dispositivos no se verán afectados.';
+  String get personalTokenRevokeHelp =>
+      'Las siguientes solicitudes de este dispositivo se rechazarán inmediatamente. Los demás dispositivos no se verán afectados.';
 
   @override
   String get personalTokenPrevious => 'Página anterior';
@@ -66,16 +71,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryTokenTitle => 'GitHub Token';
 
   @override
-  String get githubDiscoveryTokenHelp => 'Se guarda en el servidor conectado y se comparte entre sus clientes. El descubrimiento se ejecuta en este dispositivo. Con un token, las solicitudes a la API de GitHub se conectan directamente a api.github.com; los proxies de GitHub y las solicitudes de metadatos públicos nunca reciben el token.';
+  String get githubDiscoveryTokenHelp =>
+      'Se guarda en el servidor conectado y se comparte entre sus clientes. El descubrimiento se ejecuta en este dispositivo. Con un token, las solicitudes a la API de GitHub se conectan directamente a api.github.com; los proxies de GitHub y las solicitudes de metadatos públicos nunca reciben el token.';
 
   @override
-  String get githubDiscoveryTokenHint => 'Introduce un nuevo token de acceso personal';
+  String get githubDiscoveryTokenHint =>
+      'Introduce un nuevo token de acceso personal';
 
   @override
-  String get githubDiscoveryTokenConfigured => 'Hay un token configurado en este servidor.';
+  String get githubDiscoveryTokenConfigured =>
+      'Hay un token configurado en este servidor.';
 
   @override
-  String get githubDiscoveryTokenNotConfigured => 'No hay ningún token configurado en este servidor.';
+  String get githubDiscoveryTokenNotConfigured =>
+      'No hay ningún token configurado en este servidor.';
 
   @override
   String get githubDiscoveryTokenSave => 'Guardar';
@@ -90,13 +99,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryTokenVisibility => 'Mostrar / ocultar entrada';
 
   @override
-  String get githubDiscoveryTokenLoadFailed => 'No se pudo leer el token de GitHub del servidor. Reinténtalo.';
+  String get githubDiscoveryTokenLoadFailed =>
+      'No se pudo leer el token de GitHub del servidor. Reinténtalo.';
 
   @override
-  String get githubDiscoveryTokenSaveFailed => 'No se pudo guardar el token de GitHub. Revisa el formato y reinténtalo.';
+  String get githubDiscoveryTokenSaveFailed =>
+      'No se pudo guardar el token de GitHub. Revisa el formato y reinténtalo.';
 
   @override
-  String get githubDiscoveryTokenInvalid => 'El token de GitHub no es válido o ha caducado. Actualízalo o bórralo.';
+  String get githubDiscoveryTokenInvalid =>
+      'El token de GitHub no es válido o ha caducado. Actualízalo o bórralo.';
 
   @override
   String get githubDiscoveryTitle => 'Descubrir en GitHub';
@@ -105,7 +117,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryCommunity => 'Comunidad';
 
   @override
-  String get githubDiscoveryNotice => 'Plugins de la comunidad descubiertos automáticamente. Songloft no los ha revisado; validar el formato no es una revisión de seguridad.';
+  String get githubDiscoveryNotice =>
+      'Plugins de la comunidad descubiertos automáticamente. Songloft no los ha revisado; validar el formato no es una revisión de seguridad.';
 
   @override
   String get githubDiscoverySearch => 'Buscar plugins u owner/repo';
@@ -137,10 +150,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryHelpTitle => 'Acerca de descubrir en GitHub';
 
   @override
-  String get githubDiscoveryHelp => 'Busca repositorios públicos, no archivados y no derivados con el topic songloft-plugin. Deben tener un plugin.json válido en la raíz (los hashes pueden omitirse o estar vacíos), metadatos y paquetes que pueden proceder de otro repositorio de GitHub y una versión estable coincidente con un archivo .jsplugin.zip. El orden de actualización del repositorio difiere del orden de publicación del plugin. Los fallos de red quedan sin verificar; los límites de GitHub pueden dejar resultados incompletos. Songloft no ha revisado el código ni los paquetes. Revisa el código y los permisos antes de instalar.';
+  String get githubDiscoveryHelp =>
+      'Busca repositorios públicos, no archivados y no derivados con el topic songloft-plugin. Deben tener un plugin.json válido en la raíz (los hashes pueden omitirse o estar vacíos), metadatos y paquetes que pueden proceder de otro repositorio de GitHub y una versión estable coincidente con un archivo .jsplugin.zip. El orden de actualización del repositorio difiere del orden de publicación del plugin. Los fallos de red quedan sin verificar; los límites de GitHub pueden dejar resultados incompletos. Songloft no ha revisado el código ni los paquetes. Revisa el código y los permisos antes de instalar.';
 
   @override
-  String get githubDiscoveryRateLimited => 'Se alcanzó el límite de GitHub. Los plugins verificados siguen disponibles; reintenta más tarde.';
+  String get githubDiscoveryRateLimited =>
+      'Se alcanzó el límite de GitHub. Los plugins verificados siguen disponibles; reintenta más tarde.';
 
   @override
   String githubDiscoveryRetryAt(String time) {
@@ -148,21 +163,30 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get githubDiscoveryLoadFailed => 'No se pudo cargar GitHub. Comprueba la conexión y reintenta.';
+  String get githubDiscoveryLoadFailed =>
+      'No se pudo cargar GitHub. Comprueba la conexión y reintenta.';
 
   @override
-  String get githubDiscoveryEmpty => 'No se encontraron plugins válidos publicados.';
+  String get githubDiscoveryEmpty =>
+      'No se encontraron plugins válidos publicados.';
 
   @override
-  String get githubDiscoveryPending => 'Los repositorios aún no se pudieron verificar. Reintenta más tarde.';
+  String get githubDiscoveryPending =>
+      'Los repositorios aún no se pudieron verificar. Reintenta más tarde.';
 
   @override
-  String githubDiscoverySummary(int checked, int found, int excluded, int failed) {
+  String githubDiscoverySummary(
+    int checked,
+    int found,
+    int excluded,
+    int failed,
+  ) {
     return 'Repositorios comprobados: $checked · Plugins encontrados: $found · Filtrados: $excluded · Sin verificar: $failed';
   }
 
   @override
-  String get githubDiscoveryIncomplete => 'GitHub devolvió resultados parciales. Actualiza más tarde.';
+  String get githubDiscoveryIncomplete =>
+      'GitHub devolvió resultados parciales. Actualiza más tarde.';
 
   @override
   String get githubDiscoveryLoadMore => 'Descubrir más';
@@ -187,7 +211,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryNoPermissions => 'No se han declarado permisos';
 
   @override
-  String get githubDiscoveryInstallFailed => 'Error al instalar el plugin. Reintenta.';
+  String get githubDiscoveryInstallFailed =>
+      'Error al instalar el plugin. Reintenta.';
 
   @override
   String githubDiscoveryPublished(String date) {
@@ -206,13 +231,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get githubDiscoveryRelease => 'Ver versión';
 
   @override
-  String get githubDiscoveryIncompatible => 'Actualiza el servidor para cumplir la versión mínima del plugin.';
+  String get githubDiscoveryIncompatible =>
+      'Actualiza el servidor para cumplir la versión mínima del plugin.';
 
   @override
-  String get githubDiscoveryHostUnknown => 'No se pudo verificar la compatibilidad del servidor. Pulsa para reintentar.';
+  String get githubDiscoveryHostUnknown =>
+      'No se pudo verificar la compatibilidad del servidor. Pulsa para reintentar.';
 
   @override
-  String get githubDiscoveryInstalledUnknown => 'Comprobando plugins instalados; pulsa para reintentar si falla la carga.';
+  String get githubDiscoveryInstalledUnknown =>
+      'Comprobando plugins instalados; pulsa para reintentar si falla la carga.';
 
   @override
   String get githubDiscoveryOpenFailed => 'No se pudo abrir el enlace.';
@@ -226,7 +254,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get updateComponentsHeader => 'Las siguientes actualizaciones están disponibles. ¿Descargar y actualizar ahora?';
+  String get updateComponentsHeader =>
+      'Las siguientes actualizaciones están disponibles. ¿Descargar y actualizar ahora?';
 
   @override
   String updateComponentFrontend(String version) {
@@ -239,7 +268,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get updateRestartInterrupt => 'La app se reiniciará, lo que puede interrumpir la reproducción.';
+  String get updateRestartInterrupt =>
+      'La app se reiniciará, lo que puede interrumpir la reproducción.';
 
   @override
   String get updateActionDownload => 'Descargar y actualizar';
@@ -257,7 +287,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updateReadyTitle => 'Actualización completada';
 
   @override
-  String get updateReadyBody => 'La actualización se ha descargado. Reinicia la app para aplicarla.';
+  String get updateReadyBody =>
+      'La actualización se ha descargado. Reinicia la app para aplicarla.';
 
   @override
   String get updateActionRestartNow => 'Reiniciar ahora';
@@ -295,13 +326,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appearanceReduceTransparency => 'Reducir transparencia';
 
   @override
-  String get appearanceReduceTransparencyDescription => 'Usar fondos opacos y desactivar el desenfoque del cristal. Se guarda solo en este dispositivo.';
+  String get appearanceReduceTransparencyDescription =>
+      'Usar fondos opacos y desactivar el desenfoque del cristal. Se guarda solo en este dispositivo.';
 
   @override
   String get appearanceIncreaseContrast => 'Aumentar contraste';
 
   @override
-  String get appearanceIncreaseContrastDescription => 'Mejorar el contraste del texto y los controles. El reproductor usa un fondo liso en lugar de los colores de la portada. Siempre activo si el sistema tiene el contraste alto activado.';
+  String get appearanceIncreaseContrastDescription =>
+      'Mejorar el contraste del texto y los controles. El reproductor usa un fondo liso en lugar de los colores de la portada. Siempre activo si el sistema tiene el contraste alto activado.';
 
   @override
   String get themeModeTitle => 'Modo de tema';
@@ -322,10 +355,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themePaletteTitle => 'Colores integrados';
 
   @override
-  String get themePaletteDescription => 'Se guardan en este dispositivo para los modos claro y oscuro.';
+  String get themePaletteDescription =>
+      'Se guardan en este dispositivo para los modos claro y oscuro.';
 
   @override
-  String get themePalettePackHint => 'Hay un paquete de temas activo. Restaura el predeterminado para elegir colores integrados.';
+  String get themePalettePackHint =>
+      'Hay un paquete de temas activo. Restaura el predeterminado para elegir colores integrados.';
 
   @override
   String get themePaletteBlue => 'Azul';
@@ -349,7 +384,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themePackTitle => 'Paquetes de tema';
 
   @override
-  String get themePackSubtitle => 'Personaliza colores y estilos visuales con paquetes de tema';
+  String get themePackSubtitle =>
+      'Personaliza colores y estilos visuales con paquetes de tema';
 
   @override
   String get themePackImport => 'Importar';
@@ -364,7 +400,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themePackLoadError => 'No se pudieron cargar los paquetes de tema';
 
   @override
-  String get themePackImportSuccess => 'Paquete de tema importado correctamente';
+  String get themePackImportSuccess =>
+      'Paquete de tema importado correctamente';
 
   @override
   String get themePackImportError => 'Error al importar';
@@ -387,7 +424,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themeCatalogEmpty => 'No hay temas en línea disponibles';
 
   @override
-  String get themeCatalogLoadError => 'No se pudieron cargar los temas en línea';
+  String get themeCatalogLoadError =>
+      'No se pudieron cargar los temas en línea';
 
   @override
   String get themeCatalogInstall => 'Instalar';
@@ -519,7 +557,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pickerSearchHint => 'Buscar canciones, artistas o álbumes';
 
   @override
-  String get pickerNoMatchInFolder => 'No hay canciones que coincidan en esta carpeta';
+  String get pickerNoMatchInFolder =>
+      'No hay canciones que coincidan en esta carpeta';
 
   @override
   String get pickerNoMatch => 'No hay canciones que coincidan';
@@ -606,7 +645,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get createPlaylistFailed => 'No se pudo crear la lista de reproducción';
+  String get createPlaylistFailed =>
+      'No se pudo crear la lista de reproducción';
 
   @override
   String createPlaylistFailedDetail(String error) {
@@ -659,7 +699,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get coreErrorRequestFailed => 'La solicitud falló';
 
   @override
-  String get coreErrorUnauthorized => 'Tu sesión ha caducado, inicia sesión de nuevo';
+  String get coreErrorUnauthorized =>
+      'Tu sesión ha caducado, inicia sesión de nuevo';
 
   @override
   String get coreErrorForbidden => 'Acceso denegado';
@@ -668,7 +709,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get coreErrorNotFound => 'El recurso solicitado no existe';
 
   @override
-  String get coreErrorServer => 'Error del servidor, inténtalo de nuevo más tarde';
+  String get coreErrorServer =>
+      'Error del servidor, inténtalo de nuevo más tarde';
 
   @override
   String get coreNotFoundPageTitle => 'Página no encontrada';
@@ -686,7 +728,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginManagerTitle => 'Navegación y plugins';
 
   @override
-  String get jspluginManagerSubtitle => 'Administra plugins y entradas de navegación';
+  String get jspluginManagerSubtitle =>
+      'Administra plugins y entradas de navegación';
 
   @override
   String get jspluginManagementSection => 'Gestión de plugins';
@@ -695,10 +738,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginBuiltInNavigation => 'Navegación integrada';
 
   @override
-  String get jspluginShowLibraryInNavigation => 'Mostrar Biblioteca en la navegación';
+  String get jspluginShowLibraryInNavigation =>
+      'Mostrar Biblioteca en la navegación';
 
   @override
-  String get jspluginLibraryNavigationHint => 'Ocultar esta entrada no afecta a tus datos musicales.';
+  String get jspluginLibraryNavigationHint =>
+      'Ocultar esta entrada no afecta a tus datos musicales.';
 
   @override
   String get jspluginUploadPlugin => 'Subir plugin';
@@ -713,7 +758,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginCleanupOrphanTitle => 'Limpiar datos huérfanos';
 
   @override
-  String get jspluginCleanupOrphanContent => 'Se eliminarán los datos de almacenamiento persistente que dejaron los plugins desinstalados. Esta acción no se puede deshacer.';
+  String get jspluginCleanupOrphanContent =>
+      'Se eliminarán los datos de almacenamiento persistente que dejaron los plugins desinstalados. Esta acción no se puede deshacer.';
 
   @override
   String get jspluginCleanup => 'Limpiar';
@@ -732,7 +778,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get jspluginCannotReadFile => 'No se pueden leer los datos del archivo';
+  String get jspluginCannotReadFile =>
+      'No se pueden leer los datos del archivo';
 
   @override
   String get jspluginCannotGetPath => 'No se pudo obtener la ruta del archivo';
@@ -756,13 +803,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginUploadDialogTitle => 'Subir plugin JS';
 
   @override
-  String get jspluginSelectFileSemantics => 'Selecciona un archivo de plugin para subir';
+  String get jspluginSelectFileSemantics =>
+      'Selecciona un archivo de plugin para subir';
 
   @override
   String get jspluginTapToSelectFile => 'Toca para seleccionar un archivo';
 
   @override
-  String get jspluginUploadHint => 'Compatible con el formato .jsplugin.zip; subir un plugin con el mismo nombre sobrescribe la versión existente (actualización manual)';
+  String get jspluginUploadHint =>
+      'Compatible con el formato .jsplugin.zip; subir un plugin con el mismo nombre sobrescribe la versión existente (actualización manual)';
 
   @override
   String get jspluginRemove => 'Quitar';
@@ -803,7 +852,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginKeepData => 'Conservar datos del plugin';
 
   @override
-  String get jspluginKeepDataSubtitle => 'Conserva los datos de almacenamiento de archivos para reinstalarlo fácilmente después';
+  String get jspluginKeepDataSubtitle =>
+      'Conserva los datos de almacenamiento de archivos para reinstalarlo fácilmente después';
 
   @override
   String get jspluginDeleted => 'Plugin eliminado';
@@ -843,13 +893,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginShowInNavigation => 'Mostrar en la navegación';
 
   @override
-  String get jspluginShowInNavigationHint => 'Añadir a la navegación inferior o a la barra lateral; también se puede abrir desde Inicio o la lista de complementos';
+  String get jspluginShowInNavigationHint =>
+      'Añadir a la navegación inferior o a la barra lateral; también se puede abrir desde Inicio o la lista de complementos';
 
   @override
-  String get jspluginNavigationDisabledHint => 'Se oculta al desactivarlo; esta preferencia se restaura al volver a activarlo';
+  String get jspluginNavigationDisabledHint =>
+      'Se oculta al desactivarlo; esta preferencia se restaura al volver a activarlo';
 
   @override
-  String get jspluginNavigationOrder => 'Orden de complementos en la navegación';
+  String get jspluginNavigationOrder =>
+      'Orden de complementos en la navegación';
 
   @override
   String get jspluginKeepAlive => 'Mantener en ejecución';
@@ -867,7 +920,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginUpdate => 'Actualizar';
 
   @override
-  String get jspluginCheckUpdateTimeout => 'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar de proxy e inténtalo de nuevo.';
+  String get jspluginCheckUpdateTimeout =>
+      'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar de proxy e inténtalo de nuevo.';
 
   @override
   String jspluginCheckUpdateFailed(String error) {
@@ -883,7 +937,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get jspluginUpdateTimeout => 'La actualización agotó el tiempo. Inténtalo de nuevo.';
+  String get jspluginUpdateTimeout =>
+      'La actualización agotó el tiempo. Inténtalo de nuevo.';
 
   @override
   String jspluginUpdateDialogTitle(String name) {
@@ -894,7 +949,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginCheckingUpdate => 'Buscando actualizaciones...';
 
   @override
-  String get jspluginDownloadingUpdate => 'Descargando y actualizando el plugin...';
+  String get jspluginDownloadingUpdate =>
+      'Descargando y actualizando el plugin...';
 
   @override
   String get jspluginDoNotCloseDialog => 'No cierres este diálogo';
@@ -925,10 +981,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get jspluginBatchUpdateTimeout => 'La actualización por lotes agotó el tiempo. Inténtalo de nuevo.';
+  String get jspluginBatchUpdateTimeout =>
+      'La actualización por lotes agotó el tiempo. Inténtalo de nuevo.';
 
   @override
-  String get jspluginBatchUpdating => 'Comprobando y actualizando todos los plugins...';
+  String get jspluginBatchUpdating =>
+      'Comprobando y actualizando todos los plugins...';
 
   @override
   String get jspluginStatUpdated => 'Actualizado';
@@ -956,7 +1014,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get jspluginForceUpdateContent => 'Esto ignora la comprobación de versión y vuelve a descargar e instalar el plugin.';
+  String get jspluginForceUpdateContent =>
+      'Esto ignora la comprobación de versión y vuelve a descargar e instalar el plugin.';
 
   @override
   String get jspluginConfirmUpdate => 'Confirmar actualización';
@@ -974,7 +1033,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginNoRegistries => 'Aún no hay fuentes añadidas';
 
   @override
-  String get jspluginNoRegistriesHint => 'Añade una fuente para explorar e instalar plugins';
+  String get jspluginNoRegistriesHint =>
+      'Añade una fuente para explorar e instalar plugins';
 
   @override
   String get jspluginAddRegistry => 'Añadir fuente';
@@ -992,7 +1052,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get jspluginAutoUpdate => 'Autoactualizar plugins';
 
   @override
-  String get jspluginAutoUpdateHint => 'Comprueba y actualiza periódicamente los plugins instalados en segundo plano';
+  String get jspluginAutoUpdateHint =>
+      'Comprueba y actualiza periódicamente los plugins instalados en segundo plano';
 
   @override
   String get jspluginSearchHint => 'Buscar plugins...';
@@ -1187,7 +1248,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get librarySearchHint => 'Buscar canciones...';
 
   @override
-  String get libraryNoMatchingSongs => 'No se encontraron canciones que coincidan';
+  String get libraryNoMatchingSongs =>
+      'No se encontraron canciones que coincidan';
 
   @override
   String get libraryEmpty => 'La biblioteca está vacía';
@@ -1202,13 +1264,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryDeleteConfirmTitle => 'Confirmar eliminación';
 
   @override
-  String get libraryDeleteConfirmContent => '¿Seguro que quieres eliminar esta canción?';
+  String get libraryDeleteConfirmContent =>
+      '¿Seguro que quieres eliminar esta canción?';
 
   @override
   String get libraryCleanTitle => 'Limpiar canciones';
 
   @override
-  String get libraryCleanContent => 'Esto limpiará los registros de canciones no válidos (como canciones locales cuyos archivos se han eliminado).';
+  String get libraryCleanContent =>
+      'Esto limpiará los registros de canciones no válidos (como canciones locales cuyos archivos se han eliminado).';
 
   @override
   String libraryCleanedCount(int count) {
@@ -1258,7 +1322,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryCustomizeViews => 'Personalizar vistas';
 
   @override
-  String get libraryCustomizeViewsTooltip => 'Personaliza qué vistas se muestran y su orden';
+  String get libraryCustomizeViewsTooltip =>
+      'Personaliza qué vistas se muestran y su orden';
 
   @override
   String get libraryViewsMinOne => 'Mantén al menos una vista visible';
@@ -1297,10 +1362,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get librarySave => 'Guardar';
 
   @override
-  String get libraryFileInfoReadonly => 'Información del archivo (solo lectura)';
+  String get libraryFileInfoReadonly =>
+      'Información del archivo (solo lectura)';
 
   @override
-  String get libraryServerEndpointReadonly => 'Endpoint del servidor (solo lectura)';
+  String get libraryServerEndpointReadonly =>
+      'Endpoint del servidor (solo lectura)';
 
   @override
   String get libraryReadonlyFile => 'Archivo';
@@ -1327,7 +1394,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryEditArtistsRemove => 'Quitar este artista';
 
   @override
-  String get libraryEditArtistsHint => 'Un artista por línea. Introduce los intérpretes de dúo/grupo en líneas separadas para que la canción sea localizable por cualquiera de ellos.';
+  String get libraryEditArtistsHint =>
+      'Un artista por línea. Introduce los intérpretes de dúo/grupo en líneas separadas para que la canción sea localizable por cualquiera de ellos.';
 
   @override
   String get libraryEditAlbumHint => 'Introduce un álbum';
@@ -1336,13 +1404,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryRenameFileTitle => 'Renombrar archivo en sincronía';
 
   @override
-  String get libraryRenameFileSubtitle => 'Renombra el archivo de audio local al nuevo título y escribe la etiqueta de título';
+  String get libraryRenameFileSubtitle =>
+      'Renombra el archivo de audio local al nuevo título y escribe la etiqueta de título';
 
   @override
   String get libraryVideoToggleTitle => 'Contenido de video';
 
   @override
-  String get libraryVideoToggleSubtitle => 'Este enlace contiene video; al activarlo, el reproductor muestra la imagen y la transmisión se envía como video';
+  String get libraryVideoToggleSubtitle =>
+      'Este enlace contiene video; al activarlo, el reproductor muestra la imagen y la transmisión se envía como video';
 
   @override
   String get libraryEditSourceUrlLabel => 'URL de audio de origen *';
@@ -1366,7 +1436,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryEditCoverUrlLabel => 'URL de portada';
 
   @override
-  String get libraryEditCoverUrlHint => 'Introduce un enlace de imagen de portada';
+  String get libraryEditCoverUrlHint =>
+      'Introduce un enlace de imagen de portada';
 
   @override
   String get libraryEditDurationLabel => 'Duración (segundos)';
@@ -1407,16 +1478,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get libraryErrorBadRequest => 'Parámetros de solicitud no válidos';
 
   @override
-  String get libraryErrorUnauthorized => 'No autorizado, inicia sesión de nuevo';
+  String get libraryErrorUnauthorized =>
+      'No autorizado, inicia sesión de nuevo';
 
   @override
-  String get libraryErrorForbidden => 'No tienes permiso para realizar esta acción';
+  String get libraryErrorForbidden =>
+      'No tienes permiso para realizar esta acción';
 
   @override
   String get libraryErrorNotFound => 'Canción no encontrada';
 
   @override
-  String get libraryErrorServer => 'Error del servidor, inténtalo de nuevo más tarde';
+  String get libraryErrorServer =>
+      'Error del servidor, inténtalo de nuevo más tarde';
 
   @override
   String libraryErrorRequestFailed(int code) {
@@ -1424,10 +1498,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get libraryErrorTimeout => 'Se agotó el tiempo de conexión de red, comprueba tu red';
+  String get libraryErrorTimeout =>
+      'Se agotó el tiempo de conexión de red, comprueba tu red';
 
   @override
-  String get libraryErrorConnection => 'Falló la conexión de red, comprueba tu red';
+  String get libraryErrorConnection =>
+      'Falló la conexión de red, comprueba tu red';
 
   @override
   String libraryErrorNetwork(String message) {
@@ -1435,16 +1511,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get libraryFavoritePlaylistNotFound => 'La lista de favoritos no existe';
+  String get libraryFavoritePlaylistNotFound =>
+      'La lista de favoritos no existe';
 
   @override
-  String get libraryRadioFavoritePlaylistNotFound => 'La lista de radios favoritas no existe';
+  String get libraryRadioFavoritePlaylistNotFound =>
+      'La lista de radios favoritas no existe';
 
   @override
   String get homeEmptyPlaylists => 'Aún no hay listas de reproducción';
 
   @override
-  String get homeEmptyPlaylistsSubtitle => 'Crea tu primera lista para empezar a coleccionar música';
+  String get homeEmptyPlaylistsSubtitle =>
+      'Crea tu primera lista para empezar a coleccionar música';
 
   @override
   String get homeCreatePlaylist => 'Crear lista de reproducción';
@@ -1525,7 +1604,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeTvPlaylist => 'Listas de reproducción';
 
   @override
-  String get homeTvEmptySubtitle => 'Usa la navegación rápida para explorar la música local';
+  String get homeTvEmptySubtitle =>
+      'Usa la navegación rápida para explorar la música local';
 
   @override
   String homeHeroSemanticLabel(String name, int count) {
@@ -1542,7 +1622,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homePlayNow => 'Reproducir ahora';
 
   @override
-  String get homePluginLoadTimeout => 'La página agotó el tiempo de carga. Comprueba si el plugin está disponible o tu conexión de red.';
+  String get homePluginLoadTimeout =>
+      'La página agotó el tiempo de carga. Comprueba si el plugin está disponible o tu conexión de red.';
 
   @override
   String get homePluginClose => 'Cerrar';
@@ -1559,16 +1640,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get homePluginWebViewUnsupported => 'Esta plataforma no admite páginas de plugins integradas';
+  String get homePluginWebViewUnsupported =>
+      'Esta plataforma no admite páginas de plugins integradas';
 
   @override
-  String get homePluginWebViewUnsupportedHint => 'Este sistema no dispone de un motor WebView integrado, así que por ahora las páginas de plugins solo pueden abrirse en el navegador.';
+  String get homePluginWebViewUnsupportedHint =>
+      'Este sistema no dispone de un motor WebView integrado, así que por ahora las páginas de plugins solo pueden abrirse en el navegador.';
 
   @override
   String get homePluginUnknownError => 'Error desconocido';
 
   @override
-  String get homePluginWebOpenInNewTab => 'En la web, abre el plugin en una pestaña nueva';
+  String get homePluginWebOpenInNewTab =>
+      'En la web, abre el plugin en una pestaña nueva';
 
   @override
   String get authLogin => 'Iniciar sesión';
@@ -1613,7 +1697,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authApiUrlRequired => 'Introduce la dirección de la API';
 
   @override
-  String get authInvalidUrl => 'Introduce una URL válida (que empiece por http:// o https://)';
+  String get authInvalidUrl =>
+      'Introduce una URL válida (que empiece por http:// o https://)';
 
   @override
   String get authServer => 'Servidor';
@@ -1628,10 +1713,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authAgreePrefix => 'He leído y acepto los ';
 
   @override
-  String get authTermsAndPrivacy => 'Términos del servicio y política de privacidad';
+  String get authTermsAndPrivacy =>
+      'Términos del servicio y política de privacidad';
 
   @override
-  String get authPleaseAgreeTerms => 'Primero lee y acepta los Términos y la Política de privacidad';
+  String get authPleaseAgreeTerms =>
+      'Primero lee y acepta los Términos y la Política de privacidad';
 
   @override
   String get authTermsTitle => 'Términos del servicio y política de privacidad';
@@ -1672,7 +1759,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get authSessionExpired => 'Tu sesión ha caducado. Inicia sesión de nuevo.';
+  String get authSessionExpired =>
+      'Tu sesión ha caducado. Inicia sesión de nuevo.';
 
   @override
   String get authNoRefreshToken => 'No hay token de actualización disponible';
@@ -1717,7 +1805,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startupStartingLocalBackend => 'Iniciando backend local…';
 
   @override
-  String get startupConnectingLocalBackend => 'Conectando con el backend local…';
+  String get startupConnectingLocalBackend =>
+      'Conectando con el backend local…';
 
   @override
   String startupConnectingTo(String target) {
@@ -1872,10 +1961,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playerQueueEmpty => 'La cola está vacía';
 
   @override
-  String get playerDrawerEmptyHint => 'Añade canciones para empezar a reproducir';
+  String get playerDrawerEmptyHint =>
+      'Añade canciones para empezar a reproducir';
 
   @override
-  String get playerQueueEmptyHint => 'Añade canciones a la cola para empezar a reproducir';
+  String get playerQueueEmptyHint =>
+      'Añade canciones a la cola para empezar a reproducir';
 
   @override
   String playerRemovedSong(String title) {
@@ -1980,7 +2071,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playerLyricsRefetch => 'Volver a buscar letras';
 
   @override
-  String get playerEqNotSupported => 'El ecualizador no es compatible con esta plataforma';
+  String get playerEqNotSupported =>
+      'El ecualizador no es compatible con esta plataforma';
 
   @override
   String get playerEqPresetFlat => 'Plano';
@@ -2010,13 +2102,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playerEqPresetCustom => 'Personalizado';
 
   @override
-  String get playerLyricSavedWritten => 'Guardado y escrito en el archivo de audio';
+  String get playerLyricSavedWritten =>
+      'Guardado y escrito en el archivo de audio';
 
   @override
-  String get playerLyricSavedWriteFailed => 'Guardado en la base de datos, pero no se pudo escribir en el archivo de audio';
+  String get playerLyricSavedWriteFailed =>
+      'Guardado en la base de datos, pero no se pudo escribir en el archivo de audio';
 
   @override
-  String get playerLyricSavedDbOnly => 'Guardado en la base de datos (archivo no actualizado)';
+  String get playerLyricSavedDbOnly =>
+      'Guardado en la base de datos (archivo no actualizado)';
 
   @override
   String playerSaveFailedDetail(String error) {
@@ -2027,7 +2122,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playerDiscardChangesTitle => '¿Descartar cambios?';
 
   @override
-  String get playerDiscardChangesContent => 'Tus cambios no se han guardado. ¿Salir de todos modos?';
+  String get playerDiscardChangesContent =>
+      'Tus cambios no se han guardado. ¿Salir de todos modos?';
 
   @override
   String get playerContinueEditing => 'Seguir editando';
@@ -2044,7 +2140,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get playerOffsetHint => 'Consejo: si las letras aparecen demasiado pronto en general, usa un desplazamiento negativo (-); si aparecen tarde, usa uno positivo (+)';
+  String get playerOffsetHint =>
+      'Consejo: si las letras aparecen demasiado pronto en general, usa un desplazamiento negativo (-); si aparecen tarde, usa uno positivo (+)';
 
   @override
   String get playerEmptyLine => '(línea vacía)';
@@ -2096,10 +2193,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get playerPlayFailedNoOthers => 'Error de reproducción: no hay más canciones para reproducir';
+  String get playerPlayFailedNoOthers =>
+      'Error de reproducción: no hay más canciones para reproducir';
 
   @override
-  String get playerPlayFailedEndOfList => 'Error de reproducción: se llegó al final de la lista';
+  String get playerPlayFailedEndOfList =>
+      'Error de reproducción: se llegó al final de la lista';
 
   @override
   String get playlistBack => 'Atrás';
@@ -2156,10 +2255,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistSortFailed => 'Error al ordenar';
 
   @override
-  String get playlistAlreadySortedSongs => 'Las canciones ya están en este orden';
+  String get playlistAlreadySortedSongs =>
+      'Las canciones ya están en este orden';
 
   @override
-  String get playlistAlreadySortedPlaylists => 'Las listas ya están en este orden';
+  String get playlistAlreadySortedPlaylists =>
+      'Las listas ya están en este orden';
 
   @override
   String get playlistSortedByNameAsc => 'Ordenadas por nombre (A→Z)';
@@ -2229,7 +2330,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get playlistLoadMoreRetry => 'No se pudo cargar más, toca para reintentar';
+  String get playlistLoadMoreRetry =>
+      'No se pudo cargar más, toca para reintentar';
 
   @override
   String playlistAllLoaded(int count) {
@@ -2329,7 +2431,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistDeleted => 'Lista de reproducción eliminada';
 
   @override
-  String get playlistDeleteWithSongs => 'Eliminar también las canciones de la biblioteca (incluidos los archivos locales)';
+  String get playlistDeleteWithSongs =>
+      'Eliminar también las canciones de la biblioteca (incluidos los archivos locales)';
 
   @override
   String get playlistEmpty => 'La lista está vacía';
@@ -2412,10 +2515,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get playlistNameRequired => 'Introduce un nombre para la lista de reproducción';
+  String get playlistNameRequired =>
+      'Introduce un nombre para la lista de reproducción';
 
   @override
-  String get playlistNameHint => 'Introduce un nombre para la lista de reproducción';
+  String get playlistNameHint =>
+      'Introduce un nombre para la lista de reproducción';
 
   @override
   String get playlistDescLabel => 'Descripción de la lista';
@@ -2471,7 +2576,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistHideHidden => 'Ocultar listas ocultas';
 
   @override
-  String get playlistEmptyHint => 'Toca el botón de la esquina superior derecha para crear una lista';
+  String get playlistEmptyHint =>
+      'Toca el botón de la esquina superior derecha para crear una lista';
 
   @override
   String get playlistConfirmBatchDelete => 'Confirmar eliminación en lote';
@@ -2481,7 +2587,8 @@ class AppLocalizationsEs extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '¿Eliminar las $count listas seleccionadas? Esta acción no se puede deshacer.',
+      other:
+          '¿Eliminar las $count listas seleccionadas? Esta acción no se puede deshacer.',
       one: '¿Eliminar la lista seleccionada? Esta acción no se puede deshacer.',
     );
     return '$_temp0';
@@ -2567,13 +2674,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistClose => 'Cerrar';
 
   @override
-  String get playlistNoCoveredSongs => 'No hay canciones con portada en esta lista';
+  String get playlistNoCoveredSongs =>
+      'No hay canciones con portada en esta lista';
 
   @override
   String get playlistLoadRetry => 'No se pudo cargar, toca para reintentar';
 
   @override
-  String get playlistNoCoverLoadMore => 'No hay portadas en esta página, cargar más';
+  String get playlistNoCoverLoadMore =>
+      'No hay portadas en esta página, cargar más';
 
   @override
   String get playlistAllLoadedSimple => '— Todo cargado —';
@@ -2604,7 +2713,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheCleanServerTitle => 'Vaciar caché del servidor';
 
   @override
-  String get settingsCacheCleanServerContent => '¿Vaciar toda la caché de música del servidor? Los archivos se tendrán que descargar de nuevo.';
+  String get settingsCacheCleanServerContent =>
+      '¿Vaciar toda la caché de música del servidor? Los archivos se tendrán que descargar de nuevo.';
 
   @override
   String get settingsCacheServerCleaned => 'Caché del servidor vaciada';
@@ -2618,7 +2728,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheCleanLocalTitle => 'Vaciar caché local';
 
   @override
-  String get settingsCacheCleanLocalContent => '¿Vaciar toda la caché local? Incluye la caché de audio, imágenes y letras.';
+  String get settingsCacheCleanLocalContent =>
+      '¿Vaciar toda la caché local? Incluye la caché de audio, imágenes y letras.';
 
   @override
   String get settingsCacheLocalCleaned => 'Caché local vaciada';
@@ -2627,13 +2738,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheCleanBrowserTitle => 'Vaciar caché del navegador';
 
   @override
-  String get settingsCacheCleanBrowserContent => 'Esto vaciará todos los recursos de frontend en caché y recargará la página. Tu sesión y los datos del servidor no se verán afectados.';
+  String get settingsCacheCleanBrowserContent =>
+      'Esto vaciará todos los recursos de frontend en caché y recargará la página. Tu sesión y los datos del servidor no se verán afectados.';
 
   @override
   String get webUpdateAvailableTitle => 'Actualización disponible';
 
   @override
-  String get webUpdateAvailableContent => 'El servidor se ha actualizado, pero esta página sigue ejecutando una versión anterior. Toca \"Actualizar ahora\" para vaciar la caché del navegador y cargar la última versión. Tu sesión no se verá afectada.';
+  String get webUpdateAvailableContent =>
+      'El servidor se ha actualizado, pero esta página sigue ejecutando una versión anterior. Toca \"Actualizar ahora\" para vaciar la caché del navegador y cargar la última versión. Tu sesión no se verá afectada.';
 
   @override
   String get webUpdateAvailableRefresh => 'Actualizar ahora';
@@ -2647,7 +2760,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsCacheDirRestored => 'Directorio de caché predeterminado restaurado';
+  String get settingsCacheDirRestored =>
+      'Directorio de caché predeterminado restaurado';
 
   @override
   String get settingsCacheDirUpdated => 'Directorio de caché actualizado';
@@ -2677,7 +2791,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsCacheStatsLoadFailed => 'No se pudo cargar la información de la caché';
+  String get settingsCacheStatsLoadFailed =>
+      'No se pudo cargar la información de la caché';
 
   @override
   String get settingsCacheDirTitle => 'Directorio de caché';
@@ -2691,28 +2806,34 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsCacheTranscodeTitle => 'Formato de transcodificación de caché';
+  String get settingsCacheTranscodeTitle =>
+      'Formato de transcodificación de caché';
 
   @override
-  String get settingsCacheTranscodeDesc => 'Transcodifica las canciones de red a un formato unificado al almacenarlas en caché, mejorando la compatibilidad con los dispositivos (p. ej., los altavoces Xiao AI no pueden reproducir MKV); al activarlo, el contenido de video se guarda solo en audio y la transmisión no tendrá imagen';
+  String get settingsCacheTranscodeDesc =>
+      'Transcodifica las canciones de red a un formato unificado al almacenarlas en caché, mejorando la compatibilidad con los dispositivos (p. ej., los altavoces Xiao AI no pueden reproducir MKV); al activarlo, el contenido de video se guarda solo en audio y la transmisión no tendrá imagen';
 
   @override
   String get settingsCacheTranscodeOriginal => 'Original (sin transcodificar)';
 
   @override
-  String get settingsCacheTranscodeDialogTitle => 'Formato de transcodificación de caché';
+  String get settingsCacheTranscodeDialogTitle =>
+      'Formato de transcodificación de caché';
 
   @override
-  String get settingsCacheTranscodeQualityTitle => 'Calidad de transcodificación';
+  String get settingsCacheTranscodeQualityTitle =>
+      'Calidad de transcodificación';
 
   @override
   String get settingsCacheTranscodeQualityHighest => 'Máxima calidad';
 
   @override
-  String get settingsCacheTranscodeQualityDialogTitle => 'Calidad de transcodificación';
+  String get settingsCacheTranscodeQualityDialogTitle =>
+      'Calidad de transcodificación';
 
   @override
-  String get settingsCacheTranscodeUpdated => 'Ajustes de transcodificación de caché actualizados';
+  String get settingsCacheTranscodeUpdated =>
+      'Ajustes de transcodificación de caché actualizados';
 
   @override
   String get settingsCacheCleaning => 'Vaciando...';
@@ -2730,7 +2851,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheCalculating => 'Calculando...';
 
   @override
-  String get settingsCacheLocalDesc => 'Incluye la caché de audio, imágenes y letras';
+  String get settingsCacheLocalDesc =>
+      'Incluye la caché de audio, imágenes y letras';
 
   @override
   String settingsCacheMaxLocalSize(String size) {
@@ -2744,13 +2866,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheBrowserTitle => 'Caché del navegador';
 
   @override
-  String get settingsCacheBrowserDesc => 'Vacía los recursos de frontend en caché del navegador para solucionar problemas de página tras una actualización';
+  String get settingsCacheBrowserDesc =>
+      'Vacía los recursos de frontend en caché del navegador para solucionar problemas de página tras una actualización';
 
   @override
   String get settingsCacheCleanBrowserButton => 'Vaciar caché del navegador';
 
   @override
-  String get settingsCacheDirDialogDesc => 'Establece el directorio de almacenamiento de la caché de música del servidor. Déjalo vacío para usar el predeterminado. Cambiar de directorio no migra los archivos de caché existentes.';
+  String get settingsCacheDirDialogDesc =>
+      'Establece el directorio de almacenamiento de la caché de música del servidor. Déjalo vacío para usar el predeterminado. Cambiar de directorio no migra los archivos de caché existentes.';
 
   @override
   String get settingsCacheDirLabel => 'Directorio de caché (ruta absoluta)';
@@ -2789,13 +2913,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCacheDirAvailable => 'Directorio disponible';
 
   @override
-  String get settingsMetadataUseTagTitle => 'Usar etiquetas para sobrescribir el título';
+  String get settingsMetadataUseTagTitle =>
+      'Usar etiquetas para sobrescribir el título';
 
   @override
-  String get settingsMetadataUseTagOn => 'Sobrescribir los títulos con las etiquetas de audio al actualizar los metadatos de canciones remotas';
+  String get settingsMetadataUseTagOn =>
+      'Sobrescribir los títulos con las etiquetas de audio al actualizar los metadatos de canciones remotas';
 
   @override
-  String get settingsMetadataUseTagOff => 'Mantener los nombres de archivo como títulos de canciones remotas, sin sobrescribir con etiquetas';
+  String get settingsMetadataUseTagOff =>
+      'Mantener los nombres de archivo como títulos de canciones remotas, sin sobrescribir con etiquetas';
 
   @override
   String get settingsMetadataSaved => 'Guardado';
@@ -2806,10 +2933,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsMetadataRefreshTitle => 'Actualizar metadatos de canciones remotas';
+  String get settingsMetadataRefreshTitle =>
+      'Actualizar metadatos de canciones remotas';
 
   @override
-  String get settingsMetadataRefreshSubtitle => 'Analizar todas las canciones remotas con metadatos incompletos';
+  String get settingsMetadataRefreshSubtitle =>
+      'Analizar todas las canciones remotas con metadatos incompletos';
 
   @override
   String get settingsMetadataStart => 'Iniciar';
@@ -2851,19 +2980,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsClientDownloadTitle => 'Descargar app cliente';
 
   @override
-  String get settingsClientDownloadIntro => 'En comparación con la interfaz web, el cliente nativo admite reproducción en segundo plano, caché local, controles multimedia en pantalla de bloqueo/notificaciones y más.';
+  String get settingsClientDownloadIntro =>
+      'En comparación con la interfaz web, el cliente nativo admite reproducción en segundo plano, caché local, controles multimedia en pantalla de bloqueo/notificaciones y más.';
 
   @override
-  String get settingsClientDownloadStandardSection => 'Estándar · Se conecta al servidor actual';
+  String get settingsClientDownloadStandardSection =>
+      'Estándar · Se conecta al servidor actual';
 
   @override
-  String get settingsClientDownloadBundleSection => 'Bundle · Backend integrado, sin necesidad de servidor';
+  String get settingsClientDownloadBundleSection =>
+      'Bundle · Backend integrado, sin necesidad de servidor';
 
   @override
-  String get settingsClientDownloadStandardAllVersions => 'Todas las versiones estándar';
+  String get settingsClientDownloadStandardAllVersions =>
+      'Todas las versiones estándar';
 
   @override
-  String get settingsClientDownloadBundleAllVersions => 'Todas las versiones bundle';
+  String get settingsClientDownloadBundleAllVersions =>
+      'Todas las versiones bundle';
 
   @override
   String settingsClientDownloadRecommendFor(String os) {
@@ -2881,7 +3015,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsClientDownloadNoteUnsigned => 'Sin firmar, requiere instalación manual';
+  String get settingsClientDownloadNoteUnsigned =>
+      'Sin firmar, requiere instalación manual';
 
   @override
   String get settingsTabConfigTitle => 'Ajustes de menú';
@@ -2902,7 +3037,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTabConfigNoPlugins => 'No hay plugins disponibles';
 
   @override
-  String get settingsTabConfigNoPluginsHint => 'Primero instala y activa los plugins en los ajustes';
+  String get settingsTabConfigNoPluginsHint =>
+      'Primero instala y activa los plugins en los ajustes';
 
   @override
   String get settingsTabConfigPluginOrder => 'Orden de plugins';
@@ -2913,7 +3049,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsTabConfigCollapseHint => 'En móvil, las pestañas más allá de 5 se agrupan en el menú \"Más\"';
+  String get settingsTabConfigCollapseHint =>
+      'En móvil, las pestañas más allá de 5 se agrupan en el menú \"Más\"';
 
   @override
   String settingsTabConfigMaxTabs(int count) {
@@ -2974,10 +3111,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsScanModeSkipDesc => 'Solo importa los archivos de música recién descubiertos';
+  String get settingsScanModeSkipDesc =>
+      'Solo importa los archivos de música recién descubiertos';
 
   @override
-  String get settingsScanModeReimportDesc => 'Volver a escanear y sobrescribir toda la información de música';
+  String get settingsScanModeReimportDesc =>
+      'Volver a escanear y sobrescribir toda la información de música';
 
   @override
   String get settingsScanDismiss => 'Descartar';
@@ -2986,7 +3125,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsScanExcludeDirTitle => 'Ajustes de directorios excluidos';
 
   @override
-  String get settingsScanExcludeDirSubtitle => 'Configura los directorios que se ignorarán durante el escaneo';
+  String get settingsScanExcludeDirSubtitle =>
+      'Configura los directorios que se ignorarán durante el escaneo';
 
   @override
   String get settingsScanModeSkip => 'Omitir existentes';
@@ -3006,10 +3146,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsScanTargetDirsTitle => 'Directorios específicos (opcional)';
+  String get settingsScanTargetDirsTitle =>
+      'Directorios específicos (opcional)';
 
   @override
-  String get settingsScanTargetDirsSubtitle => 'Escanea solo los directorios seleccionados; déjalo vacío para escanear toda la biblioteca';
+  String get settingsScanTargetDirsSubtitle =>
+      'Escanea solo los directorios seleccionados; déjalo vacío para escanear toda la biblioteca';
 
   @override
   String settingsScanTargetDirsSelected(int count) {
@@ -3023,7 +3165,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsScanClear => 'Borrar';
 
   @override
-  String get settingsScanCreatingPlaylists => 'Creando automáticamente listas por directorio...';
+  String get settingsScanCreatingPlaylists =>
+      'Creando automáticamente listas por directorio...';
 
   @override
   String get settingsScanSplittingCue => 'Dividiendo pista única (CUE)...';
@@ -3047,7 +3190,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String settingsScanProgressStats(int scanned, int total, int imported, int skipped, int failed) {
+  String settingsScanProgressStats(
+    int scanned,
+    int total,
+    int imported,
+    int skipped,
+    int failed,
+  ) {
     return 'Procesados: $scanned/$total, importados: $imported, omitidos: $skipped, fallidos: $failed';
   }
 
@@ -3055,16 +3204,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsScanCancelScan => 'Cancelar escaneo';
 
   @override
-  String get settingsScanAutoCreatePlaylists => 'Crear listas automáticamente tras el escaneo';
+  String get settingsScanAutoCreatePlaylists =>
+      'Crear listas automáticamente tras el escaneo';
 
   @override
-  String get settingsScanAutoCreatePlaylistsDesc => 'Genera listas automáticamente según la estructura de directorios';
+  String get settingsScanAutoCreatePlaylistsDesc =>
+      'Genera listas automáticamente según la estructura de directorios';
 
   @override
-  String get settingsScanAutoFingerprint => 'Calcular huellas de audio tras el escaneo';
+  String get settingsScanAutoFingerprint =>
+      'Calcular huellas de audio tras el escaneo';
 
   @override
-  String get settingsScanAutoFingerprintDesc => 'Las huellas solo se usan para detectar duplicados y búsquedas de plugins. Activarlo en una biblioteca grande mantiene la CPU ocupada mucho tiempo; si está desactivado, puedes calcularlas manualmente en la página de detección de duplicados';
+  String get settingsScanAutoFingerprintDesc =>
+      'Las huellas solo se usan para detectar duplicados y búsquedas de plugins. Activarlo en una biblioteca grande mantiene la CPU ocupada mucho tiempo; si está desactivado, puedes calcularlas manualmente en la página de detección de duplicados';
 
   @override
   String get settingsScanLoadingConfig => 'Cargando...';
@@ -3081,37 +3234,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsScanPlaylistModeDirectory => 'Por carpeta';
 
   @override
-  String get settingsScanPlaylistModeDirectoryDesc => 'Genera una lista separada para cada carpeta';
+  String get settingsScanPlaylistModeDirectoryDesc =>
+      'Genera una lista separada para cada carpeta';
 
   @override
-  String get settingsScanPlaylistModeTopLevel => 'Por carpeta de nivel superior';
+  String get settingsScanPlaylistModeTopLevel =>
+      'Por carpeta de nivel superior';
 
   @override
-  String get settingsScanPlaylistModeTopLevelDesc => 'Fusiona las canciones de las subcarpetas en la lista de la carpeta de nivel superior';
+  String get settingsScanPlaylistModeTopLevelDesc =>
+      'Fusiona las canciones de las subcarpetas en la lista de la carpeta de nivel superior';
 
   @override
   String get settingsScanPlaylistModeBubbleUp => 'Incluir subdirectorios';
 
   @override
-  String get settingsScanPlaylistModeBubbleUpDesc => 'Las canciones aparecen en todas las listas de las carpetas superiores';
+  String get settingsScanPlaylistModeBubbleUpDesc =>
+      'Las canciones aparecen en todas las listas de las carpetas superiores';
 
   @override
   String get settingsScanPlaylistModeTitle => 'Modo de creación de listas';
 
   @override
-  String get settingsScanPlaylistModeDisabled => 'La creación automática de listas está desactivada; esta opción no tiene efecto';
+  String get settingsScanPlaylistModeDisabled =>
+      'La creación automática de listas está desactivada; esta opción no tiene efecto';
 
   @override
   String get settingsScanTitleSource => 'Usar el nombre de archivo como título';
 
   @override
-  String get settingsScanTitleSourceFilenameDesc => 'Usa el nombre de archivo (sin extensión) como título de la canción; adecuado cuando los nombres ya están numerados';
+  String get settingsScanTitleSourceFilenameDesc =>
+      'Usa el nombre de archivo (sin extensión) como título de la canción; adecuado cuando los nombres ya están numerados';
 
   @override
-  String get settingsScanTitleSourceTagDesc => 'Prefiere la información de etiquetas de audio para el título de la canción';
+  String get settingsScanTitleSourceTagDesc =>
+      'Prefiere la información de etiquetas de audio para el título de la canción';
 
   @override
-  String get settingsScanTitleSourceSaved => 'Guardado; surte efecto tras escanear en modo \'Reimportar\'';
+  String get settingsScanTitleSourceSaved =>
+      'Guardado; surte efecto tras escanear en modo \'Reimportar\'';
 
   @override
   String get settingsScanInterval10Min => '10 minutos';
@@ -3180,7 +3341,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsExcludeDirSaved => 'Ajustes de directorios excluidos guardados; limpiando en segundo plano las canciones de los directorios excluidos';
+  String get settingsExcludeDirSaved =>
+      'Ajustes de directorios excluidos guardados; limpiando en segundo plano las canciones de los directorios excluidos';
 
   @override
   String settingsExcludeDirSaveFailed(String error) {
@@ -3203,13 +3365,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExcludeDirSaveConfig => 'Guardar ajustes de exclusión';
 
   @override
-  String get settingsExcludeDirSaveHint => 'Tras guardar, las canciones importadas en directorios excluidos se limpiarán automáticamente';
+  String get settingsExcludeDirSaveHint =>
+      'Tras guardar, las canciones importadas en directorios excluidos se limpiarán automáticamente';
 
   @override
-  String get settingsExcludeDirInputName => 'Introduce el nombre del directorio';
+  String get settingsExcludeDirInputName =>
+      'Introduce el nombre del directorio';
 
   @override
-  String get settingsExcludeDirInputHint => 'Escribe y selecciona, o pulsa Enter para añadir';
+  String get settingsExcludeDirInputHint =>
+      'Escribe y selecciona, o pulsa Enter para añadir';
 
   @override
   String get settingsExcludeDirLoadingCandidates => 'Cargando candidatos...';
@@ -3218,10 +3383,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExcludeDirAdd => 'Añadir';
 
   @override
-  String get settingsExcludeDirExcludedNames => 'Nombres de directorio excluidos:';
+  String get settingsExcludeDirExcludedNames =>
+      'Nombres de directorio excluidos:';
 
   @override
-  String get settingsExcludeDirNameHint => 'Se excluirá cualquier directorio que contenga este nombre en cualquier nivel de ruta';
+  String get settingsExcludeDirNameHint =>
+      'Se excluirá cualquier directorio que contenga este nombre en cualquier nivel de ruta';
 
   @override
   String settingsExcludeDirMusicDir(String path) {
@@ -3232,10 +3399,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExcludeDirExcludedPaths => 'Rutas excluidas:';
 
   @override
-  String get settingsExcludeDirAutoCreateExcluded => 'Directorios excluidos de las listas creadas automáticamente:';
+  String get settingsExcludeDirAutoCreateExcluded =>
+      'Directorios excluidos de las listas creadas automáticamente:';
 
   @override
-  String get settingsExcludeDirAutoCreateHint => 'Los directorios que contengan este nombre en cualquier nivel no se crearán automáticamente como listas';
+  String get settingsExcludeDirAutoCreateHint =>
+      'Los directorios que contengan este nombre en cualquier nivel no se crearán automáticamente como listas';
 
   @override
   String get settingsServersTitle => 'Servidores';
@@ -3247,7 +3416,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsServersEmptyTitle => 'Aún no hay servidores añadidos';
 
   @override
-  String get settingsServersEmptyHint => 'Toca el botón \"+\" para añadir una dirección de API.\nAl iniciar, los servidores se comprueban en orden y se usa el primero que responde.';
+  String get settingsServersEmptyHint =>
+      'Toca el botón \"+\" para añadir una dirección de API.\nAl iniciar, los servidores se comprueban en orden y se usa el primero que responde.';
 
   @override
   String get settingsServersAdd => 'Añadir servidor';
@@ -3282,7 +3452,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsServersDeleteTitle => 'Eliminar servidor';
 
   @override
-  String get settingsServersDeleteCurrentConfirm => 'Este es el servidor en uso. Tras eliminarlo, los servidores restantes de la lista se volverán a probar en el próximo inicio. ¿Continuar?';
+  String get settingsServersDeleteCurrentConfirm =>
+      'Este es el servidor en uso. Tras eliminarlo, los servidores restantes de la lista se volverán a probar en el próximo inicio. ¿Continuar?';
 
   @override
   String settingsServersDeleteConfirm(String name) {
@@ -3325,7 +3496,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsServersLocalMode => 'Modo local';
 
   @override
-  String get settingsServersLocalModeDesc => 'Al activarlo, el backend se ejecuta en este dispositivo para que puedas reproducir música local sin red.';
+  String get settingsServersLocalModeDesc =>
+      'Al activarlo, el backend se ejecuta en este dispositivo para que puedas reproducir música local sin red.';
 
   @override
   String get settingsServersMusicDir => 'Carpeta de música';
@@ -3337,7 +3509,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsServersSelect => 'Seleccionar';
 
   @override
-  String get settingsServersFixedMusicDirHint => 'Coloca la música en la carpeta de Songloft mediante la app Archivos o una computadora (Finder / uso compartido de archivos de iTunes) y vuelve a escanear.';
+  String get settingsServersFixedMusicDirHint =>
+      'Coloca la música en la carpeta de Songloft mediante la app Archivos o una computadora (Finder / uso compartido de archivos de iTunes) y vuelve a escanear.';
 
   @override
   String settingsServersSwitchFailed(String error) {
@@ -3357,7 +3530,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDuplicateDismissError => 'Descartar';
 
   @override
-  String get settingsDuplicateIntro => 'Identifica archivos duplicados con contenido idéntico mediante huellas de audio. La misma canción se reconoce incluso con distintos nombres de archivo y formatos.';
+  String get settingsDuplicateIntro =>
+      'Identifica archivos duplicados con contenido idéntico mediante huellas de audio. La misma canción se reconoce incluso con distintos nombres de archivo y formatos.';
 
   @override
   String get settingsDuplicateFingerprintStats => 'Estadísticas de huellas';
@@ -3375,7 +3549,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsDuplicateUncomputable => 'No calculables';
 
   @override
-  String get settingsDuplicateUncomputableHint => 'Estos archivos no tienen pista de audio, están dañados, agotaron el tiempo o el ffmpeg del servidor no admite su formato. No se reintentarán automáticamente: usa \"Reintentar solo fallidos\" (p. ej. tras una actualización del servidor) o \"Recalcular todas las huellas\".';
+  String get settingsDuplicateUncomputableHint =>
+      'Estos archivos no tienen pista de audio, están dañados, agotaron el tiempo o el ffmpeg del servidor no admite su formato. No se reintentarán automáticamente: usa \"Reintentar solo fallidos\" (p. ej. tras una actualización del servidor) o \"Recalcular todas las huellas\".';
 
   @override
   String get settingsDuplicateViewFailed => 'Ver detalles del error';
@@ -3392,7 +3567,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsDuplicateChromaprintMissing => 'La detección de huellas de audio requiere ffmpeg con soporte de chromaprint. Los usuarios de Docker pueden simplemente actualizar a la última imagen.';
+  String get settingsDuplicateChromaprintMissing =>
+      'La detección de huellas de audio requiere ffmpeg con soporte de chromaprint. Los usuarios de Docker pueden simplemente actualizar a la última imagen.';
 
   @override
   String get settingsDuplicateStartCompute => 'Calcular y detectar';
@@ -3417,22 +3593,26 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsDuplicateAutoDetect => 'Los duplicados se detectarán automáticamente al terminar el cálculo';
+  String get settingsDuplicateAutoDetect =>
+      'Los duplicados se detectarán automáticamente al terminar el cálculo';
 
   @override
   String get settingsDuplicateStopCompute => 'Detener cálculo';
 
   @override
-  String get settingsDuplicateStopComputeHint => 'Las huellas ya calculadas se conservan; las canciones restantes se calcularán la próxima vez';
+  String get settingsDuplicateStopComputeHint =>
+      'Las huellas ya calculadas se conservan; las canciones restantes se calcularán la próxima vez';
 
   @override
   String get settingsDuplicateRecheck => 'Volver a comprobar';
 
   @override
-  String get settingsDuplicateNoResults => 'No se encontraron canciones duplicadas';
+  String get settingsDuplicateNoResults =>
+      'No se encontraron canciones duplicadas';
 
   @override
-  String get settingsDuplicateNoResultsHint => '¡Tu biblioteca de música está limpia!';
+  String get settingsDuplicateNoResultsHint =>
+      '¡Tu biblioteca de música está limpia!';
 
   @override
   String settingsDuplicateSummary(int groups, int songs) {
@@ -3497,7 +3677,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsSongTitleScrollingTitle => 'Desplazar títulos largos';
 
   @override
-  String get settingsSongTitleScrollingSubtitle => 'Desplaza automáticamente los títulos y nombres de artistas largos; muestra puntos suspensivos al desactivarlo';
+  String get settingsSongTitleScrollingSubtitle =>
+      'Desplaza automáticamente los títulos y nombres de artistas largos; muestra puntos suspensivos al desactivarlo';
 
   @override
   String get settingsCategoryPlaybackSubtitle => 'Calidad de audio';
@@ -3506,7 +3687,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCategoryLibraryTitle => 'Biblioteca';
 
   @override
-  String get settingsCategoryLibrarySubtitle => 'Escaneo, importación y conversión';
+  String get settingsCategoryLibrarySubtitle =>
+      'Escaneo, importación y conversión';
 
   @override
   String get settingsCategoryExtensionsTitle => 'Extensiones';
@@ -3530,7 +3712,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCategoryDataTitle => 'Datos';
 
   @override
-  String get settingsCategoryDataSubtitle => 'Exportación e importación de listas';
+  String get settingsCategoryDataSubtitle =>
+      'Exportación e importación de listas';
 
   @override
   String get settingsCategoryAboutTitle => 'Acerca de y actualizaciones';
@@ -3571,7 +3754,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsTabsCollapseHint => 'En móvil, las pestañas más allá de 5 se agrupan en el menú \"Más\"';
+  String get settingsTabsCollapseHint =>
+      'En móvil, las pestañas más allá de 5 se agrupan en el menú \"Más\"';
 
   @override
   String settingsMaxTabsLimit(int count) {
@@ -3602,22 +3786,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsQualityDialogTitle => 'Seleccionar calidad de audio';
 
   @override
-  String get settingsQualityOriginalDesc => 'Sin nivel solicitado: los archivos locales se reproducen tal cual, las canciones en red usan el valor por defecto de la fuente';
+  String get settingsQualityOriginalDesc =>
+      'Sin nivel solicitado: los archivos locales se reproducen tal cual, las canciones en red usan el valor por defecto de la fuente';
 
   @override
-  String get settingsQualityTranscodeDesc => 'Solo canciones en red: solicita este nivel a la fuente y usa el mejor disponible si falta; los archivos locales siempre se reproducen tal cual';
+  String get settingsQualityTranscodeDesc =>
+      'Solo canciones en red: solicita este nivel a la fuente y usa el mejor disponible si falta; los archivos locales siempre se reproducen tal cual';
 
   @override
-  String get settingsAutoPlayOnLaunchTitle => 'Reproducción automática al iniciar';
+  String get settingsAutoPlayOnLaunchTitle =>
+      'Reproducción automática al iniciar';
 
   @override
-  String get settingsAutoPlayOnLaunchDesc => 'Reanuda automáticamente la última reproducción al abrir la app';
+  String get settingsAutoPlayOnLaunchDesc =>
+      'Reanuda automáticamente la última reproducción al abrir la app';
 
   @override
   String get settingsMiniPlayerControlsTitle => 'Botones del mini reproductor';
 
   @override
-  String get settingsMiniPlayerControlsDesc => 'Qué controles mostrar en la barra del mini reproductor inferior';
+  String get settingsMiniPlayerControlsDesc =>
+      'Qué controles mostrar en la barra del mini reproductor inferior';
 
   @override
   String get settingsMiniPlayerControlsDialogTitle => 'Botones a mostrar';
@@ -3629,13 +3818,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsMiniPlayerControlsPrevNext => 'Anterior / siguiente';
 
   @override
-  String get settingsMiniPlayerControlsPrevNextMode => 'Anterior / siguiente + modo de reproducción';
+  String get settingsMiniPlayerControlsPrevNextMode =>
+      'Anterior / siguiente + modo de reproducción';
 
   @override
   String get settingsHomeGridTitle => 'Cuadrícula de inicio de listas';
 
   @override
-  String get settingsHomeGridDesc => 'Columnas y filas de las cuadrículas de listas y radios en inicio';
+  String get settingsHomeGridDesc =>
+      'Columnas y filas de las cuadrículas de listas y radios en inicio';
 
   @override
   String get settingsHomeGridColumnsTitle => 'Por fila';
@@ -3665,10 +3856,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsHomeGridClampHint => 'Las columnas se reducen automáticamente cuando la ventana es demasiado estrecha para mantener legibles las tarjetas.';
+  String get settingsHomeGridClampHint =>
+      'Las columnas se reducen automáticamente cuando la ventana es demasiado estrecha para mantener legibles las tarjetas.';
 
   @override
-  String get settingsHomeGridNarrowHint => 'Elige Cuadrícula junto al título de una sección para usar estos ajustes';
+  String get settingsHomeGridNarrowHint =>
+      'Elige Cuadrícula junto al título de una sección para usar estos ajustes';
 
   @override
   String get settingsFontScaleTitle => 'Tamaño de fuente';
@@ -3689,34 +3882,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsAutoEnterLyricsOnLaunchTitle => 'Abrir letras al iniciar';
 
   @override
-  String get settingsLyricsKeepScreenOnTitle => 'Mantener la pantalla encendida con las letras';
+  String get settingsLyricsKeepScreenOnTitle =>
+      'Mantener la pantalla encendida con las letras';
 
   @override
-  String get settingsLyricsKeepScreenOnDesc => 'Mantiene la pantalla encendida al ver las letras; restaura el apagado automático al salir o pasar a segundo plano';
+  String get settingsLyricsKeepScreenOnDesc =>
+      'Mantiene la pantalla encendida al ver las letras; restaura el apagado automático al salir o pasar a segundo plano';
 
   @override
-  String get settingsAutoEnterLyricsOnLaunchDesc => 'Abre automáticamente la vista de letras a pantalla completa al abrir la app (se adapta al tamaño de pantalla)';
+  String get settingsAutoEnterLyricsOnLaunchDesc =>
+      'Abre automáticamente la vista de letras a pantalla completa al abrir la app (se adapta al tamaño de pantalla)';
 
   @override
-  String get settingsNotificationLyricInTitleTitle => 'Letras en el título de la notificación';
+  String get settingsNotificationLyricInTitleTitle =>
+      'Letras en el título de la notificación';
 
   @override
-  String get settingsNotificationLyricInTitleDesc => 'Activado: la línea de título muestra las letras y el nombre de la canción pasa al subtítulo. Desactivado: el título muestra el nombre de la canción y las letras van al subtítulo';
+  String get settingsNotificationLyricInTitleDesc =>
+      'Activado: la línea de título muestra las letras y el nombre de la canción pasa al subtítulo. Desactivado: el título muestra el nombre de la canción y las letras van al subtítulo';
 
   @override
   String get settingsDesktopLyricTitle => 'Letras en escritorio';
 
   @override
-  String get settingsDesktopLyricDesc => 'Muestra una ventana flotante de letras en el escritorio que se desplaza con la reproducción';
+  String get settingsDesktopLyricDesc =>
+      'Muestra una ventana flotante de letras en el escritorio que se desplaza con la reproducción';
 
   @override
   String get settingsDesktopLyricLockTitle => 'Bloquear posición de las letras';
 
   @override
-  String get settingsDesktopLyricLockDesc => 'Al bloquear, la ventana no se puede arrastrar y los clics atraviesan hacia lo que hay debajo';
+  String get settingsDesktopLyricLockDesc =>
+      'Al bloquear, la ventana no se puede arrastrar y los clics atraviesan hacia lo que hay debajo';
 
   @override
-  String get settingsDesktopLyricFontSizeTitle => 'Tamaño de fuente de las letras';
+  String get settingsDesktopLyricFontSizeTitle =>
+      'Tamaño de fuente de las letras';
 
   @override
   String get settingsDesktopLyricFontSizeSmall => 'Pequeña';
@@ -3743,7 +3944,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsShortcutsEntryTitle => 'Atajos de teclado';
 
   @override
-  String get settingsShortcutsEntrySubtitle => 'Personaliza las teclas de control de reproducción';
+  String get settingsShortcutsEntrySubtitle =>
+      'Personaliza las teclas de control de reproducción';
 
   @override
   String get settingsShortcutsPageTitle => 'Atajos de teclado';
@@ -3752,7 +3954,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsShortcutsEnableTitle => 'Activar atajos de teclado';
 
   @override
-  String get settingsShortcutsEnableSubtitle => 'Controla la reproducción con atajos dentro de la ventana de escritorio';
+  String get settingsShortcutsEnableSubtitle =>
+      'Controla la reproducción con atajos dentro de la ventana de escritorio';
 
   @override
   String get settingsShortcutActionPlayPause => 'Reproducir / Pausar';
@@ -3799,10 +4002,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsShortcutClear => 'Borrar';
 
   @override
-  String get settingsShortcutResetAll => 'Restablecer todo a los valores predeterminados';
+  String get settingsShortcutResetAll =>
+      'Restablecer todo a los valores predeterminados';
 
   @override
-  String get settingsShortcutResetAllConfirm => '¿Restablecer todos los atajos a sus valores predeterminados?';
+  String get settingsShortcutResetAllConfirm =>
+      '¿Restablecer todos los atajos a sus valores predeterminados?';
 
   @override
   String settingsQualitySwitched(String quality) {
@@ -3818,7 +4023,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsLibraryDuplicateTitle => 'Detección de duplicados';
 
   @override
-  String get settingsLibraryDuplicateSubtitle => 'Identifica archivos duplicados con contenido idéntico mediante huella de audio';
+  String get settingsLibraryDuplicateSubtitle =>
+      'Identifica archivos duplicados con contenido idéntico mediante huella de audio';
 
   @override
   String get settingsPluginStoreTitle => 'Tienda de plugins';
@@ -3830,31 +4036,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExportPlaylistTitle => 'Exportar listas de reproducción';
 
   @override
-  String get settingsExportPlaylistSubtitle => 'Respalda todos los datos de las listas en un archivo JSON';
+  String get settingsExportPlaylistSubtitle =>
+      'Respalda todos los datos de las listas en un archivo JSON';
 
   @override
   String get settingsImportPlaylistTitle => 'Importar listas de reproducción';
 
   @override
-  String get settingsImportPlaylistSubtitle => 'Restaura los datos de las listas desde un archivo JSON de respaldo';
+  String get settingsImportPlaylistSubtitle =>
+      'Restaura los datos de las listas desde un archivo JSON de respaldo';
 
   @override
   String get settingsDownloadAppTitle => 'Descargar la app';
 
   @override
-  String get settingsDownloadAppSubtitle => 'Consigue el cliente nativo móvil / de escritorio con reproducción en segundo plano, caché y más';
+  String get settingsDownloadAppSubtitle =>
+      'Consigue el cliente nativo móvil / de escritorio con reproducción en segundo plano, caché y más';
 
   @override
   String get settingsWebDebugConsoleTitle => 'Consola de depuración';
 
   @override
-  String get settingsWebDebugConsoleSubtitle => 'Activa el panel de depuración web de NextConsole (requiere recargar la página)';
+  String get settingsWebDebugConsoleSubtitle =>
+      'Activa el panel de depuración web de NextConsole (requiere recargar la página)';
 
   @override
-  String get settingsWebDebugConsoleEnabled => 'Consola de depuración activada, la página se recargará';
+  String get settingsWebDebugConsoleEnabled =>
+      'Consola de depuración activada, la página se recargará';
 
   @override
-  String get settingsWebDebugConsoleDisabled => 'Consola de depuración desactivada, la página se recargará';
+  String get settingsWebDebugConsoleDisabled =>
+      'Consola de depuración desactivada, la página se recargará';
 
   @override
   String get settingsAboutTitle => 'Acerca de';
@@ -3875,19 +4087,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExitApp => 'Salir de la aplicación';
 
   @override
-  String get settingsExitAppSubtitle => 'Detener la reproducción, las notificaciones y los servicios sin cerrar sesión';
+  String get settingsExitAppSubtitle =>
+      'Detener la reproducción, las notificaciones y los servicios sin cerrar sesión';
 
   @override
   String get settingsLogoutConfirmTitle => 'Confirmar cierre de sesión';
 
   @override
-  String get settingsLogoutConfirmContent => '¿Seguro que quieres cerrar la sesión de la cuenta actual?';
+  String get settingsLogoutConfirmContent =>
+      '¿Seguro que quieres cerrar la sesión de la cuenta actual?';
 
   @override
   String get settingsLogoutButton => 'Cerrar sesión';
 
   @override
-  String get settingsExportNotLoggedIn => 'Sin sesión iniciada, no se puede exportar';
+  String get settingsExportNotLoggedIn =>
+      'Sin sesión iniciada, no se puede exportar';
 
   @override
   String settingsExportFailed(String error) {
@@ -3895,13 +4110,20 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsImportReadFailed => 'No se puede leer el contenido del archivo';
+  String get settingsImportReadFailed =>
+      'No se puede leer el contenido del archivo';
 
   @override
-  String get settingsImportPathFailed => 'No se pudo obtener la ruta del archivo';
+  String get settingsImportPathFailed =>
+      'No se pudo obtener la ruta del archivo';
 
   @override
-  String settingsImportComplete(Object created, Object merged, Object songsCreated, Object songsMatched) {
+  String settingsImportComplete(
+    Object created,
+    Object merged,
+    Object songsCreated,
+    Object songsMatched,
+  ) {
     return 'Importación completada: $created listas creadas, $merged fusionadas, $songsCreated canciones creadas, $songsMatched coincidentes';
   }
 
@@ -3933,7 +4155,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsCheckClientUpdate => 'Buscar actualizaciones del cliente';
 
   @override
-  String get settingsAutoUpdateCheckTitle => 'Buscar actualizaciones al iniciar';
+  String get settingsAutoUpdateCheckTitle =>
+      'Buscar actualizaciones al iniciar';
 
   @override
   String settingsAutoUpdateCheckSubtitle(int hours) {
@@ -3949,7 +4172,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsHlsProxyTitle => 'Proxy de backend para radio HLS';
 
   @override
-  String get settingsHlsProxySubtitle => 'Al activarlo, el servidor obtiene el m3u8 de la radio y hace de proxy de los segmentos, evitando la protección antienlaces por Referer / CORS. Todos los segmentos usan el ancho de banda de esta máquina: ten en cuenta el costo de tráfico.';
+  String get settingsHlsProxySubtitle =>
+      'Al activarlo, el servidor obtiene el m3u8 de la radio y hace de proxy de los segmentos, evitando la protección antienlaces por Referer / CORS. Todos los segmentos usan el ancho de banda de esta máquina: ten en cuenta el costo de tráfico.';
 
   @override
   String get settingsHlsProxyEnabled => 'Proxy HLS activado';
@@ -3961,22 +4185,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsVolumeNormalizeTitle => 'Normalización de volumen';
 
   @override
-  String get settingsVolumeNormalizeSubtitle => 'Activa la normalización de sonoridad EBU R128 para igualar el volumen entre distintas fuentes de audio. Requiere ffmpeg; aumenta el uso de CPU y la latencia del primer arranque';
+  String get settingsVolumeNormalizeSubtitle =>
+      'Activa la normalización de sonoridad EBU R128 para igualar el volumen entre distintas fuentes de audio. Requiere ffmpeg; aumenta el uso de CPU y la latencia del primer arranque';
 
   @override
-  String get settingsVolumeNormalizeEnabled => 'Normalización de volumen activada';
+  String get settingsVolumeNormalizeEnabled =>
+      'Normalización de volumen activada';
 
   @override
-  String get settingsVolumeNormalizeDisabled => 'Normalización de volumen desactivada';
+  String get settingsVolumeNormalizeDisabled =>
+      'Normalización de volumen desactivada';
 
   @override
-  String get settingsVolumeNormalizeLoudnessTitle => 'Sonoridad objetivo (LUFS)';
+  String get settingsVolumeNormalizeLoudnessTitle =>
+      'Sonoridad objetivo (LUFS)';
 
   @override
-  String get settingsVolumeNormalizeLoudnessSubtitle => 'Personaliza la sonoridad objetivo EBU R128, predeterminada en -16. El streaming suele usar -14 y la radiodifusión -23. Rango de -40 a -5';
+  String get settingsVolumeNormalizeLoudnessSubtitle =>
+      'Personaliza la sonoridad objetivo EBU R128, predeterminada en -16. El streaming suele usar -14 y la radiodifusión -23. Rango de -40 a -5';
 
   @override
-  String get settingsVolumeNormalizeLoudnessInvalid => 'Introduce un valor entre -40 y -5';
+  String get settingsVolumeNormalizeLoudnessInvalid =>
+      'Introduce un valor entre -40 y -5';
 
   @override
   String settingsVolumeNormalizeLoudnessSaved(String value) {
@@ -3984,10 +4214,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsProxyAllowlistTitle => 'Lista blanca de proxy para redes privadas';
+  String get settingsProxyAllowlistTitle =>
+      'Lista blanca de proxy para redes privadas';
 
   @override
-  String get settingsProxyAllowlistEmpty => 'Sin configurar (las direcciones privadas se rechazan)';
+  String get settingsProxyAllowlistEmpty =>
+      'Sin configurar (las direcciones privadas se rechazan)';
 
   @override
   String settingsProxyAllowlistCount(int count) {
@@ -3995,34 +4227,43 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsProxyAllowlistDialogDesc => 'El proxy a direcciones privadas está bloqueado por defecto para evitar SSRF. Si necesitas que este servidor haga de proxy de recursos internos (p. ej. un WebDAV accesible solo en la LAN), indica aquí las direcciones permitidas.';
+  String get settingsProxyAllowlistDialogDesc =>
+      'El proxy a direcciones privadas está bloqueado por defecto para evitar SSRF. Si necesitas que este servidor haga de proxy de recursos internos (p. ej. un WebDAV accesible solo en la LAN), indica aquí las direcciones permitidas.';
 
   @override
-  String get settingsProxyAllowlistLabel => 'Direcciones permitidas (una por línea)';
+  String get settingsProxyAllowlistLabel =>
+      'Direcciones permitidas (una por línea)';
 
   @override
-  String get settingsProxyAllowlistHelper => 'Una IP única (p. ej. 192.168.1.100) o rango CIDR (p. ej. 192.168.1.0/24) por línea. Solo afecta al proxy genérico de recursos.';
+  String get settingsProxyAllowlistHelper =>
+      'Una IP única (p. ej. 192.168.1.100) o rango CIDR (p. ej. 192.168.1.0/24) por línea. Solo afecta al proxy genérico de recursos.';
 
   @override
-  String get settingsProxyAllowlistSaved => 'Lista blanca de proxy de redes privadas guardada';
+  String get settingsProxyAllowlistSaved =>
+      'Lista blanca de proxy de redes privadas guardada';
 
   @override
-  String get settingsInsecureTlsTitle => 'Ignorar verificación de certificados SSL';
+  String get settingsInsecureTlsTitle =>
+      'Ignorar verificación de certificados SSL';
 
   @override
-  String get settingsInsecureTlsSubtitle => 'Actívalo al conectar con un servidor con certificado HTTPS autofirmado o no válido. Se aplica a las solicitudes de API y a la reproducción de audio.';
+  String get settingsInsecureTlsSubtitle =>
+      'Actívalo al conectar con un servidor con certificado HTTPS autofirmado o no válido. Se aplica a las solicitudes de API y a la reproducción de audio.';
 
   @override
-  String get settingsInsecureTlsEnabled => 'Verificación de certificados ignorada';
+  String get settingsInsecureTlsEnabled =>
+      'Verificación de certificados ignorada';
 
   @override
-  String get settingsInsecureTlsDisabled => 'Verificación de certificados activada';
+  String get settingsInsecureTlsDisabled =>
+      'Verificación de certificados activada';
 
   @override
   String get settingsInsecureTlsWarnTitle => 'Seguridad reducida';
 
   @override
-  String get settingsInsecureTlsWarnContent => 'Al activarlo se aceptará cualquier certificado HTTPS, lo que te expone a ataques de intermediario. Úsalo solo en intranets de confianza o con certificados autofirmados. ¿Activarlo de todos modos?';
+  String get settingsInsecureTlsWarnContent =>
+      'Al activarlo se aceptará cualquier certificado HTTPS, lo que te expone a ataques de intermediario. Úsalo solo en intranets de confianza o con certificados autofirmados. ¿Activarlo de todos modos?';
 
   @override
   String get settingsHttpProxyTitle => 'Proxy HTTP';
@@ -4031,7 +4272,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsHttpProxyNotConfigured => 'Sin configurar (directo)';
 
   @override
-  String get settingsHttpProxyDialogDesc => 'Establece un proxy HTTP global. Todas las solicitudes salientes del backend (descargas de plugins, comprobaciones de actualizaciones, etc.) pasarán por él. Déjalo vacío para conexión directa.';
+  String get settingsHttpProxyDialogDesc =>
+      'Establece un proxy HTTP global. Todas las solicitudes salientes del backend (descargas de plugins, comprobaciones de actualizaciones, etc.) pasarán por él. Déjalo vacío para conexión directa.';
 
   @override
   String get settingsHttpProxyAddressLabel => 'Dirección del proxy';
@@ -4057,19 +4299,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsGithubProxyTitle => 'Proxy de GitHub';
 
   @override
-  String get settingsGithubProxyDialogDesc => 'Compartido por la instalación/actualización de plugins, las comprobaciones de actualizaciones y las descargas del cliente. Elige un espejo si GitHub va lento en tu región.';
+  String get settingsGithubProxyDialogDesc =>
+      'Compartido por la instalación/actualización de plugins, las comprobaciones de actualizaciones y las descargas del cliente. Elige un espejo si GitHub va lento en tu región.';
 
   @override
   String get settingsGithubProxyCustom => 'Proxy personalizado';
 
   @override
-  String get settingsGithubProxyCustomHelper => 'Introduce una dirección de proxy, p. ej. https://example.com/';
+  String get settingsGithubProxyCustomHelper =>
+      'Introduce una dirección de proxy, p. ej. https://example.com/';
 
   @override
-  String get settingsGithubProxyCopyPrompt => 'Copiar mensaje para preguntar a una IA';
+  String get settingsGithubProxyCopyPrompt =>
+      'Copiar mensaje para preguntar a una IA';
 
   @override
-  String get settingsGithubProxyCopied => 'Copiado: pégalo en cualquier chat de IA';
+  String get settingsGithubProxyCopied =>
+      'Copiado: pégalo en cualquier chat de IA';
 
   @override
   String get settingsGithubProxyCleared => 'Cambiado a conexión directa';
@@ -4106,16 +4352,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsExportLogsTitle => 'Exportar registros';
 
   @override
-  String get settingsExportLogsSubtitle => 'Empaqueta los registros de frontend y backend (con datos sensibles omitidos) para informes de errores';
+  String get settingsExportLogsSubtitle =>
+      'Empaqueta los registros de frontend y backend (con datos sensibles omitidos) para informes de errores';
 
   @override
   String get settingsExportLogsShareSubject => 'Registros de Songloft';
 
   @override
-  String get settingsExportLogsSuccess => 'Registros empaquetados, elige cómo compartirlos o guardarlos';
+  String get settingsExportLogsSuccess =>
+      'Registros empaquetados, elige cómo compartirlos o guardarlos';
 
   @override
-  String get settingsExportLogsSuccessNoBackend => 'Registros de frontend exportados (registros de backend no disponibles)';
+  String get settingsExportLogsSuccessNoBackend =>
+      'Registros de frontend exportados (registros de backend no disponibles)';
 
   @override
   String settingsExportLogsFailed(String error) {
@@ -4123,7 +4372,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsAccountUrlNotConfigured => 'Sin configurar · Toca para añadir';
+  String get settingsAccountUrlNotConfigured =>
+      'Sin configurar · Toca para añadir';
 
   @override
   String settingsAccountUrlSummary(int count, String label) {
@@ -4134,16 +4384,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsAccountLoading => 'Cargando...';
 
   @override
-  String get settingsAboutDesc1 => 'Songloft es una app de servidor de música personal de código abierto.';
+  String get settingsAboutDesc1 =>
+      'Songloft es una app de servidor de música personal de código abierto.';
 
   @override
-  String get settingsAboutDesc2 => 'Admite gestión de biblioteca local, reproducción en línea y extensiones de plugins.';
+  String get settingsAboutDesc2 =>
+      'Admite gestión de biblioteca local, reproducción en línea y extensiones de plugins.';
 
   @override
   String get settingsAboutGithubSemantics => 'Abrir la página de GitHub';
 
   @override
-  String get settingsUpgradeCheckTimeout => 'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar el proxy e inténtalo de nuevo.';
+  String get settingsUpgradeCheckTimeout =>
+      'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar el proxy e inténtalo de nuevo.';
 
   @override
   String settingsUpgradeCheckFailed(String error) {
@@ -4170,7 +4423,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsUpgradeConfirmReset => 'Confirmar reversión';
 
   @override
-  String get settingsUpgradeConfirmResetContent => '¿Revertir a la versión de imagen base del contenedor Docker?\n\nEl servicio se reiniciará automáticamente tras la reversión.';
+  String get settingsUpgradeConfirmResetContent =>
+      '¿Revertir a la versión de imagen base del contenedor Docker?\n\nEl servicio se reiniciará automáticamente tras la reversión.';
 
   @override
   String settingsUpgradeResetFailed(String error) {
@@ -4192,7 +4446,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsUpgradeSelectVersion => 'Selecciona la versión a la que actualizar:';
+  String get settingsUpgradeSelectVersion =>
+      'Selecciona la versión a la que actualizar:';
 
   @override
   String settingsUpgradeBuildTime(String time) {
@@ -4241,10 +4496,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get settingsUpgradeUploadConfirmChannel => 'Confirmación de cambio de canal';
+  String get settingsUpgradeUploadConfirmChannel =>
+      'Confirmación de cambio de canal';
 
   @override
-  String settingsUpgradeUploadConfirmChannelContent(String currentChannel, String uploadChannel, String version) {
+  String settingsUpgradeUploadConfirmChannelContent(
+    String currentChannel,
+    String uploadChannel,
+    String version,
+  ) {
     return 'El canal actual es $currentChannel, el archivo subido es $uploadChannel ($version). ¿Confirmar el cambio de canal y la actualización?\n\nEl servicio se reiniciará automáticamente.';
   }
 
@@ -4257,7 +4517,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsUpgradeUploadConfirm => 'Confirmar actualización';
 
   @override
-  String get settingsFrontendUpgradeCheckTimeout => 'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar el proxy e inténtalo de nuevo.';
+  String get settingsFrontendUpgradeCheckTimeout =>
+      'La comprobación de actualizaciones agotó el tiempo. Prueba a cambiar el proxy e inténtalo de nuevo.';
 
   @override
   String get settingsFrontendUpgradeTitle => 'Actualización del cliente';
@@ -4296,16 +4557,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsFrontendUpgradeGoDownload => 'Ir a descargar';
 
   @override
-  String get settingsFrontendUpgradeDownloadFull => 'Descargar instalador completo';
+  String get settingsFrontendUpgradeDownloadFull =>
+      'Descargar instalador completo';
 
   @override
-  String get settingsFrontendUpgradeReinstallHint => 'Si la app se comporta mal tras una actualización en caliente, descarga el instalador completo y reinstala sobre él';
+  String get settingsFrontendUpgradeReinstallHint =>
+      'Si la app se comporta mal tras una actualización en caliente, descarga el instalador completo y reinstala sobre él';
 
   @override
   String get settingsConfigTitle => 'Configuración';
 
   @override
-  String get settingsConfigSubtitle => 'Administra los elementos de configuración del sistema';
+  String get settingsConfigSubtitle =>
+      'Administra los elementos de configuración del sistema';
 
   @override
   String get settingsConfigAdd => 'Añadir configuración';
@@ -4317,7 +4581,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsConfigEmpty => 'No hay elementos de configuración';
 
   @override
-  String get settingsConfigEmptyHint => 'Toca \"Añadir configuración\" para crear un elemento nuevo';
+  String get settingsConfigEmptyHint =>
+      'Toca \"Añadir configuración\" para crear un elemento nuevo';
 
   @override
   String get settingsConfigKeyLabel => 'Clave de configuración';
@@ -4326,16 +4591,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsConfigKeyHint => 'p. ej. app.setting.name';
 
   @override
-  String get settingsConfigKeyRequired => 'Introduce una clave de configuración';
+  String get settingsConfigKeyRequired =>
+      'Introduce una clave de configuración';
 
   @override
   String get settingsConfigValueLabel => 'Valor de configuración';
 
   @override
-  String get settingsConfigValueHint => 'Valor de configuración (admite varias líneas)';
+  String get settingsConfigValueHint =>
+      'Valor de configuración (admite varias líneas)';
 
   @override
-  String get settingsConfigValueRequired => 'Introduce un valor de configuración';
+  String get settingsConfigValueRequired =>
+      'Introduce un valor de configuración';
 
   @override
   String get settingsConfigAddButton => 'Añadir';
@@ -4392,7 +4660,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTokenTitle => 'Gestión de tokens';
 
   @override
-  String get settingsTokenSubtitle => 'Administra los tokens de inicio de sesión';
+  String get settingsTokenSubtitle =>
+      'Administra los tokens de inicio de sesión';
 
   @override
   String get settingsTokenEmpty => 'No hay tokens';
@@ -4401,7 +4670,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTokenConfirmRevoke => 'Confirmar revocación';
 
   @override
-  String get settingsTokenRevokeConfirm => 'Revocar este token invalidará la sesión de inicio de sesión correspondiente. ¿Continuar?';
+  String get settingsTokenRevokeConfirm =>
+      'Revocar este token invalidará la sesión de inicio de sesión correspondiente. ¿Continuar?';
 
   @override
   String get settingsTokenRevoke => 'Revocar';
@@ -4457,7 +4727,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get coreUrlEmpty => 'La URL no puede estar vacía';
 
   @override
-  String get coreUrlInvalid => 'Introduce una URL válida (que incluya http:// o https://)';
+  String get coreUrlInvalid =>
+      'Introduce una URL válida (que incluya http:// o https://)';
 
   @override
   String get corePickMusicDir => 'Seleccionar carpeta de música';
@@ -4508,7 +4779,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get categoryEmptySubtitle => 'No hay canciones que clasificar en esta dimensión';
+  String get categoryEmptySubtitle =>
+      'No hay canciones que clasificar en esta dimensión';
 
   @override
   String get folderBrowseEmpty => 'No se encontraron carpetas';
@@ -4561,13 +4833,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get songCacheFailed => 'Error al guardar';
 
   @override
-  String get songCacheLimitExceeded => 'Se alcanzó el límite de caché local; libera espacio en Ajustes primero';
+  String get songCacheLimitExceeded =>
+      'Se alcanzó el límite de caché local; libera espacio en Ajustes primero';
 
   @override
   String get songCacheVideoWarnTitle => 'Guardar archivo de video';
 
   @override
-  String get songCacheVideoWarnContent => 'Los archivos de video son grandes. ¿Guardarlo en el dispositivo de todos modos?';
+  String get songCacheVideoWarnContent =>
+      'Los archivos de video son grandes. ¿Guardarlo en el dispositivo de todos modos?';
 
   @override
   String get songInfoTitle => 'Información de la canción';
@@ -4609,7 +4883,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get songInfoCachePath => 'Ubicación de la caché';
 
   @override
-  String get songInfoQualityNote => 'La calidad de la caché sigue la calidad de reproducción establecida al guardar; cambiar el ajuste después no afecta a los archivos ya guardados.';
+  String get songInfoQualityNote =>
+      'La calidad de la caché sigue la calidad de reproducción establecida al guardar; cambiar el ajuste después no afecta a los archivos ya guardados.';
 
   @override
   String get songTypeLocalLabel => 'Local';
@@ -4638,10 +4913,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get localSongCachePlaylists => 'Listas guardadas';
 
   @override
-  String get localSongCacheClearAll => 'Vaciar caché de canciones del dispositivo';
+  String get localSongCacheClearAll =>
+      'Vaciar caché de canciones del dispositivo';
 
   @override
-  String get localSongCacheClearAllConfirm => '¿Vaciar toda la caché de canciones del dispositivo?';
+  String get localSongCacheClearAllConfirm =>
+      '¿Vaciar toda la caché de canciones del dispositivo?';
 
   @override
   String get playlistCacheAll => 'Guardar lista en caché';
@@ -4674,13 +4951,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playHistoryEmpty => 'Aún no hay historial de reproducción';
 
   @override
-  String get playHistoryEmptyHint => 'Las canciones que reproduzcas aquí se registran para que puedas retomar donde lo dejaste';
+  String get playHistoryEmptyHint =>
+      'Las canciones que reproduzcas aquí se registran para que puedas retomar donde lo dejaste';
 
   @override
   String get playHistoryClear => 'Borrar historial';
 
   @override
-  String get playHistoryClearConfirm => '¿Borrar el historial de reproducción de aquí?';
+  String get playHistoryClearConfirm =>
+      '¿Borrar el historial de reproducción de aquí?';
 
   @override
   String get playHistoryCleared => 'Historial de reproducción borrado';
@@ -4689,10 +4968,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playHistoryDeleteEntry => 'Quitar esta entrada';
 
   @override
-  String get playHistoryOperationFailed => 'La operación falló, inténtalo de nuevo';
+  String get playHistoryOperationFailed =>
+      'La operación falló, inténtalo de nuevo';
 
   @override
-  String get playHistorySongMissing => 'Esta canción ya no está en la lista; el resto se ha añadido a la cola';
+  String get playHistorySongMissing =>
+      'Esta canción ya no está en la lista; el resto se ha añadido a la cola';
 
   @override
   String get scrollToTop => 'Volver arriba';
@@ -4701,7 +4982,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playlistLocatePlaying => 'Localizar canción en reproducción';
 
   @override
-  String get playlistLocateNotFound => 'La canción actual no está en esta lista';
+  String get playlistLocateNotFound =>
+      'La canción actual no está en esta lista';
 
   @override
   String get playlistSortShuffle => 'Aleatorio';
@@ -4751,43 +5033,53 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deviceCacheDirectoryTitle => 'Carpeta de canciones en caché';
 
   @override
-  String get deviceCacheDirectoryDefault => 'Predeterminada (carpeta privada de la aplicación)';
+  String get deviceCacheDirectoryDefault =>
+      'Predeterminada (carpeta privada de la aplicación)';
 
   @override
-  String get deviceCacheDirectoryHelp => 'Elige una carpeta del dispositivo o de la tarjeta SD para las nuevas canciones en caché, accesible desde el gestor de archivos. Las canciones existentes se pueden trasladar por separado. Vaciar la caché elimina sus archivos.';
+  String get deviceCacheDirectoryHelp =>
+      'Elige una carpeta del dispositivo o de la tarjeta SD para las nuevas canciones en caché, accesible desde el gestor de archivos. Las canciones existentes se pueden trasladar por separado. Vaciar la caché elimina sus archivos.';
 
   @override
-  String get deviceCacheDirectoryUpgrade => 'Instala el APK más reciente del cliente para usar una carpeta personalizada.';
+  String get deviceCacheDirectoryUpgrade =>
+      'Instala el APK más reciente del cliente para usar una carpeta personalizada.';
 
   @override
-  String get deviceCacheDirectoryUnavailable => 'La carpeta no está disponible o no permite escribir. Comprueba la tarjeta SD y vuelve a seleccionar la carpeta para conceder acceso. Se conservan los registros de caché.';
+  String get deviceCacheDirectoryUnavailable =>
+      'La carpeta no está disponible o no permite escribir. Comprueba la tarjeta SD y vuelve a seleccionar la carpeta para conceder acceso. Se conservan los registros de caché.';
 
   @override
-  String get deviceCacheDirectoryBusy => 'Hay una operación de caché en curso. Espera a que termine antes de cambiar de carpeta o trasladar archivos.';
+  String get deviceCacheDirectoryBusy =>
+      'Hay una operación de caché en curso. Espera a que termine antes de cambiar de carpeta o trasladar archivos.';
 
   @override
   String get deviceCacheDirectorySaved => 'Carpeta de caché actualizada';
 
   @override
-  String get deviceCacheChooseDirectory => 'Elegir carpeta / conceder acceso de nuevo';
+  String get deviceCacheChooseDirectory =>
+      'Elegir carpeta / conceder acceso de nuevo';
 
   @override
   String get deviceCacheRestoreDefault => 'Restaurar carpeta predeterminada';
 
   @override
-  String get deviceCacheMigrate => 'Trasladar la caché existente a la carpeta actual';
+  String get deviceCacheMigrate =>
+      'Trasladar la caché existente a la carpeta actual';
 
   @override
-  String get deviceCacheMigrationConfirm => 'El traslado detiene la reproducción de canciones en caché y requiere espacio adicional temporalmente. Cada original se elimina solo después de guardar la copia y el índice. La cancelación o un fallo conserva los traslados completados y los originales restantes.';
+  String get deviceCacheMigrationConfirm =>
+      'El traslado detiene la reproducción de canciones en caché y requiere espacio adicional temporalmente. Cada original se elimina solo después de guardar la copia y el índice. La cancelación o un fallo conserva los traslados completados y los originales restantes.';
 
   @override
   String get deviceCacheMigrationDone => 'Traslado de caché completado';
 
   @override
-  String get deviceCacheMigrationFailed => 'No se pudo completar el traslado. Comprueba el acceso a la carpeta y el espacio libre. Se conservan los traslados completados y los originales restantes.';
+  String get deviceCacheMigrationFailed =>
+      'No se pudo completar el traslado. Comprueba el acceso a la carpeta y el espacio libre. Se conservan los traslados completados y los originales restantes.';
 
   @override
-  String get deviceCacheMigrationCancelled => 'Traslado cancelado. Se conservan los traslados completados; no se eliminaron los originales restantes.';
+  String get deviceCacheMigrationCancelled =>
+      'Traslado cancelado. Se conservan los traslados completados; no se eliminaron los originales restantes.';
 
   @override
   String deviceCacheMigrationProgress(int done, int total) {
@@ -4795,7 +5087,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get deviceCacheClearFailed => 'No se pudo completar la limpieza de caché. Comprueba el acceso a la carpeta y el espacio disponible. Se conservan los registros de archivos no eliminados.';
+  String get deviceCacheClearFailed =>
+      'No se pudo completar la limpieza de caché. Comprueba el acceso a la carpeta y el espacio disponible. Se conservan los registros de archivos no eliminados.';
 
   @override
   String get homePlaylistLayout => 'Diseño de listas en inicio';
@@ -4816,22 +5109,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsHomeShowFavorites => 'Mostrar Favoritos en inicio';
 
   @override
-  String get settingsHomeShowFavoritesDesc => 'Solo controla la tarjeta de inicio. La biblioteca, las canciones y los favoritos siguen disponibles. Se guarda en este dispositivo para este servidor y cuenta.';
+  String get settingsHomeShowFavoritesDesc =>
+      'Solo controla la tarjeta de inicio. La biblioteca, las canciones y los favoritos siguen disponibles. Se guarda en este dispositivo para este servidor y cuenta.';
 
   @override
-  String get settingsHomeShowRadioFavorites => 'Mostrar Radios favoritas en inicio';
+  String get settingsHomeShowRadioFavorites =>
+      'Mostrar Radios favoritas en inicio';
 
   @override
-  String get settingsHomeShowRadioFavoritesDesc => 'Solo controla la tarjeta de inicio cuando se muestra la sección de radios. Se guarda en este dispositivo para este servidor y cuenta.';
+  String get settingsHomeShowRadioFavoritesDesc =>
+      'Solo controla la tarjeta de inicio cuando se muestra la sección de radios. Se guarda en este dispositivo para este servidor y cuenta.';
 
   @override
   String get settingsHomeShowRadios => 'Mostrar sección de radios';
 
   @override
-  String get settingsHomeShowRadiosDesc => 'Mostrar Mis radios en inicio. Esta opción se guarda en este dispositivo.';
+  String get settingsHomeShowRadiosDesc =>
+      'Mostrar Mis radios en inicio. Esta opción se guarda en este dispositivo.';
 
   @override
   String get browseSearchHint => '搜索在线音乐';
+
+  @override
+  String get searchScopeOnline => '在线';
 
   @override
   String get browseDiscoverTitle => '在线发现';

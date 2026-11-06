@@ -12,7 +12,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalTokenTitle => 'Permanent access tokens';
 
   @override
-  String get personalTokenHelp => 'Valid until revoked. Grants administrator access to business APIs, excluding token management.';
+  String get personalTokenHelp =>
+      'Valid until revoked. Grants administrator access to business APIs, excluding token management.';
 
   @override
   String get personalTokenCreate => 'Create token';
@@ -24,7 +25,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalTokenPermanent => 'Never expires';
 
   @override
-  String get personalTokenOnce => 'This is the only time the full token is shown. Copy and save it before closing.';
+  String get personalTokenOnce =>
+      'This is the only time the full token is shown. Copy and save it before closing.';
 
   @override
   String get personalTokenCopy => 'Copy token';
@@ -36,10 +38,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalTokenCopied => 'Copied';
 
   @override
-  String get personalTokenCopyFailed => 'Copy failed. Select and copy the token manually.';
+  String get personalTokenCopyFailed =>
+      'Copy failed. Select and copy the token manually.';
 
   @override
-  String get personalTokenFailed => 'Operation failed. Check that your server supports permanent tokens and retry.';
+  String get personalTokenFailed =>
+      'Operation failed. Check that your server supports permanent tokens and retry.';
 
   @override
   String get personalTokenDone => 'Done';
@@ -54,7 +58,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalTokenNeverUsed => 'Never used';
 
   @override
-  String get personalTokenRevokeHelp => 'Further requests from this device will be rejected immediately. Other devices are unaffected.';
+  String get personalTokenRevokeHelp =>
+      'Further requests from this device will be rejected immediately. Other devices are unaffected.';
 
   @override
   String get personalTokenPrevious => 'Previous page';
@@ -66,16 +71,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryTokenTitle => 'GitHub Token';
 
   @override
-  String get githubDiscoveryTokenHelp => 'Saved on the connected server and shared by its clients. Discovery runs on this device. With a token, GitHub API requests connect directly to api.github.com; GitHub proxies and public metadata requests never receive the token.';
+  String get githubDiscoveryTokenHelp =>
+      'Saved on the connected server and shared by its clients. Discovery runs on this device. With a token, GitHub API requests connect directly to api.github.com; GitHub proxies and public metadata requests never receive the token.';
 
   @override
   String get githubDiscoveryTokenHint => 'Enter a new personal access token';
 
   @override
-  String get githubDiscoveryTokenConfigured => 'A token is configured on this server.';
+  String get githubDiscoveryTokenConfigured =>
+      'A token is configured on this server.';
 
   @override
-  String get githubDiscoveryTokenNotConfigured => 'No token is configured on this server.';
+  String get githubDiscoveryTokenNotConfigured =>
+      'No token is configured on this server.';
 
   @override
   String get githubDiscoveryTokenSave => 'Save';
@@ -90,13 +98,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryTokenVisibility => 'Show / hide input';
 
   @override
-  String get githubDiscoveryTokenLoadFailed => 'Could not read the server’s GitHub token. Retry.';
+  String get githubDiscoveryTokenLoadFailed =>
+      'Could not read the server’s GitHub token. Retry.';
 
   @override
-  String get githubDiscoveryTokenSaveFailed => 'Could not save the GitHub token. Check its format and retry.';
+  String get githubDiscoveryTokenSaveFailed =>
+      'Could not save the GitHub token. Check its format and retry.';
 
   @override
-  String get githubDiscoveryTokenInvalid => 'The GitHub token is invalid or expired. Update or clear it.';
+  String get githubDiscoveryTokenInvalid =>
+      'The GitHub token is invalid or expired. Update or clear it.';
 
   @override
   String get githubDiscoveryTitle => 'GitHub discovery';
@@ -105,7 +116,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryCommunity => 'Community';
 
   @override
-  String get githubDiscoveryNotice => 'Automatically discovered community plugins. Not reviewed by Songloft; format validation is not a security review.';
+  String get githubDiscoveryNotice =>
+      'Automatically discovered community plugins. Not reviewed by Songloft; format validation is not a security review.';
 
   @override
   String get githubDiscoverySearch => 'Search plugins or owner/repo';
@@ -137,10 +149,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryHelpTitle => 'About GitHub discovery';
 
   @override
-  String get githubDiscoveryHelp => 'Searches public, non-archived, non-fork repositories with the songloft-plugin topic. Plugins must have a valid root plugin.json (root hashes may be omitted or empty), update metadata and packages that may come from another GitHub repository and a matching stable Release containing a .jsplugin.zip asset. Repository update order differs from plugin release order. Network failures remain unverified; GitHub rate limits can leave results incomplete. Songloft has not reviewed the source or packages. Review code and permissions before installing.';
+  String get githubDiscoveryHelp =>
+      'Searches public, non-archived, non-fork repositories with the songloft-plugin topic. Plugins must have a valid root plugin.json (root hashes may be omitted or empty), update metadata and packages that may come from another GitHub repository and a matching stable Release containing a .jsplugin.zip asset. Repository update order differs from plugin release order. Network failures remain unverified; GitHub rate limits can leave results incomplete. Songloft has not reviewed the source or packages. Review code and permissions before installing.';
 
   @override
-  String get githubDiscoveryRateLimited => 'GitHub rate limit reached. Verified plugins remain available; retry later.';
+  String get githubDiscoveryRateLimited =>
+      'GitHub rate limit reached. Verified plugins remain available; retry later.';
 
   @override
   String githubDiscoveryRetryAt(String time) {
@@ -148,21 +162,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get githubDiscoveryLoadFailed => 'Could not load GitHub discovery. Check your connection and retry.';
+  String get githubDiscoveryLoadFailed =>
+      'Could not load GitHub discovery. Check your connection and retry.';
 
   @override
   String get githubDiscoveryEmpty => 'No valid published plugins found.';
 
   @override
-  String get githubDiscoveryPending => 'Repositories could not be verified yet. Retry later.';
+  String get githubDiscoveryPending =>
+      'Repositories could not be verified yet. Retry later.';
 
   @override
-  String githubDiscoverySummary(int checked, int found, int excluded, int failed) {
+  String githubDiscoverySummary(
+    int checked,
+    int found,
+    int excluded,
+    int failed,
+  ) {
     return 'Checked $checked repositories · Found $found plugins · Filtered $excluded · Unverified $failed';
   }
 
   @override
-  String get githubDiscoveryIncomplete => 'GitHub returned partial results. Refresh later.';
+  String get githubDiscoveryIncomplete =>
+      'GitHub returned partial results. Refresh later.';
 
   @override
   String get githubDiscoveryLoadMore => 'Discover more';
@@ -187,7 +209,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryNoPermissions => 'No permissions declared';
 
   @override
-  String get githubDiscoveryInstallFailed => 'Plugin installation failed. Retry.';
+  String get githubDiscoveryInstallFailed =>
+      'Plugin installation failed. Retry.';
 
   @override
   String githubDiscoveryPublished(String date) {
@@ -206,13 +229,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get githubDiscoveryRelease => 'View release';
 
   @override
-  String get githubDiscoveryIncompatible => 'Upgrade the server to meet this plugin\'s minimum version.';
+  String get githubDiscoveryIncompatible =>
+      'Upgrade the server to meet this plugin\'s minimum version.';
 
   @override
-  String get githubDiscoveryHostUnknown => 'Cannot verify server compatibility. Tap to retry.';
+  String get githubDiscoveryHostUnknown =>
+      'Cannot verify server compatibility. Tap to retry.';
 
   @override
-  String get githubDiscoveryInstalledUnknown => 'Checking installed plugins; tap to retry if loading fails.';
+  String get githubDiscoveryInstalledUnknown =>
+      'Checking installed plugins; tap to retry if loading fails.';
 
   @override
   String get githubDiscoveryOpenFailed => 'Could not open the link.';
@@ -226,7 +252,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateComponentsHeader => 'The following updates are available. Download and update now?';
+  String get updateComponentsHeader =>
+      'The following updates are available. Download and update now?';
 
   @override
   String updateComponentFrontend(String version) {
@@ -239,7 +266,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateRestartInterrupt => 'The app will restart, which may interrupt playback.';
+  String get updateRestartInterrupt =>
+      'The app will restart, which may interrupt playback.';
 
   @override
   String get updateActionDownload => 'Download & update';
@@ -257,7 +285,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateReadyTitle => 'Update complete';
 
   @override
-  String get updateReadyBody => 'The update has been downloaded. Restart the app to apply it.';
+  String get updateReadyBody =>
+      'The update has been downloaded. Restart the app to apply it.';
 
   @override
   String get updateActionRestartNow => 'Restart now';
@@ -295,13 +324,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceReduceTransparency => 'Reduce transparency';
 
   @override
-  String get appearanceReduceTransparencyDescription => 'Use opaque backgrounds and disable glass blur. Saved on this device only.';
+  String get appearanceReduceTransparencyDescription =>
+      'Use opaque backgrounds and disable glass blur. Saved on this device only.';
 
   @override
   String get appearanceIncreaseContrast => 'Increase contrast';
 
   @override
-  String get appearanceIncreaseContrastDescription => 'Improve text and control contrast. The player uses a solid background instead of cover colors. Always active when system high contrast is enabled.';
+  String get appearanceIncreaseContrastDescription =>
+      'Improve text and control contrast. The player uses a solid background instead of cover colors. Always active when system high contrast is enabled.';
 
   @override
   String get themeModeTitle => 'Theme mode';
@@ -322,10 +353,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePaletteTitle => 'Built-in colors';
 
   @override
-  String get themePaletteDescription => 'Saved on this device, for both light and dark modes.';
+  String get themePaletteDescription =>
+      'Saved on this device, for both light and dark modes.';
 
   @override
-  String get themePalettePackHint => 'A theme pack is active. Restore default to choose built-in colors.';
+  String get themePalettePackHint =>
+      'A theme pack is active. Restore default to choose built-in colors.';
 
   @override
   String get themePaletteBlue => 'Blue';
@@ -349,7 +382,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePackTitle => 'Theme Packs';
 
   @override
-  String get themePackSubtitle => 'Customize colors and visual styles with theme packs';
+  String get themePackSubtitle =>
+      'Customize colors and visual styles with theme packs';
 
   @override
   String get themePackImport => 'Import';
@@ -659,7 +693,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coreErrorRequestFailed => 'Request failed';
 
   @override
-  String get coreErrorUnauthorized => 'Your session has expired, please log in again';
+  String get coreErrorUnauthorized =>
+      'Your session has expired, please log in again';
 
   @override
   String get coreErrorForbidden => 'Access denied';
@@ -698,7 +733,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginShowLibraryInNavigation => 'Show Library in navigation';
 
   @override
-  String get jspluginLibraryNavigationHint => 'Hiding this entry does not affect your music data.';
+  String get jspluginLibraryNavigationHint =>
+      'Hiding this entry does not affect your music data.';
 
   @override
   String get jspluginUploadPlugin => 'Upload Plugin';
@@ -713,7 +749,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginCleanupOrphanTitle => 'Clean Up Orphan Data';
 
   @override
-  String get jspluginCleanupOrphanContent => 'This will remove persistent storage data left by uninstalled plugins. This action cannot be undone.';
+  String get jspluginCleanupOrphanContent =>
+      'This will remove persistent storage data left by uninstalled plugins. This action cannot be undone.';
 
   @override
   String get jspluginCleanup => 'Clean Up';
@@ -762,7 +799,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginTapToSelectFile => 'Tap to select a file';
 
   @override
-  String get jspluginUploadHint => 'Supports .jsplugin.zip format; uploading a plugin with the same name overwrites the existing version (manual update)';
+  String get jspluginUploadHint =>
+      'Supports .jsplugin.zip format; uploading a plugin with the same name overwrites the existing version (manual update)';
 
   @override
   String get jspluginRemove => 'Remove';
@@ -803,7 +841,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginKeepData => 'Keep plugin data';
 
   @override
-  String get jspluginKeepDataSubtitle => 'Keep file storage data for easy reinstallation later';
+  String get jspluginKeepDataSubtitle =>
+      'Keep file storage data for easy reinstallation later';
 
   @override
   String get jspluginDeleted => 'Plugin deleted';
@@ -843,10 +882,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginShowInNavigation => 'Show in navigation';
 
   @override
-  String get jspluginShowInNavigationHint => 'Add to the bottom navigation or desktop sidebar; you can also open it from Home or the plugin list';
+  String get jspluginShowInNavigationHint =>
+      'Add to the bottom navigation or desktop sidebar; you can also open it from Home or the plugin list';
 
   @override
-  String get jspluginNavigationDisabledHint => 'Hidden while disabled; this choice is restored when the plugin is enabled again';
+  String get jspluginNavigationDisabledHint =>
+      'Hidden while disabled; this choice is restored when the plugin is enabled again';
 
   @override
   String get jspluginNavigationOrder => 'Plugin navigation order';
@@ -867,7 +908,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginUpdate => 'Update';
 
   @override
-  String get jspluginCheckUpdateTimeout => 'Update check timed out. Try switching proxy and retry.';
+  String get jspluginCheckUpdateTimeout =>
+      'Update check timed out. Try switching proxy and retry.';
 
   @override
   String jspluginCheckUpdateFailed(String error) {
@@ -925,7 +967,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get jspluginBatchUpdateTimeout => 'Batch update timed out. Please retry.';
+  String get jspluginBatchUpdateTimeout =>
+      'Batch update timed out. Please retry.';
 
   @override
   String get jspluginBatchUpdating => 'Checking and updating all plugins...';
@@ -956,7 +999,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get jspluginForceUpdateContent => 'This ignores the version check and re-downloads and reinstalls the plugin.';
+  String get jspluginForceUpdateContent =>
+      'This ignores the version check and re-downloads and reinstalls the plugin.';
 
   @override
   String get jspluginConfirmUpdate => 'Confirm Update';
@@ -974,7 +1018,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginNoRegistries => 'No sources added yet';
 
   @override
-  String get jspluginNoRegistriesHint => 'Add a source to browse and install plugins';
+  String get jspluginNoRegistriesHint =>
+      'Add a source to browse and install plugins';
 
   @override
   String get jspluginAddRegistry => 'Add Source';
@@ -992,7 +1037,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jspluginAutoUpdate => 'Auto-update plugins';
 
   @override
-  String get jspluginAutoUpdateHint => 'Periodically check and update installed plugins in the background';
+  String get jspluginAutoUpdateHint =>
+      'Periodically check and update installed plugins in the background';
 
   @override
   String get jspluginSearchHint => 'Search plugins...';
@@ -1202,13 +1248,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryDeleteConfirmTitle => 'Confirm deletion';
 
   @override
-  String get libraryDeleteConfirmContent => 'Are you sure you want to delete this song?';
+  String get libraryDeleteConfirmContent =>
+      'Are you sure you want to delete this song?';
 
   @override
   String get libraryCleanTitle => 'Clean songs';
 
   @override
-  String get libraryCleanContent => 'This will clean up invalid song records (such as local songs whose files have been deleted).';
+  String get libraryCleanContent =>
+      'This will clean up invalid song records (such as local songs whose files have been deleted).';
 
   @override
   String libraryCleanedCount(int count) {
@@ -1258,7 +1306,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryCustomizeViews => 'Customize views';
 
   @override
-  String get libraryCustomizeViewsTooltip => 'Customize which views show and their order';
+  String get libraryCustomizeViewsTooltip =>
+      'Customize which views show and their order';
 
   @override
   String get libraryViewsMinOne => 'Keep at least one view visible';
@@ -1327,7 +1376,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryEditArtistsRemove => 'Remove this artist';
 
   @override
-  String get libraryEditArtistsHint => 'One artist per line. Enter duet/group performers on separate lines so the song is findable by any of them.';
+  String get libraryEditArtistsHint =>
+      'One artist per line. Enter duet/group performers on separate lines so the song is findable by any of them.';
 
   @override
   String get libraryEditAlbumHint => 'Please enter an album';
@@ -1336,13 +1386,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryRenameFileTitle => 'Rename file in sync';
 
   @override
-  String get libraryRenameFileSubtitle => 'Rename the local audio file to the new title and write the title tag';
+  String get libraryRenameFileSubtitle =>
+      'Rename the local audio file to the new title and write the title tag';
 
   @override
   String get libraryVideoToggleTitle => 'Video content';
 
   @override
-  String get libraryVideoToggleSubtitle => 'This link contains video; when on, the player renders the picture and casting streams it as video';
+  String get libraryVideoToggleSubtitle =>
+      'This link contains video; when on, the player renders the picture and casting streams it as video';
 
   @override
   String get libraryEditSourceUrlLabel => 'Source audio URL *';
@@ -1410,7 +1462,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryErrorUnauthorized => 'Unauthorized, please log in again';
 
   @override
-  String get libraryErrorForbidden => 'You do not have permission to perform this action';
+  String get libraryErrorForbidden =>
+      'You do not have permission to perform this action';
 
   @override
   String get libraryErrorNotFound => 'Song not found';
@@ -1424,10 +1477,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get libraryErrorTimeout => 'Network connection timed out, please check your network';
+  String get libraryErrorTimeout =>
+      'Network connection timed out, please check your network';
 
   @override
-  String get libraryErrorConnection => 'Network connection failed, please check your network';
+  String get libraryErrorConnection =>
+      'Network connection failed, please check your network';
 
   @override
   String libraryErrorNetwork(String message) {
@@ -1435,16 +1490,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get libraryFavoritePlaylistNotFound => 'Favorites playlist does not exist';
+  String get libraryFavoritePlaylistNotFound =>
+      'Favorites playlist does not exist';
 
   @override
-  String get libraryRadioFavoritePlaylistNotFound => 'Radio favorites playlist does not exist';
+  String get libraryRadioFavoritePlaylistNotFound =>
+      'Radio favorites playlist does not exist';
 
   @override
   String get homeEmptyPlaylists => 'No playlists yet';
 
   @override
-  String get homeEmptyPlaylistsSubtitle => 'Create your first playlist to start collecting music';
+  String get homeEmptyPlaylistsSubtitle =>
+      'Create your first playlist to start collecting music';
 
   @override
   String get homeCreatePlaylist => 'Create playlist';
@@ -1525,7 +1583,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTvPlaylist => 'Playlists';
 
   @override
-  String get homeTvEmptySubtitle => 'Use quick navigation to browse local music';
+  String get homeTvEmptySubtitle =>
+      'Use quick navigation to browse local music';
 
   @override
   String homeHeroSemanticLabel(String name, int count) {
@@ -1542,7 +1601,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePlayNow => 'Play Now';
 
   @override
-  String get homePluginLoadTimeout => 'Page load timed out. Check whether the plugin is available or your network connection.';
+  String get homePluginLoadTimeout =>
+      'Page load timed out. Check whether the plugin is available or your network connection.';
 
   @override
   String get homePluginClose => 'Close';
@@ -1559,16 +1619,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homePluginWebViewUnsupported => 'In-app plugin pages are not supported on this platform';
+  String get homePluginWebViewUnsupported =>
+      'In-app plugin pages are not supported on this platform';
 
   @override
-  String get homePluginWebViewUnsupportedHint => 'This system has no in-app WebView engine, so plugin pages can only be opened in your browser for now.';
+  String get homePluginWebViewUnsupportedHint =>
+      'This system has no in-app WebView engine, so plugin pages can only be opened in your browser for now.';
 
   @override
   String get homePluginUnknownError => 'Unknown error';
 
   @override
-  String get homePluginWebOpenInNewTab => 'On the web, please open the plugin in a new tab';
+  String get homePluginWebOpenInNewTab =>
+      'On the web, please open the plugin in a new tab';
 
   @override
   String get authLogin => 'Log in';
@@ -1613,7 +1676,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authApiUrlRequired => 'Please enter the API address';
 
   @override
-  String get authInvalidUrl => 'Please enter a valid URL (starting with http:// or https://)';
+  String get authInvalidUrl =>
+      'Please enter a valid URL (starting with http:// or https://)';
 
   @override
   String get authServer => 'Server';
@@ -1631,7 +1695,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authTermsAndPrivacy => 'Terms of Service & Privacy Policy';
 
   @override
-  String get authPleaseAgreeTerms => 'Please read and agree to the Terms & Privacy Policy first';
+  String get authPleaseAgreeTerms =>
+      'Please read and agree to the Terms & Privacy Policy first';
 
   @override
   String get authTermsTitle => 'Terms of Service & Privacy Policy';
@@ -1672,7 +1737,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get authSessionExpired => 'Your session has expired. Please log in again.';
+  String get authSessionExpired =>
+      'Your session has expired. Please log in again.';
 
   @override
   String get authNoRefreshToken => 'No refresh token available';
@@ -1980,7 +2046,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerLyricsRefetch => 'Re-fetch lyrics';
 
   @override
-  String get playerEqNotSupported => 'Equalizer is not supported on this platform';
+  String get playerEqNotSupported =>
+      'Equalizer is not supported on this platform';
 
   @override
   String get playerEqPresetFlat => 'Flat';
@@ -2013,7 +2080,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerLyricSavedWritten => 'Saved and written to audio file';
 
   @override
-  String get playerLyricSavedWriteFailed => 'Saved to database, but writing to the audio file failed';
+  String get playerLyricSavedWriteFailed =>
+      'Saved to database, but writing to the audio file failed';
 
   @override
   String get playerLyricSavedDbOnly => 'Saved to database (file not updated)';
@@ -2027,7 +2095,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerDiscardChangesTitle => 'Discard changes?';
 
   @override
-  String get playerDiscardChangesContent => 'Your changes haven\'t been saved. Leave anyway?';
+  String get playerDiscardChangesContent =>
+      'Your changes haven\'t been saved. Leave anyway?';
 
   @override
   String get playerContinueEditing => 'Keep editing';
@@ -2044,7 +2113,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get playerOffsetHint => 'Tip: if lyrics appear too early overall, use a negative offset (-); if too late, use a positive offset (+)';
+  String get playerOffsetHint =>
+      'Tip: if lyrics appear too early overall, use a negative offset (-); if too late, use a positive offset (+)';
 
   @override
   String get playerEmptyLine => '(empty line)';
@@ -2096,10 +2166,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get playerPlayFailedNoOthers => 'Playback failed—no other songs to play';
+  String get playerPlayFailedNoOthers =>
+      'Playback failed—no other songs to play';
 
   @override
-  String get playerPlayFailedEndOfList => 'Playback failed—reached the end of the playlist';
+  String get playerPlayFailedEndOfList =>
+      'Playback failed—reached the end of the playlist';
 
   @override
   String get playlistBack => 'Back';
@@ -2159,7 +2231,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistAlreadySortedSongs => 'Songs are already in this order';
 
   @override
-  String get playlistAlreadySortedPlaylists => 'Playlists are already in this order';
+  String get playlistAlreadySortedPlaylists =>
+      'Playlists are already in this order';
 
   @override
   String get playlistSortedByNameAsc => 'Sorted by name (A→Z)';
@@ -2329,7 +2402,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistDeleted => 'Playlist deleted';
 
   @override
-  String get playlistDeleteWithSongs => 'Also delete songs from library (including local files)';
+  String get playlistDeleteWithSongs =>
+      'Also delete songs from library (including local files)';
 
   @override
   String get playlistEmpty => 'Playlist is empty';
@@ -2471,7 +2545,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistHideHidden => 'Hide hidden playlists';
 
   @override
-  String get playlistEmptyHint => 'Tap the button in the top-right to create a playlist';
+  String get playlistEmptyHint =>
+      'Tap the button in the top-right to create a playlist';
 
   @override
   String get playlistConfirmBatchDelete => 'Confirm bulk deletion';
@@ -2604,7 +2679,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheCleanServerTitle => 'Clear Server Cache';
 
   @override
-  String get settingsCacheCleanServerContent => 'Clear all music cache on the server? Files will need to be downloaded again.';
+  String get settingsCacheCleanServerContent =>
+      'Clear all music cache on the server? Files will need to be downloaded again.';
 
   @override
   String get settingsCacheServerCleaned => 'Server cache cleared';
@@ -2618,7 +2694,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheCleanLocalTitle => 'Clear Local Cache';
 
   @override
-  String get settingsCacheCleanLocalContent => 'Clear all local cache? This includes audio, image and lyrics cache.';
+  String get settingsCacheCleanLocalContent =>
+      'Clear all local cache? This includes audio, image and lyrics cache.';
 
   @override
   String get settingsCacheLocalCleaned => 'Local cache cleared';
@@ -2627,13 +2704,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheCleanBrowserTitle => 'Clear Browser Cache';
 
   @override
-  String get settingsCacheCleanBrowserContent => 'This will clear all cached frontend assets and reload the page. Your login and server data will not be affected.';
+  String get settingsCacheCleanBrowserContent =>
+      'This will clear all cached frontend assets and reload the page. Your login and server data will not be affected.';
 
   @override
   String get webUpdateAvailableTitle => 'Update available';
 
   @override
-  String get webUpdateAvailableContent => 'The server has been updated, but this page is still running an older version. Tap \"Refresh now\" to clear the browser cache and load the latest version. Your login will not be affected.';
+  String get webUpdateAvailableContent =>
+      'The server has been updated, but this page is still running an older version. Tap \"Refresh now\" to clear the browser cache and load the latest version. Your login will not be affected.';
 
   @override
   String get webUpdateAvailableRefresh => 'Refresh now';
@@ -2694,7 +2773,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheTranscodeTitle => 'Cache transcode format';
 
   @override
-  String get settingsCacheTranscodeDesc => 'Transcode network songs to a unified format when caching, improving device compatibility (e.g. Xiao AI speakers cannot play MKV); once enabled, video content caches audio only and casting will have no picture';
+  String get settingsCacheTranscodeDesc =>
+      'Transcode network songs to a unified format when caching, improving device compatibility (e.g. Xiao AI speakers cannot play MKV); once enabled, video content caches audio only and casting will have no picture';
 
   @override
   String get settingsCacheTranscodeOriginal => 'Original (no transcode)';
@@ -2712,7 +2792,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheTranscodeQualityDialogTitle => 'Transcode bitrate';
 
   @override
-  String get settingsCacheTranscodeUpdated => 'Cache transcode settings updated';
+  String get settingsCacheTranscodeUpdated =>
+      'Cache transcode settings updated';
 
   @override
   String get settingsCacheCleaning => 'Clearing...';
@@ -2744,13 +2825,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheBrowserTitle => 'Browser Cache';
 
   @override
-  String get settingsCacheBrowserDesc => 'Clear cached frontend assets in the browser to fix page issues after an update';
+  String get settingsCacheBrowserDesc =>
+      'Clear cached frontend assets in the browser to fix page issues after an update';
 
   @override
   String get settingsCacheCleanBrowserButton => 'Clear Browser Cache';
 
   @override
-  String get settingsCacheDirDialogDesc => 'Set the storage directory for the server music cache. Leave empty to use the default. Switching directories does not migrate existing cache files.';
+  String get settingsCacheDirDialogDesc =>
+      'Set the storage directory for the server music cache. Leave empty to use the default. Switching directories does not migrate existing cache files.';
 
   @override
   String get settingsCacheDirLabel => 'Cache directory (absolute path)';
@@ -2792,10 +2875,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMetadataUseTagTitle => 'Use tags to override title';
 
   @override
-  String get settingsMetadataUseTagOn => 'Override titles with audio tags when refreshing remote song metadata';
+  String get settingsMetadataUseTagOn =>
+      'Override titles with audio tags when refreshing remote song metadata';
 
   @override
-  String get settingsMetadataUseTagOff => 'Keep filenames as remote song titles, do not override with tags';
+  String get settingsMetadataUseTagOff =>
+      'Keep filenames as remote song titles, do not override with tags';
 
   @override
   String get settingsMetadataSaved => 'Saved';
@@ -2809,7 +2894,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMetadataRefreshTitle => 'Refresh remote song metadata';
 
   @override
-  String get settingsMetadataRefreshSubtitle => 'Probe all remote songs with missing metadata';
+  String get settingsMetadataRefreshSubtitle =>
+      'Probe all remote songs with missing metadata';
 
   @override
   String get settingsMetadataStart => 'Start';
@@ -2851,16 +2937,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsClientDownloadTitle => 'Download Client App';
 
   @override
-  String get settingsClientDownloadIntro => 'Compared with the web interface, the native client supports background playback, local caching, lock-screen/notification media controls and more.';
+  String get settingsClientDownloadIntro =>
+      'Compared with the web interface, the native client supports background playback, local caching, lock-screen/notification media controls and more.';
 
   @override
-  String get settingsClientDownloadStandardSection => 'Standard · Connects to current server';
+  String get settingsClientDownloadStandardSection =>
+      'Standard · Connects to current server';
 
   @override
-  String get settingsClientDownloadBundleSection => 'Bundle · Embedded backend, no server needed';
+  String get settingsClientDownloadBundleSection =>
+      'Bundle · Embedded backend, no server needed';
 
   @override
-  String get settingsClientDownloadStandardAllVersions => 'All standard versions';
+  String get settingsClientDownloadStandardAllVersions =>
+      'All standard versions';
 
   @override
   String get settingsClientDownloadBundleAllVersions => 'All bundle versions';
@@ -2881,7 +2971,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsClientDownloadNoteUnsigned => 'Unsigned, requires manual sideloading';
+  String get settingsClientDownloadNoteUnsigned =>
+      'Unsigned, requires manual sideloading';
 
   @override
   String get settingsTabConfigTitle => 'Menu Settings';
@@ -2902,7 +2993,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTabConfigNoPlugins => 'No plugins available';
 
   @override
-  String get settingsTabConfigNoPluginsHint => 'Please install and enable plugins in settings first';
+  String get settingsTabConfigNoPluginsHint =>
+      'Please install and enable plugins in settings first';
 
   @override
   String get settingsTabConfigPluginOrder => 'Plugin Order';
@@ -2913,7 +3005,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsTabConfigCollapseHint => 'On mobile, tabs beyond 5 will collapse into the \"More\" menu';
+  String get settingsTabConfigCollapseHint =>
+      'On mobile, tabs beyond 5 will collapse into the \"More\" menu';
 
   @override
   String settingsTabConfigMaxTabs(int count) {
@@ -2974,10 +3067,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsScanModeSkipDesc => 'Only import newly discovered music files';
+  String get settingsScanModeSkipDesc =>
+      'Only import newly discovered music files';
 
   @override
-  String get settingsScanModeReimportDesc => 'Rescan and overwrite all music info';
+  String get settingsScanModeReimportDesc =>
+      'Rescan and overwrite all music info';
 
   @override
   String get settingsScanDismiss => 'Dismiss';
@@ -2986,7 +3081,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScanExcludeDirTitle => 'Exclude directory settings';
 
   @override
-  String get settingsScanExcludeDirSubtitle => 'Configure directories to ignore during scan';
+  String get settingsScanExcludeDirSubtitle =>
+      'Configure directories to ignore during scan';
 
   @override
   String get settingsScanModeSkip => 'Skip existing';
@@ -3009,7 +3105,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScanTargetDirsTitle => 'Specific directories (optional)';
 
   @override
-  String get settingsScanTargetDirsSubtitle => 'Only scan selected directories; leave empty to scan the whole library';
+  String get settingsScanTargetDirsSubtitle =>
+      'Only scan selected directories; leave empty to scan the whole library';
 
   @override
   String settingsScanTargetDirsSelected(int count) {
@@ -3023,7 +3120,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScanClear => 'Clear';
 
   @override
-  String get settingsScanCreatingPlaylists => 'Auto-creating playlists by directory...';
+  String get settingsScanCreatingPlaylists =>
+      'Auto-creating playlists by directory...';
 
   @override
   String get settingsScanSplittingCue => 'Splitting whole track (CUE)...';
@@ -3047,7 +3145,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String settingsScanProgressStats(int scanned, int total, int imported, int skipped, int failed) {
+  String settingsScanProgressStats(
+    int scanned,
+    int total,
+    int imported,
+    int skipped,
+    int failed,
+  ) {
     return 'Processed: $scanned/$total, imported: $imported, skipped: $skipped, failed: $failed';
   }
 
@@ -3055,16 +3159,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScanCancelScan => 'Cancel scan';
 
   @override
-  String get settingsScanAutoCreatePlaylists => 'Auto-create playlists after scan';
+  String get settingsScanAutoCreatePlaylists =>
+      'Auto-create playlists after scan';
 
   @override
-  String get settingsScanAutoCreatePlaylistsDesc => 'Auto-generate playlists by directory structure';
+  String get settingsScanAutoCreatePlaylistsDesc =>
+      'Auto-generate playlists by directory structure';
 
   @override
-  String get settingsScanAutoFingerprint => 'Compute audio fingerprints after scan';
+  String get settingsScanAutoFingerprint =>
+      'Compute audio fingerprints after scan';
 
   @override
-  String get settingsScanAutoFingerprintDesc => 'Fingerprints are only used for duplicate detection and plugin search. Enabling this on a large library keeps the CPU busy for a long time; while off, you can compute them manually on the Duplicate detection page';
+  String get settingsScanAutoFingerprintDesc =>
+      'Fingerprints are only used for duplicate detection and plugin search. Enabling this on a large library keeps the CPU busy for a long time; while off, you can compute them manually on the Duplicate detection page';
 
   @override
   String get settingsScanLoadingConfig => 'Loading...';
@@ -3081,37 +3189,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsScanPlaylistModeDirectory => 'By folder';
 
   @override
-  String get settingsScanPlaylistModeDirectoryDesc => 'Generate a separate playlist for each folder';
+  String get settingsScanPlaylistModeDirectoryDesc =>
+      'Generate a separate playlist for each folder';
 
   @override
   String get settingsScanPlaylistModeTopLevel => 'By top-level folder';
 
   @override
-  String get settingsScanPlaylistModeTopLevelDesc => 'Merge songs from subfolders into the top-level folder playlist';
+  String get settingsScanPlaylistModeTopLevelDesc =>
+      'Merge songs from subfolders into the top-level folder playlist';
 
   @override
   String get settingsScanPlaylistModeBubbleUp => 'Include subdirectories';
 
   @override
-  String get settingsScanPlaylistModeBubbleUpDesc => 'Songs appear in all ancestor folder playlists';
+  String get settingsScanPlaylistModeBubbleUpDesc =>
+      'Songs appear in all ancestor folder playlists';
 
   @override
   String get settingsScanPlaylistModeTitle => 'Playlist creation mode';
 
   @override
-  String get settingsScanPlaylistModeDisabled => 'Auto-create playlists is off; this option has no effect';
+  String get settingsScanPlaylistModeDisabled =>
+      'Auto-create playlists is off; this option has no effect';
 
   @override
   String get settingsScanTitleSource => 'Use filename as title';
 
   @override
-  String get settingsScanTitleSourceFilenameDesc => 'Use the filename (without extension) as the song title; suitable when filenames are already numbered';
+  String get settingsScanTitleSourceFilenameDesc =>
+      'Use the filename (without extension) as the song title; suitable when filenames are already numbered';
 
   @override
-  String get settingsScanTitleSourceTagDesc => 'Prefer audio tag info for the song title';
+  String get settingsScanTitleSourceTagDesc =>
+      'Prefer audio tag info for the song title';
 
   @override
-  String get settingsScanTitleSourceSaved => 'Saved; takes effect after scanning in \'Reimport\' mode';
+  String get settingsScanTitleSourceSaved =>
+      'Saved; takes effect after scanning in \'Reimport\' mode';
 
   @override
   String get settingsScanInterval10Min => '10 minutes';
@@ -3180,7 +3295,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsExcludeDirSaved => 'Exclude directory settings saved; cleaning up songs in excluded directories in the background';
+  String get settingsExcludeDirSaved =>
+      'Exclude directory settings saved; cleaning up songs in excluded directories in the background';
 
   @override
   String settingsExcludeDirSaveFailed(String error) {
@@ -3203,13 +3319,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExcludeDirSaveConfig => 'Save exclude settings';
 
   @override
-  String get settingsExcludeDirSaveHint => 'After saving, imported songs in excluded directories will be cleaned up automatically';
+  String get settingsExcludeDirSaveHint =>
+      'After saving, imported songs in excluded directories will be cleaned up automatically';
 
   @override
   String get settingsExcludeDirInputName => 'Enter directory name';
 
   @override
-  String get settingsExcludeDirInputHint => 'Type and select, or press Enter to add';
+  String get settingsExcludeDirInputHint =>
+      'Type and select, or press Enter to add';
 
   @override
   String get settingsExcludeDirLoadingCandidates => 'Loading candidates...';
@@ -3221,7 +3339,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExcludeDirExcludedNames => 'Excluded directory names:';
 
   @override
-  String get settingsExcludeDirNameHint => 'Any directory containing this name at any path level will be excluded';
+  String get settingsExcludeDirNameHint =>
+      'Any directory containing this name at any path level will be excluded';
 
   @override
   String settingsExcludeDirMusicDir(String path) {
@@ -3232,10 +3351,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExcludeDirExcludedPaths => 'Excluded paths:';
 
   @override
-  String get settingsExcludeDirAutoCreateExcluded => 'Directories excluded from auto-created playlists:';
+  String get settingsExcludeDirAutoCreateExcluded =>
+      'Directories excluded from auto-created playlists:';
 
   @override
-  String get settingsExcludeDirAutoCreateHint => 'Directories containing this name at any path level will not be auto-created as playlists';
+  String get settingsExcludeDirAutoCreateHint =>
+      'Directories containing this name at any path level will not be auto-created as playlists';
 
   @override
   String get settingsServersTitle => 'Servers';
@@ -3247,7 +3368,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsServersEmptyTitle => 'No servers added yet';
 
   @override
-  String get settingsServersEmptyHint => 'Tap the \"+\" button to add an API address.\nOn startup, servers are probed in order and the first reachable one is used.';
+  String get settingsServersEmptyHint =>
+      'Tap the \"+\" button to add an API address.\nOn startup, servers are probed in order and the first reachable one is used.';
 
   @override
   String get settingsServersAdd => 'Add server';
@@ -3282,7 +3404,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsServersDeleteTitle => 'Delete server';
 
   @override
-  String get settingsServersDeleteCurrentConfirm => 'This is the server currently in use. After deletion, the remaining servers in the list will be probed again on next startup. Continue?';
+  String get settingsServersDeleteCurrentConfirm =>
+      'This is the server currently in use. After deletion, the remaining servers in the list will be probed again on next startup. Continue?';
 
   @override
   String settingsServersDeleteConfirm(String name) {
@@ -3325,7 +3448,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsServersLocalMode => 'Local mode';
 
   @override
-  String get settingsServersLocalModeDesc => 'When enabled, the backend runs on this device so you can play local music without a network.';
+  String get settingsServersLocalModeDesc =>
+      'When enabled, the backend runs on this device so you can play local music without a network.';
 
   @override
   String get settingsServersMusicDir => 'Music folder';
@@ -3337,7 +3461,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsServersSelect => 'Select';
 
   @override
-  String get settingsServersFixedMusicDirHint => 'Put music into the Songloft folder via the Files app or a computer (Finder / iTunes file sharing), then rescan.';
+  String get settingsServersFixedMusicDirHint =>
+      'Put music into the Songloft folder via the Files app or a computer (Finder / iTunes file sharing), then rescan.';
 
   @override
   String settingsServersSwitchFailed(String error) {
@@ -3357,7 +3482,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDuplicateDismissError => 'Dismiss';
 
   @override
-  String get settingsDuplicateIntro => 'Identify duplicate files with identical content using audio fingerprints. The same song is recognized even across different file names and formats.';
+  String get settingsDuplicateIntro =>
+      'Identify duplicate files with identical content using audio fingerprints. The same song is recognized even across different file names and formats.';
 
   @override
   String get settingsDuplicateFingerprintStats => 'Fingerprint stats';
@@ -3375,7 +3501,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDuplicateUncomputable => 'Cannot compute';
 
   @override
-  String get settingsDuplicateUncomputableHint => 'These files have no audio track, are corrupted, timed out, or the server ffmpeg does not support their format. They will not be retried automatically — use \"Retry failed only\" (e.g. after a server upgrade) or \"Recompute all fingerprints\".';
+  String get settingsDuplicateUncomputableHint =>
+      'These files have no audio track, are corrupted, timed out, or the server ffmpeg does not support their format. They will not be retried automatically — use \"Retry failed only\" (e.g. after a server upgrade) or \"Recompute all fingerprints\".';
 
   @override
   String get settingsDuplicateViewFailed => 'View failed details';
@@ -3392,7 +3519,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsDuplicateChromaprintMissing => 'Audio fingerprint detection requires ffmpeg with chromaprint support. Docker users can simply upgrade to the latest image.';
+  String get settingsDuplicateChromaprintMissing =>
+      'Audio fingerprint detection requires ffmpeg with chromaprint support. Docker users can simply upgrade to the latest image.';
 
   @override
   String get settingsDuplicateStartCompute => 'Compute and detect';
@@ -3417,13 +3545,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsDuplicateAutoDetect => 'Duplicates will be detected automatically once computation finishes';
+  String get settingsDuplicateAutoDetect =>
+      'Duplicates will be detected automatically once computation finishes';
 
   @override
   String get settingsDuplicateStopCompute => 'Stop computing';
 
   @override
-  String get settingsDuplicateStopComputeHint => 'Fingerprints already computed are kept; the remaining songs will be computed next time';
+  String get settingsDuplicateStopComputeHint =>
+      'Fingerprints already computed are kept; the remaining songs will be computed next time';
 
   @override
   String get settingsDuplicateRecheck => 'Recheck';
@@ -3497,7 +3627,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSongTitleScrollingTitle => 'Scroll long song titles';
 
   @override
-  String get settingsSongTitleScrollingSubtitle => 'Automatically scroll long song titles and artist names; show ellipses when disabled';
+  String get settingsSongTitleScrollingSubtitle =>
+      'Automatically scroll long song titles and artist names; show ellipses when disabled';
 
   @override
   String get settingsCategoryPlaybackSubtitle => 'Audio quality';
@@ -3571,7 +3702,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsTabsCollapseHint => 'On mobile, tabs beyond 5 collapse into the \"More\" menu';
+  String get settingsTabsCollapseHint =>
+      'On mobile, tabs beyond 5 collapse into the \"More\" menu';
 
   @override
   String settingsMaxTabsLimit(int count) {
@@ -3602,22 +3734,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsQualityDialogTitle => 'Select audio quality';
 
   @override
-  String get settingsQualityOriginalDesc => 'No tier requested: local files play as-is, network songs use the source default';
+  String get settingsQualityOriginalDesc =>
+      'No tier requested: local files play as-is, network songs use the source default';
 
   @override
-  String get settingsQualityTranscodeDesc => 'Network songs only: request this tier from the source, falling back to the best available; local files always play as-is';
+  String get settingsQualityTranscodeDesc =>
+      'Network songs only: request this tier from the source, falling back to the best available; local files always play as-is';
 
   @override
   String get settingsAutoPlayOnLaunchTitle => 'Auto-play on launch';
 
   @override
-  String get settingsAutoPlayOnLaunchDesc => 'Resume the last playback automatically when the app opens';
+  String get settingsAutoPlayOnLaunchDesc =>
+      'Resume the last playback automatically when the app opens';
 
   @override
   String get settingsMiniPlayerControlsTitle => 'Mini player buttons';
 
   @override
-  String get settingsMiniPlayerControlsDesc => 'Which controls to show on the mini player bar at the bottom';
+  String get settingsMiniPlayerControlsDesc =>
+      'Which controls to show on the mini player bar at the bottom';
 
   @override
   String get settingsMiniPlayerControlsDialogTitle => 'Buttons to show';
@@ -3629,13 +3765,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMiniPlayerControlsPrevNext => 'Previous / next';
 
   @override
-  String get settingsMiniPlayerControlsPrevNextMode => 'Previous / next + play mode';
+  String get settingsMiniPlayerControlsPrevNextMode =>
+      'Previous / next + play mode';
 
   @override
   String get settingsHomeGridTitle => 'Home playlist grid';
 
   @override
-  String get settingsHomeGridDesc => 'Columns and rows for the home playlist and radio grids';
+  String get settingsHomeGridDesc =>
+      'Columns and rows for the home playlist and radio grids';
 
   @override
   String get settingsHomeGridColumnsTitle => 'Per row';
@@ -3665,10 +3803,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsHomeGridClampHint => 'Columns are reduced automatically when the window is too narrow, to keep cards readable.';
+  String get settingsHomeGridClampHint =>
+      'Columns are reduced automatically when the window is too narrow, to keep cards readable.';
 
   @override
-  String get settingsHomeGridNarrowHint => 'Choose Grid beside a home section heading to use these row and column settings';
+  String get settingsHomeGridNarrowHint =>
+      'Choose Grid beside a home section heading to use these row and column settings';
 
   @override
   String get settingsFontScaleTitle => 'Font size';
@@ -3692,28 +3832,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLyricsKeepScreenOnTitle => 'Keep screen on for lyrics';
 
   @override
-  String get settingsLyricsKeepScreenOnDesc => 'Keep the screen awake while viewing lyrics; restore automatic sleep when leaving lyrics or switching to the background';
+  String get settingsLyricsKeepScreenOnDesc =>
+      'Keep the screen awake while viewing lyrics; restore automatic sleep when leaving lyrics or switching to the background';
 
   @override
-  String get settingsAutoEnterLyricsOnLaunchDesc => 'Automatically open the full-screen lyrics view when the app opens (adapts to screen size)';
+  String get settingsAutoEnterLyricsOnLaunchDesc =>
+      'Automatically open the full-screen lyrics view when the app opens (adapts to screen size)';
 
   @override
-  String get settingsNotificationLyricInTitleTitle => 'Lyrics in the notification title';
+  String get settingsNotificationLyricInTitleTitle =>
+      'Lyrics in the notification title';
 
   @override
-  String get settingsNotificationLyricInTitleDesc => 'On: the title line shows lyrics and the song name moves to the subtitle. Off: the title line shows the song name and lyrics move to the subtitle';
+  String get settingsNotificationLyricInTitleDesc =>
+      'On: the title line shows lyrics and the song name moves to the subtitle. Off: the title line shows the song name and lyrics move to the subtitle';
 
   @override
   String get settingsDesktopLyricTitle => 'Desktop Lyrics';
 
   @override
-  String get settingsDesktopLyricDesc => 'Show a floating lyrics window on the desktop that scrolls with playback';
+  String get settingsDesktopLyricDesc =>
+      'Show a floating lyrics window on the desktop that scrolls with playback';
 
   @override
   String get settingsDesktopLyricLockTitle => 'Lock Lyrics Position';
 
   @override
-  String get settingsDesktopLyricLockDesc => 'When locked, the window can\'t be dragged and taps pass through to whatever is below';
+  String get settingsDesktopLyricLockDesc =>
+      'When locked, the window can\'t be dragged and taps pass through to whatever is below';
 
   @override
   String get settingsDesktopLyricFontSizeTitle => 'Lyrics Font Size';
@@ -3743,7 +3889,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShortcutsEntryTitle => 'Keyboard shortcuts';
 
   @override
-  String get settingsShortcutsEntrySubtitle => 'Customize playback control keys';
+  String get settingsShortcutsEntrySubtitle =>
+      'Customize playback control keys';
 
   @override
   String get settingsShortcutsPageTitle => 'Keyboard shortcuts';
@@ -3752,7 +3899,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShortcutsEnableTitle => 'Enable keyboard shortcuts';
 
   @override
-  String get settingsShortcutsEnableSubtitle => 'Control playback with shortcuts inside the desktop window';
+  String get settingsShortcutsEnableSubtitle =>
+      'Control playback with shortcuts inside the desktop window';
 
   @override
   String get settingsShortcutActionPlayPause => 'Play / Pause';
@@ -3802,7 +3950,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShortcutResetAll => 'Reset all to defaults';
 
   @override
-  String get settingsShortcutResetAllConfirm => 'Reset all shortcuts to their defaults?';
+  String get settingsShortcutResetAllConfirm =>
+      'Reset all shortcuts to their defaults?';
 
   @override
   String settingsQualitySwitched(String quality) {
@@ -3818,7 +3967,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLibraryDuplicateTitle => 'Duplicate detection';
 
   @override
-  String get settingsLibraryDuplicateSubtitle => 'Identify duplicate files with identical content via audio fingerprint';
+  String get settingsLibraryDuplicateSubtitle =>
+      'Identify duplicate files with identical content via audio fingerprint';
 
   @override
   String get settingsPluginStoreTitle => 'Plugin store';
@@ -3830,31 +3980,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExportPlaylistTitle => 'Export playlists';
 
   @override
-  String get settingsExportPlaylistSubtitle => 'Back up all playlist data to a JSON file';
+  String get settingsExportPlaylistSubtitle =>
+      'Back up all playlist data to a JSON file';
 
   @override
   String get settingsImportPlaylistTitle => 'Import playlists';
 
   @override
-  String get settingsImportPlaylistSubtitle => 'Restore playlist data from a JSON backup file';
+  String get settingsImportPlaylistSubtitle =>
+      'Restore playlist data from a JSON backup file';
 
   @override
   String get settingsDownloadAppTitle => 'Download the app';
 
   @override
-  String get settingsDownloadAppSubtitle => 'Get the mobile / desktop native client with background playback, caching and more';
+  String get settingsDownloadAppSubtitle =>
+      'Get the mobile / desktop native client with background playback, caching and more';
 
   @override
   String get settingsWebDebugConsoleTitle => 'Debug Console';
 
   @override
-  String get settingsWebDebugConsoleSubtitle => 'Enable NextConsole web debug panel (requires page reload)';
+  String get settingsWebDebugConsoleSubtitle =>
+      'Enable NextConsole web debug panel (requires page reload)';
 
   @override
-  String get settingsWebDebugConsoleEnabled => 'Debug console enabled, page will reload';
+  String get settingsWebDebugConsoleEnabled =>
+      'Debug console enabled, page will reload';
 
   @override
-  String get settingsWebDebugConsoleDisabled => 'Debug console disabled, page will reload';
+  String get settingsWebDebugConsoleDisabled =>
+      'Debug console disabled, page will reload';
 
   @override
   String get settingsAboutTitle => 'About';
@@ -3875,13 +4031,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExitApp => 'Exit app';
 
   @override
-  String get settingsExitAppSubtitle => 'Stop playback, notifications and background services; stay signed in';
+  String get settingsExitAppSubtitle =>
+      'Stop playback, notifications and background services; stay signed in';
 
   @override
   String get settingsLogoutConfirmTitle => 'Confirm log out';
 
   @override
-  String get settingsLogoutConfirmContent => 'Are you sure you want to log out of the current account?';
+  String get settingsLogoutConfirmContent =>
+      'Are you sure you want to log out of the current account?';
 
   @override
   String get settingsLogoutButton => 'Log out';
@@ -3901,7 +4059,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImportPathFailed => 'Unable to get file path';
 
   @override
-  String settingsImportComplete(Object created, Object merged, Object songsCreated, Object songsMatched) {
+  String settingsImportComplete(
+    Object created,
+    Object merged,
+    Object songsCreated,
+    Object songsMatched,
+  ) {
     return 'Import complete: $created playlists created, $merged merged, $songsCreated songs created, $songsMatched matched';
   }
 
@@ -3949,7 +4112,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsHlsProxyTitle => 'HLS radio backend proxy';
 
   @override
-  String get settingsHlsProxySubtitle => 'When enabled, the server fetches radio m3u8 and proxies segments, bypassing Referer hotlink protection / CORS. All segments use this machine\'s bandwidth—mind the traffic cost.';
+  String get settingsHlsProxySubtitle =>
+      'When enabled, the server fetches radio m3u8 and proxies segments, bypassing Referer hotlink protection / CORS. All segments use this machine\'s bandwidth—mind the traffic cost.';
 
   @override
   String get settingsHlsProxyEnabled => 'HLS proxy enabled';
@@ -3961,7 +4125,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVolumeNormalizeTitle => 'Volume normalization';
 
   @override
-  String get settingsVolumeNormalizeSubtitle => 'Enable EBU R128 loudness normalization to equalize volume across different audio sources. Requires ffmpeg; increases CPU usage and first-play latency';
+  String get settingsVolumeNormalizeSubtitle =>
+      'Enable EBU R128 loudness normalization to equalize volume across different audio sources. Requires ffmpeg; increases CPU usage and first-play latency';
 
   @override
   String get settingsVolumeNormalizeEnabled => 'Volume normalization enabled';
@@ -3973,10 +4138,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVolumeNormalizeLoudnessTitle => 'Target loudness (LUFS)';
 
   @override
-  String get settingsVolumeNormalizeLoudnessSubtitle => 'Customize the EBU R128 target loudness, default -16. Streaming often uses -14, broadcast -23. Range -40 to -5';
+  String get settingsVolumeNormalizeLoudnessSubtitle =>
+      'Customize the EBU R128 target loudness, default -16. Streaming often uses -14, broadcast -23. Range -40 to -5';
 
   @override
-  String get settingsVolumeNormalizeLoudnessInvalid => 'Please enter a value between -40 and -5';
+  String get settingsVolumeNormalizeLoudnessInvalid =>
+      'Please enter a value between -40 and -5';
 
   @override
   String settingsVolumeNormalizeLoudnessSaved(String value) {
@@ -3987,7 +4154,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsProxyAllowlistTitle => 'Private network proxy allowlist';
 
   @override
-  String get settingsProxyAllowlistEmpty => 'Not configured (private addresses are rejected)';
+  String get settingsProxyAllowlistEmpty =>
+      'Not configured (private addresses are rejected)';
 
   @override
   String settingsProxyAllowlistCount(int count) {
@@ -3995,22 +4163,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsProxyAllowlistDialogDesc => 'Proxying private addresses is blocked by default to prevent SSRF. If you need this server to proxy internal resources (e.g. a WebDAV reachable only on the LAN), list the allowed addresses here.';
+  String get settingsProxyAllowlistDialogDesc =>
+      'Proxying private addresses is blocked by default to prevent SSRF. If you need this server to proxy internal resources (e.g. a WebDAV reachable only on the LAN), list the allowed addresses here.';
 
   @override
   String get settingsProxyAllowlistLabel => 'Allowed addresses (one per line)';
 
   @override
-  String get settingsProxyAllowlistHelper => 'One single IP (e.g. 192.168.1.100) or CIDR range (e.g. 192.168.1.0/24) per line. Only affects the generic resource proxy.';
+  String get settingsProxyAllowlistHelper =>
+      'One single IP (e.g. 192.168.1.100) or CIDR range (e.g. 192.168.1.0/24) per line. Only affects the generic resource proxy.';
 
   @override
-  String get settingsProxyAllowlistSaved => 'Private network proxy allowlist saved';
+  String get settingsProxyAllowlistSaved =>
+      'Private network proxy allowlist saved';
 
   @override
   String get settingsInsecureTlsTitle => 'Ignore SSL certificate verification';
 
   @override
-  String get settingsInsecureTlsSubtitle => 'Enable when connecting to a server with a self-signed or invalid HTTPS certificate. Applies to both API requests and audio playback.';
+  String get settingsInsecureTlsSubtitle =>
+      'Enable when connecting to a server with a self-signed or invalid HTTPS certificate. Applies to both API requests and audio playback.';
 
   @override
   String get settingsInsecureTlsEnabled => 'Certificate verification ignored';
@@ -4022,7 +4194,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsInsecureTlsWarnTitle => 'Reduced security';
 
   @override
-  String get settingsInsecureTlsWarnContent => 'Once enabled, any HTTPS certificate will be accepted, which exposes you to man-in-the-middle attacks. Use only on trusted intranets or with self-signed certificates. Enable anyway?';
+  String get settingsInsecureTlsWarnContent =>
+      'Once enabled, any HTTPS certificate will be accepted, which exposes you to man-in-the-middle attacks. Use only on trusted intranets or with self-signed certificates. Enable anyway?';
 
   @override
   String get settingsHttpProxyTitle => 'HTTP proxy';
@@ -4031,7 +4204,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsHttpProxyNotConfigured => 'Not configured (direct)';
 
   @override
-  String get settingsHttpProxyDialogDesc => 'Set a global HTTP proxy. All outbound backend requests (plugin downloads, update checks, etc.) will be forwarded through it. Leave empty for a direct connection.';
+  String get settingsHttpProxyDialogDesc =>
+      'Set a global HTTP proxy. All outbound backend requests (plugin downloads, update checks, etc.) will be forwarded through it. Leave empty for a direct connection.';
 
   @override
   String get settingsHttpProxyAddressLabel => 'Proxy address';
@@ -4057,13 +4231,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGithubProxyTitle => 'GitHub Proxy';
 
   @override
-  String get settingsGithubProxyDialogDesc => 'Shared by plugin install/update, update checks and client downloads. Pick a mirror if GitHub is slow in your region.';
+  String get settingsGithubProxyDialogDesc =>
+      'Shared by plugin install/update, update checks and client downloads. Pick a mirror if GitHub is slow in your region.';
 
   @override
   String get settingsGithubProxyCustom => 'Custom proxy';
 
   @override
-  String get settingsGithubProxyCustomHelper => 'Enter a proxy address, e.g. https://example.com/';
+  String get settingsGithubProxyCustomHelper =>
+      'Enter a proxy address, e.g. https://example.com/';
 
   @override
   String get settingsGithubProxyCopyPrompt => 'Copy prompt to ask AI';
@@ -4106,16 +4282,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExportLogsTitle => 'Export logs';
 
   @override
-  String get settingsExportLogsSubtitle => 'Bundle redacted frontend & backend logs for issue reports';
+  String get settingsExportLogsSubtitle =>
+      'Bundle redacted frontend & backend logs for issue reports';
 
   @override
   String get settingsExportLogsShareSubject => 'Songloft logs';
 
   @override
-  String get settingsExportLogsSuccess => 'Logs bundled, choose how to share or save';
+  String get settingsExportLogsSuccess =>
+      'Logs bundled, choose how to share or save';
 
   @override
-  String get settingsExportLogsSuccessNoBackend => 'Exported frontend logs (backend logs unavailable)';
+  String get settingsExportLogsSuccessNoBackend =>
+      'Exported frontend logs (backend logs unavailable)';
 
   @override
   String settingsExportLogsFailed(String error) {
@@ -4134,16 +4313,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccountLoading => 'Loading...';
 
   @override
-  String get settingsAboutDesc1 => 'Songloft is an open-source personal music server app.';
+  String get settingsAboutDesc1 =>
+      'Songloft is an open-source personal music server app.';
 
   @override
-  String get settingsAboutDesc2 => 'Supports local library management, online playback and plugin extensions.';
+  String get settingsAboutDesc2 =>
+      'Supports local library management, online playback and plugin extensions.';
 
   @override
   String get settingsAboutGithubSemantics => 'Open the GitHub page';
 
   @override
-  String get settingsUpgradeCheckTimeout => 'Update check timed out. Try switching the proxy and retry.';
+  String get settingsUpgradeCheckTimeout =>
+      'Update check timed out. Try switching the proxy and retry.';
 
   @override
   String settingsUpgradeCheckFailed(String error) {
@@ -4170,7 +4352,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsUpgradeConfirmReset => 'Confirm rollback';
 
   @override
-  String get settingsUpgradeConfirmResetContent => 'Roll back to the base image version of the Docker image?\n\nThe service will restart automatically after rollback.';
+  String get settingsUpgradeConfirmResetContent =>
+      'Roll back to the base image version of the Docker image?\n\nThe service will restart automatically after rollback.';
 
   @override
   String settingsUpgradeResetFailed(String error) {
@@ -4241,10 +4424,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsUpgradeUploadConfirmChannel => 'Channel switch confirmation';
+  String get settingsUpgradeUploadConfirmChannel =>
+      'Channel switch confirmation';
 
   @override
-  String settingsUpgradeUploadConfirmChannelContent(String currentChannel, String uploadChannel, String version) {
+  String settingsUpgradeUploadConfirmChannelContent(
+    String currentChannel,
+    String uploadChannel,
+    String version,
+  ) {
     return 'Current channel is $currentChannel, uploaded file is $uploadChannel ($version). Confirm switching channel and upgrade?\n\nThe service will restart automatically.';
   }
 
@@ -4257,7 +4445,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsUpgradeUploadConfirm => 'Confirm upgrade';
 
   @override
-  String get settingsFrontendUpgradeCheckTimeout => 'Update check timed out. Try switching the proxy and retry.';
+  String get settingsFrontendUpgradeCheckTimeout =>
+      'Update check timed out. Try switching the proxy and retry.';
 
   @override
   String get settingsFrontendUpgradeTitle => 'Client update';
@@ -4299,7 +4488,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFrontendUpgradeDownloadFull => 'Download full installer';
 
   @override
-  String get settingsFrontendUpgradeReinstallHint => 'If the app misbehaves after a hot update, download the full installer and reinstall over it';
+  String get settingsFrontendUpgradeReinstallHint =>
+      'If the app misbehaves after a hot update, download the full installer and reinstall over it';
 
   @override
   String get settingsConfigTitle => 'Configuration';
@@ -4317,7 +4507,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsConfigEmpty => 'No configuration items';
 
   @override
-  String get settingsConfigEmptyHint => 'Tap \"Add config\" to create a new item';
+  String get settingsConfigEmptyHint =>
+      'Tap \"Add config\" to create a new item';
 
   @override
   String get settingsConfigKeyLabel => 'Config key';
@@ -4401,7 +4592,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTokenConfirmRevoke => 'Confirm revocation';
 
   @override
-  String get settingsTokenRevokeConfirm => 'Revoking this token will invalidate the corresponding login session. Continue?';
+  String get settingsTokenRevokeConfirm =>
+      'Revoking this token will invalidate the corresponding login session. Continue?';
 
   @override
   String get settingsTokenRevoke => 'Revoke';
@@ -4457,7 +4649,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coreUrlEmpty => 'URL cannot be empty';
 
   @override
-  String get coreUrlInvalid => 'Enter a valid URL (including http:// or https://)';
+  String get coreUrlInvalid =>
+      'Enter a valid URL (including http:// or https://)';
 
   @override
   String get corePickMusicDir => 'Select music folder';
@@ -4508,7 +4701,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get categoryEmptySubtitle => 'No songs to categorize in this dimension';
+  String get categoryEmptySubtitle =>
+      'No songs to categorize in this dimension';
 
   @override
   String get folderBrowseEmpty => 'No folders found';
@@ -4561,13 +4755,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songCacheFailed => 'Caching failed';
 
   @override
-  String get songCacheLimitExceeded => 'Local cache limit reached; clear some in Settings first';
+  String get songCacheLimitExceeded =>
+      'Local cache limit reached; clear some in Settings first';
 
   @override
   String get songCacheVideoWarnTitle => 'Cache video file';
 
   @override
-  String get songCacheVideoWarnContent => 'Video files are large. Cache on device anyway?';
+  String get songCacheVideoWarnContent =>
+      'Video files are large. Cache on device anyway?';
 
   @override
   String get songInfoTitle => 'Song info';
@@ -4609,7 +4805,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songInfoCachePath => 'Cache location';
 
   @override
-  String get songInfoQualityNote => 'Cache quality follows the playback quality set at cache time; changing the setting later does not affect already-cached files.';
+  String get songInfoQualityNote =>
+      'Cache quality follows the playback quality set at cache time; changing the setting later does not affect already-cached files.';
 
   @override
   String get songTypeLocalLabel => 'Local';
@@ -4674,7 +4871,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playHistoryEmpty => 'No play history yet';
 
   @override
-  String get playHistoryEmptyHint => 'Songs you play here get recorded, so you can pick up where you left off';
+  String get playHistoryEmptyHint =>
+      'Songs you play here get recorded, so you can pick up where you left off';
 
   @override
   String get playHistoryClear => 'Clear history';
@@ -4692,7 +4890,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playHistoryOperationFailed => 'Operation failed, please try again';
 
   @override
-  String get playHistorySongMissing => 'This song is no longer in the list; the rest have been added to the queue';
+  String get playHistorySongMissing =>
+      'This song is no longer in the list; the rest have been added to the queue';
 
   @override
   String get scrollToTop => 'Scroll to top';
@@ -4754,16 +4953,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deviceCacheDirectoryDefault => 'Default (app-private directory)';
 
   @override
-  String get deviceCacheDirectoryHelp => 'Choose a device or SD card folder for new caches, accessible from a file manager. Existing caches can be migrated separately. Clearing caches deletes their files.';
+  String get deviceCacheDirectoryHelp =>
+      'Choose a device or SD card folder for new caches, accessible from a file manager. Existing caches can be migrated separately. Clearing caches deletes their files.';
 
   @override
-  String get deviceCacheDirectoryUpgrade => 'Install the latest client APK to use a custom cache directory.';
+  String get deviceCacheDirectoryUpgrade =>
+      'Install the latest client APK to use a custom cache directory.';
 
   @override
-  String get deviceCacheDirectoryUnavailable => 'The folder is unavailable or not writable. Check the SD card and select the folder again to grant access. Cache records are preserved.';
+  String get deviceCacheDirectoryUnavailable =>
+      'The folder is unavailable or not writable. Check the SD card and select the folder again to grant access. Cache records are preserved.';
 
   @override
-  String get deviceCacheDirectoryBusy => 'A cache operation is running. Wait for it to finish before changing folders or migrating.';
+  String get deviceCacheDirectoryBusy =>
+      'A cache operation is running. Wait for it to finish before changing folders or migrating.';
 
   @override
   String get deviceCacheDirectorySaved => 'Cache directory updated';
@@ -4778,16 +4981,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deviceCacheMigrate => 'Move existing caches to the current folder';
 
   @override
-  String get deviceCacheMigrationConfirm => 'Migration stops playback of cached songs and temporarily uses extra space. Each original is deleted only after its copy and index are saved. Cancellation or failure preserves completed moves and the remaining originals.';
+  String get deviceCacheMigrationConfirm =>
+      'Migration stops playback of cached songs and temporarily uses extra space. Each original is deleted only after its copy and index are saved. Cancellation or failure preserves completed moves and the remaining originals.';
 
   @override
   String get deviceCacheMigrationDone => 'Cache migration complete';
 
   @override
-  String get deviceCacheMigrationFailed => 'Migration could not finish. Check folder access and free space. Completed moves are preserved; remaining original caches are kept.';
+  String get deviceCacheMigrationFailed =>
+      'Migration could not finish. Check folder access and free space. Completed moves are preserved; remaining original caches are kept.';
 
   @override
-  String get deviceCacheMigrationCancelled => 'Migration cancelled. Completed moves are preserved; remaining original caches were not deleted.';
+  String get deviceCacheMigrationCancelled =>
+      'Migration cancelled. Completed moves are preserved; remaining original caches were not deleted.';
 
   @override
   String deviceCacheMigrationProgress(int done, int total) {
@@ -4795,7 +5001,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get deviceCacheClearFailed => 'Cache cleanup could not finish. Check folder access and storage space. Records for files that were not deleted are preserved.';
+  String get deviceCacheClearFailed =>
+      'Cache cleanup could not finish. Check folder access and storage space. Records for files that were not deleted are preserved.';
 
   @override
   String get homePlaylistLayout => 'Home playlist layout';
@@ -4816,22 +5023,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsHomeShowFavorites => 'Show Favorites on home';
 
   @override
-  String get settingsHomeShowFavoritesDesc => 'Only controls the home card. Library access, songs and favorites stay available. Saved on this device for this server and account.';
+  String get settingsHomeShowFavoritesDesc =>
+      'Only controls the home card. Library access, songs and favorites stay available. Saved on this device for this server and account.';
 
   @override
   String get settingsHomeShowRadioFavorites => 'Show Radio favorites on home';
 
   @override
-  String get settingsHomeShowRadioFavoritesDesc => 'Only controls the home card when the radio section is shown. Saved on this device for this server and account.';
+  String get settingsHomeShowRadioFavoritesDesc =>
+      'Only controls the home card when the radio section is shown. Saved on this device for this server and account.';
 
   @override
   String get settingsHomeShowRadios => 'Show radio section';
 
   @override
-  String get settingsHomeShowRadiosDesc => 'Show My Radios on the home page. This choice stays on this device.';
+  String get settingsHomeShowRadiosDesc =>
+      'Show My Radios on the home page. This choice stays on this device.';
 
   @override
   String get browseSearchHint => 'Search online music';
+
+  @override
+  String get searchScopeOnline => 'Online';
 
   @override
   String get browseDiscoverTitle => 'Discover';
@@ -4913,7 +5126,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browseLocalEmpty => 'No local music';
 
   @override
-  String get browseLocalEmptyHint => 'Songs will appear here after you scan local music folders';
+  String get browseLocalEmptyHint =>
+      'Songs will appear here after you scan local music folders';
 
   @override
   String get browseGoScan => 'Scan now';
