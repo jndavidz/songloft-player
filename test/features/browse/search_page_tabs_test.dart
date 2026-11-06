@@ -60,6 +60,21 @@ class _FakeBrowseApi implements PluginBrowseApi {
             BrowseSheet(id: '3', name: '歌单C', creator: '创建者C', trackCount: 30),
           ],
         );
+      case 'mv':
+        return BrowseSearchResponse(
+          type: type,
+          isEnd: true,
+          videos: const [
+            BrowseVideo(
+              id: '440623',
+              source: 'kuwo',
+              title: 'MV视频',
+              artist: '歌手A',
+              duration: 221,
+              quality: 'fhd',
+            ),
+          ],
+        );
       default:
         return BrowseSearchResponse(
           type: type,
@@ -83,7 +98,7 @@ class _FakeBrowseApi implements PluginBrowseApi {
 }
 
 void main() {
-  testWidgets('四类型 tab 就地切换：关键词保持、列表按类型切换', (tester) async {
+  testWidgets('五类型 tab 就地切换：关键词保持、列表按类型切换', (tester) async {
     final fake = _FakeBrowseApi();
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(
@@ -108,15 +123,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // 默认单曲 tab：fake 收到 mv 探测 + music，歌曲条目可见
-    expect(fake.typesCalled, ['mv', 'music']);
+    // 默认单曲 tab：只请求 music（不再并发探测 mv），歌曲条目可见
+    expect(fake.typesCalled, ['music']);
     expect(find.text('歌曲T'), findsOneWidget);
 
     // 切到专辑 tab：就地换列表、同一关键词
     await tester.tap(find.text('专辑'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['mv', 'music', 'album']);
+    expect(fake.typesCalled, ['music', 'album']);
     expect(find.text('专辑A'), findsOneWidget);
     expect(find.text('歌曲T'), findsNothing);
 
@@ -124,17 +139,26 @@ void main() {
     await tester.tap(find.text('歌手'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['mv', 'music', 'album', 'artist']);
+    expect(fake.typesCalled, ['music', 'album', 'artist']);
     expect(find.text('歌手B'), findsOneWidget);
 
     // 切到歌单 tab
     await tester.tap(find.text('歌单'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['mv', 'music', 'album', 'artist', 'sheet']);
+    expect(fake.typesCalled, ['music', 'album', 'artist', 'sheet']);
     expect(find.text('歌单C'), findsOneWidget);
 
-    // 搜索页未触发除 search 外的任何插件端点调用（含一次 mv 探测）
+    // 切到 MV tab：MV 结果不再混进单曲列表，单列一项
+    await tester.tap(find.text('MV'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(fake.typesCalled, ['music', 'album', 'artist', 'sheet', 'mv']);
+    expect(find.text('MV视频'), findsOneWidget);
+    expect(find.text('歌单C'), findsNothing);
+    expect(find.text('歌曲T'), findsNothing);
+
+    // 搜索页只打过 search 端点：5 次（五类型各一次）
     expect(fake.searchCalls, 5);
   });
 }

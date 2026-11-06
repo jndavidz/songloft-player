@@ -5175,9 +5175,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get browseTabSheets => '歌单';
 
   @override
-  String get browseRelatedVideos => '相关视频';
-
-  @override
   String get browseSearchHistory => '搜索历史';
 
   @override

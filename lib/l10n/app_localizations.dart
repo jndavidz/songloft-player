@@ -8826,12 +8826,6 @@ abstract class AppLocalizations {
   /// **'歌单'**
   String get browseTabSheets;
 
-  /// No description provided for @browseRelatedVideos.
-  ///
-  /// In zh, this message translates to:
-  /// **'相关视频'**
-  String get browseRelatedVideos;
-
   /// No description provided for @browseSearchHistory.
   ///
   /// In zh, this message translates to:

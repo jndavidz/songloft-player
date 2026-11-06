@@ -1,8 +1,9 @@
-/// 在线搜索结果里的 MV/视频条目卡片。
+/// 在线搜索结果里的 MV/视频条目卡片（「MV」tab 专用）。
 ///
-/// 与音乐条目混排：16:9 封面 + 播放角标，副标题为「平台 · 清晰度 · 时长」。
-/// 条目只做定位（id + 平台），点击后经 `SongMvApi.findMv` 取可播放直链，
-/// 再进既有 [SongMvPage]；取不到时给出明确提示，不静默无反应。
+/// 16:9 封面 + 播放角标，标题为 MV 名，副标题为「平台 · 歌手 · 清晰度 · 时长」，
+/// 与其它结果 tab 的条目信息结构一致。条目只做定位（id + 平台），点击后经
+/// `SongMvApi.findMv` 取可播放直链，再进既有 [SongMvPage]；取不到时给出明确
+/// 提示，不静默无反应。
 library;
 
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class BrowseVideoTile extends StatelessWidget {
     final theme = Theme.of(context);
     final subtitle = [
       platformLabel,
+      if (video.artist.isNotEmpty) video.artist,
       if (video.quality != null && video.quality!.isNotEmpty)
         video.quality!.toUpperCase(),
       if (video.duration > 0)
