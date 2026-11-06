@@ -56,7 +56,7 @@ void main() {
 
   testWidgets('远程歌曲未探测到码率时不显示数字（不臆造）', (tester) async {
     await tester.pumpWidget(_host(_song(sourceData: const {'source': 'qq'})));
-    expect(find.text('QQ音乐'), findsOneWidget);
+    expect(find.text('QQ'), findsOneWidget);
     expect(find.textContaining('kbps'), findsNothing);
   });
 
@@ -69,5 +69,20 @@ void main() {
       _host(_song(type: 'remote', pluginEntryPath: 'songloft-plugin-dav')),
     );
     expect(find.text('WebDAV'), findsOneWidget);
+  });
+
+  testWidgets('真实音源取 source_data.s，内部枚举不外露', (tester) async {
+    await tester.pumpWidget(
+      _host(
+        _song(
+          pluginEntryPath: 'kwqq',
+          sourceData: const {'s': 'netease', 'i': '123'},
+        ),
+      ),
+    );
+    expect(find.text('网易云'), findsOneWidget);
+    expect(find.text('kwqq'), findsNothing);
+    expect(find.text('browse'), findsNothing);
+    expect(find.text('remote'), findsNothing);
   });
 }

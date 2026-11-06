@@ -571,6 +571,7 @@ class AppPreferences {
   static const _desktopLyricPosXKey = 'desktop_lyric_pos_x';
   static const _desktopLyricPosYKey = 'desktop_lyric_pos_y';
   static const _desktopLyricOpeningKey = 'desktop_lyric_opening';
+  static const _playerLyricFontSizeKey = 'player_lyric_font_size';
 
   /// 桌面歌词悬浮窗总开关（默认关闭，目前仅 Windows 支持，songloft-org/songloft#318）。
   /// 纯本地设置，不参与服务器偏好同步。
@@ -613,6 +614,15 @@ class AppPreferences {
 
   Future<bool> setDesktopLyricFontSize(String value) {
     return _prefs.setString(_desktopLyricFontSizeKey, value);
+  }
+
+  /// 播放页歌词字号档位：'small' / 'medium'（默认） / 'large'
+  String getPlayerLyricFontSize() {
+    return _prefs.getString(_playerLyricFontSizeKey) ?? 'medium';
+  }
+
+  Future<bool> setPlayerLyricFontSize(String value) {
+    return _prefs.setString(_playerLyricFontSizeKey, value);
   }
 
   /// 桌面歌词背景透明度 (0.0~0.8)，默认 0.4

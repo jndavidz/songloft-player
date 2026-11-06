@@ -1926,6 +1926,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playerEqualizer => '均衡器';
 
   @override
+  String get playerSongVideo => '歌曲视频';
+
+  @override
+  String get songMvUnavailable => '该歌曲暂无可用 MV';
+
+  @override
+  String get songMvLoadFailed => 'MV 加载失败，请稍后重试';
+
+  @override
   String get playerAudioTrack => '音轨';
 
   @override
@@ -3689,6 +3698,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsDesktopLyricFontSizeTitle => '歌词字号';
+
+  @override
+  String get settingsPlayerLyricFontSizeTitle => '播放页歌词字号';
 
   @override
   String get settingsDesktopLyricFontSizeSmall => '小';

@@ -343,6 +343,9 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
                       playbackSource: state.playbackSource,
                     );
                   }
+                case 'song_video':
+                  final song = state.currentSong;
+                  if (song != null) openSongMv(context, ref, song);
                 case 'delete':
                   deleteCurrentSongFromPlayer(context, ref);
               }
@@ -406,6 +409,17 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
                     child: ListTile(
                       leading: const Icon(Icons.info_outline_rounded),
                       title: Text(AppLocalizations.of(context).songCacheInfo),
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                // 歌曲视频：直接跳转该曲的在线 MV（本身是视频的歌已有画面，不重复给入口）
+                if (song != null && !song.isVideo)
+                  PopupMenuItem(
+                    value: 'song_video',
+                    child: ListTile(
+                      leading: const Icon(Icons.movie_outlined),
+                      title: Text(AppLocalizations.of(context).playerSongVideo),
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                     ),

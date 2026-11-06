@@ -12,7 +12,9 @@ import '../../../../shared/widgets/delete_song_dialog.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../library/presentation/providers/songs_provider.dart';
 import '../../../settings/presentation/providers/song_cache_provider.dart';
+import '../../data/song_mv_api.dart';
 import '../providers/player_provider.dart';
+import '../song_mv_page.dart';
 
 Future<bool> deleteCurrentSongFromPlayer(
   BuildContext context,
@@ -114,6 +116,46 @@ Future<void> removeSongFromDevice(
     () => notifier.removeSong(song.id),
     successMessage: l10n.songCacheRemoved,
   );
+}
+
+/// 打开当前歌曲的在线 MV（「...」菜单 → 歌曲视频）。
+///
+/// 平台与平台曲 id 取自 `source_data.s` / `source_data.i`（kwqq 插件写入）；
+/// 查不到可用 MV 时给出明确提示，不静默无反应。
+Future<void> openSongMv(BuildContext context, WidgetRef ref, Song song) async {
+  final l10n = AppLocalizations.of(context);
+  final sourceData = song.sourceData;
+  final source =
+      (sourceData?['s'] ?? sourceData?['source'] ?? '')
+          .toString()
+          .trim()
+          .toLowerCase();
+  final platformId = (sourceData?['i'] ?? '').toString().trim();
+
+  if (source.isEmpty || platformId.isEmpty) {
+    ResponsiveSnackBar.show(context, message: l10n.songMvUnavailable);
+    return;
+  }
+
+  final track = await ref
+      .read(songMvApiProvider)
+      .findMv(
+        source: source,
+        id: platformId,
+        title: song.title,
+        artist: song.artist ?? '',
+      );
+
+  if (!context.mounted) return;
+  if (track == null) {
+    ResponsiveSnackBar.show(context, message: l10n.songMvUnavailable);
+    return;
+  }
+
+  await Navigator.of(
+    context,
+    rootNavigator: true,
+  ).push(MaterialPageRoute<void>(builder: (_) => SongMvPage(track: track)));
 }
 
 /// 打开「歌曲信息」弹窗：码率/格式/采样率/大小/类型/播放来源/缓存位置。

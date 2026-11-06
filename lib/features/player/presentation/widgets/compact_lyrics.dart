@@ -1,9 +1,10 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/lyric_provider.dart';
+import '../../../settings/presentation/providers/player_lyric_font_size_provider.dart';
 import 'karaoke_line.dart';
 
 /// 唱盘下方的常驻两行歌词窗口（酷狗概念版观感）：
@@ -17,26 +18,29 @@ class CompactLyrics extends ConsumerWidget {
   const CompactLyrics({
     super.key,
     this.activeColor,
-    this.rowHeight = 34,
-    this.fontSize = 15,
+    this.rowHeight,
+    this.fontSize,
   });
 
   /// 已唱字的目标色（封面同色系、更浅）。
   final Color? activeColor;
 
-  /// 每行高度（两行窗口 = 2 倍）。
-  final double rowHeight;
+  /// 每行高度（两行窗口 = 2 倍）；为空时按字号自动取。
+  final double? rowHeight;
 
-  /// 字号。
-  final double fontSize;
+  /// 字号；为空时取设置里的播放页歌词字号（默认 17）。
+  final double? fontSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final state = ref.watch(lyricStateProvider);
+    final settings = ref.watch(playerLyricFontSizeProvider);
+    final size = fontSize ?? settings.compactSize;
+    final rh = rowHeight ?? size * 2.0;
     final idle = theme.colorScheme.onSurface.withValues(alpha: 0.55);
     final active = activeColor ?? theme.colorScheme.primary;
-    final height = rowHeight * 2;
+    final height = rh * 2;
 
     if (!state.hasLyrics) {
       // 无歌词也占位，避免盘面随歌词到位而跳动。
@@ -52,7 +56,7 @@ class CompactLyrics extends ConsumerWidget {
       final isCurrent = i == index;
       rows.add(
         SizedBox(
-          height: rowHeight,
+          height: rh,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Center(
@@ -64,7 +68,7 @@ class CompactLyrics extends ConsumerWidget {
                             line: line,
                             activeColor: active,
                             inactiveColor: idle,
-                            fontSize: fontSize,
+                            fontSize: size,
                             fontWeight: FontWeight.w500,
                             maxLines: 1,
                             height: 1.2,
@@ -72,7 +76,7 @@ class CompactLyrics extends ConsumerWidget {
                           : Text(
                             line.text,
                             style: TextStyle(
-                              fontSize: fontSize,
+                              fontSize: size,
                               fontWeight: FontWeight.w500,
                               color: active,
                               height: 1.2,
@@ -84,7 +88,7 @@ class CompactLyrics extends ConsumerWidget {
                       : Text(
                         line.text,
                         style: TextStyle(
-                          fontSize: fontSize,
+                          fontSize: size,
                           fontWeight: FontWeight.w400,
                           color: idle,
                           height: 1.2,
@@ -108,7 +112,7 @@ class CompactLyrics extends ConsumerWidget {
           minHeight: 0,
           maxHeight: double.infinity,
           child: TweenAnimationBuilder<double>(
-            tween: Tween<double>(end: index * rowHeight),
+            tween: Tween<double>(end: index * rh),
             duration: const Duration(milliseconds: 420),
             curve: Curves.easeOutCubic,
             builder:

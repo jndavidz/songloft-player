@@ -1987,6 +1987,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerEqualizer => 'Equalizer';
 
   @override
+  String get playerSongVideo => 'Song Video';
+
+  @override
+  String get songMvUnavailable => 'No music video available for this song';
+
+  @override
+  String get songMvLoadFailed =>
+      'Failed to load the music video. Please try again later.';
+
+  @override
   String get playerAudioTrack => 'Audio track';
 
   @override
@@ -3863,6 +3873,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDesktopLyricFontSizeTitle => 'Lyrics Font Size';
+
+  @override
+  String get settingsPlayerLyricFontSizeTitle => 'Player Lyrics Font Size';
 
   @override
   String get settingsDesktopLyricFontSizeSmall => 'Small';

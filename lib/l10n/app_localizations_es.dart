@@ -2012,6 +2012,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get playerEqualizer => 'Ecualizador';
 
   @override
+  String get playerSongVideo => 'Vídeo de la canción';
+
+  @override
+  String get songMvUnavailable => 'No hay vídeo disponible para esta canción';
+
+  @override
+  String get songMvLoadFailed =>
+      'No se pudo cargar el vídeo. Inténtalo más tarde.';
+
+  @override
   String get playerAudioTrack => 'Pista de audio';
 
   @override
@@ -3918,6 +3928,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsDesktopLyricFontSizeTitle =>
       'Tamaño de fuente de las letras';
+
+  @override
+  String get settingsPlayerLyricFontSizeTitle =>
+      'Tamaño de letra del reproductor';
 
   @override
   String get settingsDesktopLyricFontSizeSmall => 'Pequeña';

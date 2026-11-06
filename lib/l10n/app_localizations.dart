@@ -3585,6 +3585,24 @@ abstract class AppLocalizations {
   /// **'均衡器'**
   String get playerEqualizer;
 
+  /// No description provided for @playerSongVideo.
+  ///
+  /// In zh, this message translates to:
+  /// **'歌曲视频'**
+  String get playerSongVideo;
+
+  /// No description provided for @songMvUnavailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'该歌曲暂无可用 MV'**
+  String get songMvUnavailable;
+
+  /// No description provided for @songMvLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'MV 加载失败，请稍后重试'**
+  String get songMvLoadFailed;
+
   /// No description provided for @playerAudioTrack.
   ///
   /// In zh, this message translates to:
@@ -6710,6 +6728,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'歌词字号'**
   String get settingsDesktopLyricFontSizeTitle;
+
+  /// No description provided for @settingsPlayerLyricFontSizeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'播放页歌词字号'**
+  String get settingsPlayerLyricFontSizeTitle;
 
   /// No description provided for @settingsDesktopLyricFontSizeSmall.
   ///

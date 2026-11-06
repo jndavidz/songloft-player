@@ -9,6 +9,7 @@ import '../../domain/lyric_parser.dart';
 import '../lyric_adjust_page.dart';
 import '../providers/lyric_provider.dart';
 import '../providers/player_provider.dart';
+import '../../../settings/presentation/providers/player_lyric_font_size_provider.dart';
 import 'karaoke_line.dart';
 import 'player_backdrop.dart';
 
@@ -70,12 +71,16 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
 
   /// 每行统一高度，随是否含翻译/罗马音在 build 中动态计算。
   /// 保持统一便于用 `index * _lineHeight` 精确定位滚动。
-  double _lineHeight = _mainRowHeight;
+  double _lineHeight = 48.0;
 
-  static const double _mainRowHeight = 48.0;
+  /// 主歌词行高（随歌词字号档位缩放）。
+  double _mainRowHeight = 48.0;
   static const double _translationRowHeight = 22.0;
   static const double _romajiRowHeight = 20.0;
   static const Duration _resumeDelay = Duration(seconds: 3);
+
+  /// 播放页歌词字号档位（设置项），影响当前行/非当前行与行高。
+  PlayerLyricFontSize _fontSizeSetting = PlayerLyricFontSize.medium;
 
   @override
   void initState() {
@@ -287,15 +292,22 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
       main = KaraokeLine(
         line: lyric,
         activeColor: primary,
-        inactiveColor: dim,
-        fontSize: 18,
+        // 未唱字明显淡于「已唱」与相邻行的灰，逐字推进才看得出层次
+        // （两色仅色相不同、明度接近时会被误读成整行高亮）。
+        inactiveColor: dim.withValues(alpha: 0.45),
+        fontSize: _fontSizeSetting.fullCurrentSize,
       );
     } else {
       final text = lyric.text;
       main = Text(
         text.isEmpty ? '...' : text,
         style: TextStyle(
-          fontSize: plain ? 16 : (isCurrent ? 18 : 15),
+          fontSize:
+              plain
+                  ? _fontSizeSetting.fullOtherSize + 1
+                  : (isCurrent
+                      ? _fontSizeSetting.fullCurrentSize
+                      : _fontSizeSetting.fullOtherSize),
           fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
           color: plain ? plainColor : (isCurrent ? primary : dim),
         ),
@@ -406,6 +418,10 @@ class _LyricsViewState extends ConsumerState<LyricsView> {
 
     final lyrics = lyricState.lyrics;
     final isPlain = !lyricState.synced;
+
+    // 字号来自设置项：主行高随当前行字号等比缩放，保证滚动定位精确。
+    _fontSizeSetting = ref.watch(playerLyricFontSizeProvider);
+    _mainRowHeight = _fontSizeSetting.fullCurrentSize * 2.4;
 
     // 统一行高：轨道含翻译/罗马音时为所有行预留对应行高，保持等距，滚动定位精确。
     final hasTranslations = lyrics.any((l) => l.translation != null);

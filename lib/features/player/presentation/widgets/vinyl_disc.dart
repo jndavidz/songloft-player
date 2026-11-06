@@ -447,7 +447,33 @@ class _VinylBodyPainter extends CustomPainter {
       );
     }
 
-    // 沟槽：约 2.4px 间距的白色亮线 + 极淡暗线，撑出层次而不是压黑盘面。
+    // 沟槽区整体材质：不是「深色底 + 白线」，而是整圈半透明白的亚克力雾面。
+    // 以 label 外沿为起点铺白，中段最亮、接近盘缘时略收，让沟槽带本身读作白色材质。
+    canvas.drawCircle(
+      center,
+      r,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.0),
+            Colors.white.withValues(alpha: 0.0),
+            Colors.white.withValues(alpha: 0.10),
+            Colors.white.withValues(alpha: 0.16),
+            Colors.white.withValues(alpha: 0.10),
+            Colors.white.withValues(alpha: 0.04),
+          ],
+          stops: [
+            0.0,
+            VinylDisc.labelRatio,
+            VinylDisc.labelRatio + 0.04,
+            VinylDisc.labelRatio + 0.26,
+            0.90,
+            1.0,
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: r)),
+    );
+
+    // 沟槽：在白色雾面材质上用极细的亮线 / 淡暗线撑层次，不再加高对比白线。
     final groovePaint = Paint()..style = PaintingStyle.stroke;
     var i = 0;
     for (var radius = labelR + 3; radius < r - 1.5; radius += 2.4, i++) {
@@ -455,9 +481,9 @@ class _VinylBodyPainter extends CustomPainter {
       groovePaint
         ..color =
             bright
-                ? Colors.white.withValues(alpha: 0.12)
-                : Colors.white.withValues(alpha: 0.045)
-        ..strokeWidth = bright ? 1.0 : 1.2;
+                ? Colors.white.withValues(alpha: 0.085)
+                : Colors.white.withValues(alpha: 0.03)
+        ..strokeWidth = bright ? 0.8 : 1.0;
       canvas.drawCircle(center, radius, groovePaint);
     }
 
@@ -673,37 +699,49 @@ class VinylTonearmPainter extends CustomPainter {
     canvas.translate(pivot.dx, pivot.dy);
     canvas.rotate(radians);
 
-    // 配重块（支点上方）。
-    final weightCenter = Offset(0, -armLength * 0.14);
-    final weightRadius = w * 0.021;
-    canvas.drawCircle(
-      weightCenter + Offset(w * 0.004, w * 0.006),
-      weightRadius,
-      Paint()..color = Colors.black.withValues(alpha: 0.22),
+    // 顶部配重/夹具：参考图里是一块竖向白色圆角方块，带两道卡扣灰线。
+    final clampRect = Rect.fromCenter(
+      center: Offset(0, -armLength * 0.10),
+      width: w * 0.048,
+      height: w * 0.082,
     );
-    canvas.drawCircle(
-      weightCenter,
-      weightRadius,
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        clampRect.translate(w * 0.004, w * 0.005),
+        Radius.circular(w * 0.012),
+      ),
+      Paint()..color = Colors.black.withValues(alpha: 0.18),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(clampRect, Radius.circular(w * 0.012)),
       Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFC9CFD7), Color(0xFF98A1AC)],
-        ).createShader(
-          Rect.fromCircle(center: weightCenter, radius: weightRadius),
-        ),
+          colors: [Colors.white, Color(0xFFF2F5F9), Color(0xFFD2D8E0)],
+        ).createShader(clampRect),
     );
+    for (final dy in const [-0.013, 0.011]) {
+      canvas.drawLine(
+        Offset(-w * 0.017, clampRect.center.dy + w * dy),
+        Offset(w * 0.017, clampRect.center.dy + w * dy),
+        Paint()
+          ..color = const Color(0xFFB4BCC6).withValues(alpha: 0.55)
+          ..strokeWidth = w * 0.0022,
+      );
+    }
 
-    // 灰色边缘阴影（杆体右侧），随后是白色杆体。
+    // 灰色边缘阴影：紧贴杆体右侧的细窄暗边，而不是整根杆的投影。
     canvas.drawLine(
-      Offset(w * 0.012, 0),
-      Offset(w * 0.012, armLength),
+      Offset(w * 0.0050, 0),
+      Offset(w * 0.0050, armLength - w * 0.016),
       Paint()
-        ..color = Colors.black.withValues(alpha: 0.26)
-        ..strokeWidth = w * 0.020
+        ..color = const Color(0xFF9AA1AB).withValues(alpha: 0.55)
+        ..strokeWidth = w * 0.0042
         ..strokeCap = StrokeCap.round,
     );
-    final rodWidth = w * 0.0153;
+    // 白色杆体：很细的直杆，正面近纯白、右侧略暗。
+    final rodWidth = w * 0.0105;
     canvas.drawLine(
       Offset.zero,
       Offset(0, armLength),
@@ -713,51 +751,75 @@ class VinylTonearmPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: [Colors.white, Color(0xFFF3F5F8), Color(0xFFD3D8DF)],
+          colors: [Colors.white, Colors.white, Color(0xFFE2E7EE)],
         ).createShader(Rect.fromLTWH(-rodWidth / 2, 0, rodWidth, armLength)),
     );
 
-    // 唱头：白色小方块 + 灰色阴影。
+    // 唱头：沿杆方向的细长白色圆角块 + 探出的短唱针。
     final headRect = Rect.fromCenter(
-      center: Offset(0, armLength),
-      width: w * 0.050,
-      height: w * 0.036,
+      center: Offset(0, armLength - w * 0.018),
+      width: w * 0.026,
+      height: w * 0.062,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        headRect.translate(w * 0.004, w * 0.006),
-        Radius.circular(w * 0.011),
+        headRect.translate(w * 0.004, w * 0.005),
+        Radius.circular(w * 0.009),
       ),
-      Paint()..color = Colors.black.withValues(alpha: 0.24),
+      Paint()..color = Colors.black.withValues(alpha: 0.20),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.011)),
+      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.009)),
       Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFD6DBE2)],
+          colors: [Colors.white, Color(0xFFF0F3F7), Color(0xFFCFD5DE)],
         ).createShader(headRect),
+    );
+    canvas.drawLine(
+      Offset(0, armLength + w * 0.010),
+      Offset(0, armLength + w * 0.028),
+      Paint()
+        ..color = const Color(0xFF8E959F)
+        ..strokeWidth = w * 0.0025
+        ..strokeCap = StrokeCap.round,
     );
 
     canvas.restore();
 
-    // 支点轴座（不随杆旋转）。
-    final pivotRadius = w * 0.0286;
-    canvas.drawCircle(
-      pivot + Offset(w * 0.005, w * 0.007),
-      pivotRadius,
+    // 支点轴座（不随杆旋转）：竖向白色圆角夹座 + 中心圆柱。
+    final baseRect = Rect.fromCenter(
+      center: pivot,
+      width: w * 0.040,
+      height: w * 0.090,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        baseRect.translate(w * 0.005, w * 0.007),
+        Radius.circular(w * 0.012),
+      ),
       Paint()..color = Colors.black.withValues(alpha: 0.20),
     );
-    canvas.drawCircle(
-      pivot,
-      pivotRadius,
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.012)),
       Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFCFD5DE), Color(0xFF9AA3AE)],
-        ).createShader(Rect.fromCircle(center: pivot, radius: pivotRadius)),
+          colors: [Colors.white, Color(0xFFE9EDF2), Color(0xFFB9C1CB)],
+        ).createShader(baseRect),
+    );
+    final cylinder = pivot + Offset(0, -w * 0.012);
+    canvas.drawCircle(
+      cylinder,
+      w * 0.013,
+      Paint()..color = const Color(0xFFE6EAF0),
+    );
+    canvas.drawCircle(
+      cylinder,
+      w * 0.006,
+      Paint()..color = const Color(0xFFABB3BE),
     );
   }
 

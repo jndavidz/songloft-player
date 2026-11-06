@@ -24,6 +24,7 @@ import '../../../../core/utils/web_cache_clearer.dart' as web_cache;
 import '../../../../shared/utils/responsive_snackbar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../desktop_lyric/desktop_lyric_font_size.dart';
+import '../providers/player_lyric_font_size_provider.dart';
 import '../../../player/domain/mini_player_controls.dart';
 import '../../../player/presentation/providers/mini_player_controls_provider.dart';
 import '../../../playlist/presentation/providers/playlist_provider.dart';
@@ -365,6 +366,12 @@ class _SettingsCategoryContentState
       DesktopLyricFontSize.medium: l10n.settingsDesktopLyricFontSizeMedium,
       DesktopLyricFontSize.large: l10n.settingsDesktopLyricFontSizeLarge,
     };
+    final playerLyricFontSize = ref.watch(playerLyricFontSizeProvider);
+    final playerLyricFontSizeLabels = {
+      PlayerLyricFontSize.small: l10n.settingsDesktopLyricFontSizeSmall,
+      PlayerLyricFontSize.medium: l10n.settingsDesktopLyricFontSizeMedium,
+      PlayerLyricFontSize.large: l10n.settingsDesktopLyricFontSizeLarge,
+    };
     final labels = {
       'original': l10n.settingsQualityOriginal,
       '128': l10n.settingsQualityLow,
@@ -544,6 +551,29 @@ class _SettingsCategoryContentState
               onTap: () => context.push(AppRoutes.shortcuts),
             ),
           ],
+          const Divider(height: 1),
+          // 播放页歌词字号：唱盘下两行与独立歌词页共用（纯本地偏好）。
+          ListTile(
+            leading: const Icon(Icons.text_fields),
+            title: Text(l10n.settingsPlayerLyricFontSizeTitle),
+            trailing: SegmentedButton<PlayerLyricFontSize>(
+              segments:
+                  PlayerLyricFontSize.values
+                      .map(
+                        (size) => ButtonSegment(
+                          value: size,
+                          label: Text(playerLyricFontSizeLabels[size] ?? ''),
+                        ),
+                      )
+                      .toList(),
+              selected: {playerLyricFontSize},
+              onSelectionChanged: (selection) {
+                ref
+                    .read(playerLyricFontSizeProvider.notifier)
+                    .setFontSize(selection.first);
+              },
+            ),
+          ),
           // 悬浮歌词窗口（Windows 桌面窗口 / Android 系统悬浮窗，songloft-org/songloft#318）
           if (PlatformUtils.isWindows || PlatformUtils.isAndroid) ...[
             const Divider(height: 1),
