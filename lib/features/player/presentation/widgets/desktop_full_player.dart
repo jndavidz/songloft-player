@@ -425,20 +425,30 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
             ? UrlHelper.buildCoverUrl(coverUrl, width: 300)
             : null;
 
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        // 发光在最外层（旋转子树之外），避免每帧重算 blur。
-        boxShadow:
-            glowColor != null
-                ? AppEffects.primaryGlow(glowColor)
-                : AppEffects.softGlow(theme.colorScheme.onSurface),
-      ),
-      child: VinylDisc(
-        isPlaying: isPlaying,
-        diameter: diameter,
-        coverUrl: resolvedCover,
-        title: song.title,
+    return SizedBox.square(
+      dimension: diameter,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 光晕与缩小后的盘体同径（盘径 = 0.78×方形），发光仍在旋转子树之外，避免每帧重算 blur。
+          Container(
+            width: diameter * VinylDisc.discScale,
+            height: diameter * VinylDisc.discScale,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow:
+                  glowColor != null
+                      ? AppEffects.primaryGlow(glowColor)
+                      : AppEffects.softGlow(theme.colorScheme.onSurface),
+            ),
+          ),
+          VinylDisc(
+            isPlaying: isPlaying,
+            diameter: diameter,
+            coverUrl: resolvedCover,
+            title: song.title,
+          ),
+        ],
       ),
     );
   }

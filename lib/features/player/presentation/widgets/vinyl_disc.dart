@@ -36,6 +36,12 @@ class VinylDisc extends StatefulWidget {
   /// 盘心（专辑封面）直径 / 盘体直径。
   static const double labelRatio = 0.54;
 
+  /// 盘体直径 / 组件方形边长。
+  ///
+  /// 盘不再铺满整个方形：缩到 0.78 给右侧唱臂留出摆放空间（唱盘与唱臂同坐标，
+  /// 盘缩了臂才有「整根退到盘外」的余量）。
+  static const double discScale = 0.78;
+
   /// 是否应旋转（跟随实际发声设备的播放态）。
   final bool isPlaying;
 
@@ -228,7 +234,7 @@ class _VinylDiscState extends State<VinylDisc> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final d = widget.diameter;
-    final labelSize = d * VinylDisc.labelRatio;
+    final labelSize = d * VinylDisc.discScale * VinylDisc.labelRatio;
 
     return SizedBox.square(
       dimension: d,
@@ -397,7 +403,8 @@ class _VinylBodyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final r = size.shortestSide / 2;
+    // 盘径 = 方形边长 × discScale（与唱臂同一坐标系），封面 / 沟槽 / 星光比例同比不变。
+    final r = size.shortestSide / 2 * VinylDisc.discScale;
     final labelR = r * VinylDisc.labelRatio;
 
     // 近透明白玻璃：几乎不压暗背景，靠极低不透明度白叠出亚克力质感。
@@ -569,7 +576,7 @@ class _RefractionPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final r = size.shortestSide / 2;
+    final r = size.shortestSide / 2 * VinylDisc.discScale;
     final labelR = r * VinylDisc.labelRatio;
 
     // 只让沟槽环带透出封面色彩（盘心由封面本身覆盖，外侧留白边）。
@@ -607,7 +614,7 @@ class _SparklePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final r = size.shortestSide / 2;
+    final r = size.shortestSide / 2 * VinylDisc.discScale;
     final t = progress.value * periodSec;
 
     final core = Paint();
@@ -656,43 +663,53 @@ class _SparklePainter extends CustomPainter {
   bool shouldRepaint(_SparklePainter oldDelegate) => false;
 }
 
-/// 唱臂：极淡半透明杆体 + 极轻边缘阴影，支点在盘体右上、盘圆圆外。
+/// 唱臂：极细半透明杆体 + 极轻边缘阴影，支点在缩小后的盘体右上角、盘圆圆外。
 ///
-/// 几何按参考图定下的量级：支点 → 唱头约 0.845d，两段比例直杆:折角 = 7:2，
-/// 末端折角 30°（向盘内）；杆宽 0.014d、唱头 0.040d×0.052d、唱针 0.026d。
-/// 两个姿态都只靠「绕支点旋转」得到：暂停 0°（长端垂直、唱针在盘缘附近），
-/// 播放 21°（几何反算，唱针落到沟槽环带中线）。
+/// 几何（单位 = 组件方形边长 w，见 [VinylDisc.discScale] 盘径 0.78w）：
+/// - 支点 (0.958w, 0.105w)，离盘心 0.605w ≈ 1.55R（盘缘外侧，臂才有竖直下垂的余量）；
+/// - 细杆：直杆 0.380w + 末端 30° 折角 0.075w，唱针到支点 0.486w；杆宽 0.0062w
+///   （= 盘径的 0.008，远细于上一版的 0.014w）；
+/// - 暂停 0°（长端垂直）：杆身 / 折角 / 唱头 / 唱针**整根都在盘圆之外**，唱针贴盘缘外侧；
+/// - 播放 12.8°（几何反算）：唱针落到封面圆外的沟槽环带中线 0.77R，杆身不进入封面圆。
+///
+/// 两个姿态只由「绕支点旋转」得到，不改杆长与支点。
 @visibleForTesting
 class VinylTonearmPainter extends CustomPainter {
   const VinylTonearmPainter({required this.pose});
 
   final double pose;
 
-  /// 支点（相对盘体方形）：右上角，落在盘圆之外的空角里。
-  static const Offset pivotFraction = Offset(0.960, 0.115);
+  /// 支点（相对方形边长）：右上角，落在盘圆之外的空角里。
+  static const Offset pivotFraction = Offset(0.958, 0.105);
 
-  /// 直杆段长（相对盘体边长）。与 [bendLength] 为 7:2，合计 0.845d。
-  static const double straightLength = 0.657;
+  /// 直杆段长（相对方形边长）。细杆的主要可视长度。
+  static const double straightLength = 0.380;
 
   /// 末端折角段长。
-  static const double bendLength = 0.188;
+  static const double bendLength = 0.075;
 
   /// 折角角度（度，向盘内侧）。
   static const double bendDegrees = 30.0;
 
-  /// 唱头高（沿杆方向）与唱针长（相对盘体边长）。
-  static const double headHeight = 0.052;
-  static const double stylusLength = 0.026;
+  /// 唱头宽 / 高（沿杆方向）与唱针长（相对方形边长）。
+  static const double headWidth = 0.030;
+  static const double headHeight = 0.046;
+  static const double stylusLength = 0.020;
 
-  /// 杆宽（相对盘体边长）。
-  static const double rodWidth = 0.0140;
+  /// 杆宽（相对方形边长）。约等于盘径的 0.008，保持「很细的杆」的观感。
+  static const double rodWidth = 0.0062;
 
   /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
   ///
-  /// 暂停 = 0°：直杆（长端）垂直；播放 = 21°：唱针落点 ≈0.76R（几何反算，
-  /// 不改杆长与支点）。
-  static const double playingDegrees = 21.0;
+  /// 暂停 = 0°：直杆（长端）垂直；播放 = 12.8°：几何反算出的最小内旋角，
+  /// 唱针正好落到 (封面半径, 盘半径) 环带的中线。
+  static const double playingDegrees = 12.8;
   static const double pausedDegrees = 0.0;
+
+  /// 盘体半径（与各盘体绘制层同一坐标系）。
+  @visibleForTesting
+  static double discRadius(Size size) =>
+      size.shortestSide / 2 * VinylDisc.discScale;
 
   /// 折角段末端（局部坐标：原点在支点，+y 沿杆向下）。
   static Offset _bendEnd(double w) {
@@ -710,19 +727,72 @@ class VinylTonearmPainter extends CustomPainter {
     return _bendEnd(w) + Offset(-reach * math.sin(r), reach * math.cos(r));
   }
 
-  /// 当前姿态下唱针落点（供测试断言「播放落沟槽中线、暂停贴盘缘」）。
+  /// 当前姿态下唱针落点（供测试断言「播放落环带中线、暂停贴盘缘」）。
   @visibleForTesting
   static Offset tipPosition(Size size, double pose) {
     final w = size.shortestSide;
     final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
     final local = _localTip(w);
     final radians = _radians(pose);
-    return pivot +
-        Offset(
-          local.dx * math.cos(radians) - local.dy * math.sin(radians),
-          local.dx * math.sin(radians) + local.dy * math.cos(radians),
-        );
+    return pivot + _rotate(local, radians);
   }
+
+  /// 唱臂覆盖区域的采样点（全局坐标）：杆身中线与两侧边缘、折角段、唱头四角、唱针两端。
+  ///
+  /// 供测试断言两条硬约束：暂停态「整根在盘圆之外」、播放态「不进封面圆」。
+  @visibleForTesting
+  static List<Offset> armSamples(Size size, double pose) {
+    final w = size.shortestSide;
+    final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
+    final radians = _radians(pose);
+    const bendRad = bendDegrees * math.pi / 180;
+    final halfRod = w * rodWidth / 2;
+    final normal = Offset(math.cos(bendRad), math.sin(bendRad));
+    final bendDirection = Offset(-math.sin(bendRad), math.cos(bendRad));
+    final bendEnd = _bendEnd(w);
+
+    Offset toGlobal(Offset local) => pivot + _rotate(local, radians);
+
+    final points = <Offset>[];
+    // 杆身：中线 + 两侧边缘（整根杆是描边路径，边缘即为最外侧投影）。
+    const rodSteps = 24;
+    for (var i = 0; i <= rodSteps; i++) {
+      final y = w * straightLength * i / rodSteps;
+      points
+        ..add(toGlobal(Offset(0, y)))
+        ..add(toGlobal(Offset(halfRod, y)))
+        ..add(toGlobal(Offset(-halfRod, y)));
+    }
+    // 折角段：中线 + 两侧边缘。
+    for (var i = 0; i <= 8; i++) {
+      final base = Offset.lerp(Offset(0, w * straightLength), bendEnd, i / 8)!;
+      points
+        ..add(toGlobal(base))
+        ..add(toGlobal(base + normal * halfRod))
+        ..add(toGlobal(base - normal * halfRod));
+    }
+    // 唱头四角 + 唱针两端。
+    for (final sh in const [-0.5, 0.5]) {
+      for (final sw in const [-0.5, 0.5]) {
+        points.add(
+          toGlobal(
+            bendEnd +
+                bendDirection * (sh * w * headHeight) +
+                normal * (sw * w * headWidth),
+          ),
+        );
+      }
+    }
+    points
+      ..add(toGlobal(bendEnd + bendDirection * (w * headHeight / 2)))
+      ..add(toGlobal(_localTip(w)));
+    return points;
+  }
+
+  static Offset _rotate(Offset local, double radians) => Offset(
+    local.dx * math.cos(radians) - local.dy * math.sin(radians),
+    local.dx * math.sin(radians) + local.dy * math.cos(radians),
+  );
 
   static double _radians(double pose) =>
       (pausedDegrees + pose * (playingDegrees - pausedDegrees)) * math.pi / 180;
@@ -736,20 +806,20 @@ class VinylTonearmPainter extends CustomPainter {
     // —— 轴座（静态层，不随杆旋转）：竖向淡白圆角夹座 + 两道卡扣细线 + 中心圆柱 ——
     final baseRect = Rect.fromCenter(
       center: pivot,
-      width: w * 0.070,
-      height: w * 0.155,
+      width: w * 0.062,
+      height: w * 0.138,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        baseRect.translate(w * 0.004, w * 0.005),
-        Radius.circular(w * 0.016),
+        baseRect.translate(w * 0.003, w * 0.004),
+        Radius.circular(w * 0.0145),
       ),
       Paint()
         ..color = const Color(0xFF101820).withValues(alpha: 0.10)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.010),
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.016)),
+      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.0145)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
@@ -764,8 +834,8 @@ class VinylTonearmPainter extends CustomPainter {
     );
     for (final dy in const [-0.030, 0.026]) {
       canvas.drawLine(
-        Offset(pivot.dx - w * 0.024, pivot.dy + w * dy),
-        Offset(pivot.dx + w * 0.024, pivot.dy + w * dy),
+        Offset(pivot.dx - w * 0.021, pivot.dy + w * dy),
+        Offset(pivot.dx + w * 0.021, pivot.dy + w * dy),
         Paint()
           ..color = const Color(0xFF98A2AE).withValues(alpha: 0.18)
           ..strokeWidth = w * 0.0020,
@@ -773,11 +843,11 @@ class VinylTonearmPainter extends CustomPainter {
     }
     canvas.drawCircle(
       pivot + Offset(0, w * 0.004),
-      w * 0.014,
+      w * 0.0125,
       Paint()..color = Colors.white.withValues(alpha: 0.30),
     );
 
-    // —— 杆体（随姿态旋转）：直杆 + 末端 10° 折角，末端挂唱头与短唱针 ——
+    // —— 杆体（随姿态旋转）：细直杆 + 末端 30° 折角，末端挂唱头与短唱针 ——
     canvas.save();
     canvas.translate(pivot.dx, pivot.dy);
     canvas.rotate(radians);
@@ -792,12 +862,12 @@ class VinylTonearmPainter extends CustomPainter {
 
     // 投影：极轻的一点落感，不做高反差投影。
     canvas.drawPath(
-      rodPath.shift(Offset(w * 0.004, w * 0.006)),
+      rodPath.shift(Offset(w * 0.0025, w * 0.004)),
       Paint()
         ..color = const Color(0xFF101820).withValues(alpha: 0.10)
         ..strokeWidth = w * rodWidth
         ..strokeCap = StrokeCap.round
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.005),
     );
     // 杆体：低对比半透明白（左亮右淡），不用纯白 → 浅灰的高反差渐变。
     canvas.drawPath(
@@ -816,9 +886,9 @@ class VinylTonearmPainter extends CustomPainter {
           stops: const [0.0, 0.5, 1.0],
         ).createShader(
           Rect.fromLTRB(
-            -w * 0.050,
+            -w * rodWidth / 2,
             0,
-            w * 0.008,
+            w * rodWidth / 2,
             w * (straightLength + bendLength),
           ),
         ),
@@ -830,20 +900,20 @@ class VinylTonearmPainter extends CustomPainter {
     canvas.rotate(bendRad);
     final headRect = Rect.fromCenter(
       center: Offset.zero,
-      width: w * 0.040,
+      width: w * headWidth,
       height: w * headHeight,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        headRect.translate(w * 0.004, w * 0.005),
-        Radius.circular(w * 0.010),
+        headRect.translate(w * 0.0025, w * 0.004),
+        Radius.circular(w * 0.008),
       ),
       Paint()
         ..color = const Color(0xFF101820).withValues(alpha: 0.10)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.006),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.010)),
+      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.008)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
@@ -861,7 +931,7 @@ class VinylTonearmPainter extends CustomPainter {
       Offset(0, w * (headHeight / 2 + stylusLength)),
       Paint()
         ..color = const Color(0xFF8E959F).withValues(alpha: 0.40)
-        ..strokeWidth = w * 0.0024
+        ..strokeWidth = w * 0.0020
         ..strokeCap = StrokeCap.round,
     );
     canvas.restore();

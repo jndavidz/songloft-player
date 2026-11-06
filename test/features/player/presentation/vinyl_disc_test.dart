@@ -93,32 +93,58 @@ void main() {
     expect(_armPose(tester), closeTo(0.0, 1e-6));
   });
 
-  test('唱臂落点半径：播放落沟槽环带中线，暂停长端垂直（落点略在盘缘外侧）', () {
+  test('暂停态：整根唱臂（杆身 + 折角段 + 唱头 + 唱针）都在盘圆之外', () {
     const size = Size(220, 220);
     const center = Offset(110, 110);
-    const radius = 110.0;
+    final rDisc = VinylTonearmPainter.discRadius(size);
 
-    final playing =
-        (VinylTonearmPainter.tipPosition(size, 1) - center).distance / radius;
-    final paused =
-        (VinylTonearmPainter.tipPosition(size, 0) - center).distance / radius;
+    // 逐点断言「臂身与盘圆不相交」：整根臂的投影（含描边两侧）都在盘圆外。
+    for (final point in VinylTonearmPainter.armSamples(size, 0)) {
+      expect((point - center).distance, greaterThan(rDisc));
+    }
 
-    // 沟槽环带 label(0.54R) → 盘缘(1.0R)，中线约 0.77R。
-    expect(playing, inInclusiveRange(0.70, 0.82));
-    // 暂停姿态以「直杆（长端）垂直」为先：0.845d 的臂长在 0° 时唱针落到 1.18R，
-    // 比「贴盘缘 0.99R」外移约 0.19R（≈0.09d）——支点/杆长不变时二者无法同时满足。
-    expect(paused, inInclusiveRange(1.10, 1.24));
+    // 唱针贴边但不压盘：尖端落在盘缘外侧一点点。
+    final tip = VinylTonearmPainter.tipPosition(size, 0);
+    expect((tip - center).distance / rDisc, inInclusiveRange(1.0, 1.10));
 
-    // 长端垂直 = 暂停角 0°；两段配比 7:2；折角 30°。
+    // 长端垂直（暂停角 0°）、末端折角 30°。
     expect(VinylTonearmPainter.pausedDegrees, 0.0);
-    expect(
-      VinylTonearmPainter.straightLength / VinylTonearmPainter.bendLength,
-      closeTo(3.5, 0.02),
-    );
     expect(VinylTonearmPainter.bendDegrees, 30.0);
 
-    // 落点都在盘心右侧（不是盘心里侧）。
-    expect(VinylTonearmPainter.tipPosition(size, 1).dx, greaterThan(center.dx));
-    expect(VinylTonearmPainter.tipPosition(size, 0).dx, greaterThan(center.dx));
+    // 支点离盘缘留出足够余量（竖直下垂才可能整根落在盘圆外）。
+    final pivot = Offset(
+      220 * VinylTonearmPainter.pivotFraction.dx,
+      220 * VinylTonearmPainter.pivotFraction.dy,
+    );
+    expect((pivot - center).distance - rDisc, greaterThan(0.15 * 220));
+  });
+
+  test('播放态：唱针落在 (封面半径, 盘半径) 环带内，杆身不进封面圆', () {
+    const size = Size(220, 220);
+    const center = Offset(110, 110);
+    final rDisc = VinylTonearmPainter.discRadius(size);
+    final rLabel = rDisc * VinylDisc.labelRatio;
+
+    final tipR = (VinylTonearmPainter.tipPosition(size, 1) - center).distance;
+    // 环带（0.54R → 1.00R）中线 = 0.77R。
+    expect(tipR / rDisc, closeTo(0.77, 0.03));
+    expect(tipR, greaterThan(rLabel));
+    expect(tipR, lessThan(rDisc));
+
+    for (final point in VinylTonearmPainter.armSamples(size, 1)) {
+      expect((point - center).distance, greaterThan(rLabel));
+    }
+    expect(VinylTonearmPainter.playingDegrees, closeTo(12.8, 0.2));
+  });
+
+  test('唱臂是细杆：杆宽不超过盘径的 0.009，且仍可见', () {
+    expect(
+      VinylTonearmPainter.rodWidth,
+      lessThanOrEqualTo(0.009 * VinylDisc.discScale),
+    );
+    expect(
+      VinylTonearmPainter.rodWidth,
+      greaterThanOrEqualTo(0.006 * VinylDisc.discScale),
+    );
   });
 }
