@@ -93,7 +93,7 @@ void main() {
     expect(_armPose(tester), closeTo(0.0, 1e-6));
   });
 
-  test('唱臂落点半径：播放落沟槽环带中线，暂停贴盘缘', () {
+  test('唱臂落点半径：播放落沟槽环带中线，暂停长端垂直（落点略在盘缘外侧）', () {
     const size = Size(220, 220);
     const center = Offset(110, 110);
     const radius = 110.0;
@@ -105,8 +105,17 @@ void main() {
 
     // 沟槽环带 label(0.54R) → 盘缘(1.0R)，中线约 0.77R。
     expect(playing, inInclusiveRange(0.70, 0.82));
-    // 暂停时几乎贴住盘体边缘。
-    expect(paused, inInclusiveRange(0.94, 1.02));
+    // 暂停姿态以「直杆（长端）垂直」为先：0.845d 的臂长在 0° 时唱针落到 1.18R，
+    // 比「贴盘缘 0.99R」外移约 0.19R（≈0.09d）——支点/杆长不变时二者无法同时满足。
+    expect(paused, inInclusiveRange(1.10, 1.24));
+
+    // 长端垂直 = 暂停角 0°；两段配比 7:2；折角 30°。
+    expect(VinylTonearmPainter.pausedDegrees, 0.0);
+    expect(
+      VinylTonearmPainter.straightLength / VinylTonearmPainter.bendLength,
+      closeTo(3.5, 0.02),
+    );
+    expect(VinylTonearmPainter.bendDegrees, 30.0);
 
     // 落点都在盘心右侧（不是盘心里侧）。
     expect(VinylTonearmPainter.tipPosition(size, 1).dx, greaterThan(center.dx));

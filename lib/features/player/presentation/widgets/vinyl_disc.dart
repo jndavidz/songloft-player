@@ -658,9 +658,10 @@ class _SparklePainter extends CustomPainter {
 
 /// 唱臂：极淡半透明杆体 + 极轻边缘阴影，支点在盘体右上、盘圆圆外。
 ///
-/// 尺寸按参考图（酷狗概念版实拍）核对过：杆长约 0.87×盘面直径（近似纵贯整个盘面）、
-/// 杆宽约 0.014×直径、末端带约 10° 折角、唱头约占杆长 6%、唱针极短。
-/// pose 0 = 抬起（暂停，落点贴盘缘 ≈0.99R），1 = 落针（播放，落点沟槽环带中线 ≈0.78R）。
+/// 几何按参考图定下的量级：支点 → 唱头约 0.845d，两段比例直杆:折角 = 7:2，
+/// 末端折角 30°（向盘内）；杆宽 0.014d、唱头 0.040d×0.052d、唱针 0.026d。
+/// 两个姿态都只靠「绕支点旋转」得到：暂停 0°（长端垂直、唱针在盘缘附近），
+/// 播放 21°（几何反算，唱针落到沟槽环带中线）。
 @visibleForTesting
 class VinylTonearmPainter extends CustomPainter {
   const VinylTonearmPainter({required this.pose});
@@ -670,14 +671,14 @@ class VinylTonearmPainter extends CustomPainter {
   /// 支点（相对盘体方形）：右上角，落在盘圆之外的空角里。
   static const Offset pivotFraction = Offset(0.960, 0.115);
 
-  /// 直杆段长（相对盘体边长，从支点向下）。
-  static const double straightLength = 0.615;
+  /// 直杆段长（相对盘体边长）。与 [bendLength] 为 7:2，合计 0.845d。
+  static const double straightLength = 0.657;
 
-  /// 末端折角段长（参考图杆身近竖直、最下端向盘内折一点点）。
-  static const double bendLength = 0.230;
+  /// 末端折角段长。
+  static const double bendLength = 0.188;
 
   /// 折角角度（度，向盘内侧）。
-  static const double bendDegrees = 10.0;
+  static const double bendDegrees = 30.0;
 
   /// 唱头高（沿杆方向）与唱针长（相对盘体边长）。
   static const double headHeight = 0.052;
@@ -687,8 +688,11 @@ class VinylTonearmPainter extends CustomPainter {
   static const double rodWidth = 0.0140;
 
   /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
-  static const double playingDegrees = 27.0;
-  static const double pausedDegrees = 15.0;
+  ///
+  /// 暂停 = 0°：直杆（长端）垂直；播放 = 21°：唱针落点 ≈0.76R（几何反算，
+  /// 不改杆长与支点）。
+  static const double playingDegrees = 21.0;
+  static const double pausedDegrees = 0.0;
 
   /// 折角段末端（局部坐标：原点在支点，+y 沿杆向下）。
   static Offset _bendEnd(double w) {
