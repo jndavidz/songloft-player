@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-/// 黑胶唱片视觉（酷狗概念版观感）：近透明白玻璃盘体 + 封面折射 + 星光 + 白色唱臂。
+/// 黑胶唱片视觉（酷狗概念版观感）：近透明白玻璃盘体 + 封面折射 + 星光 + 极淡唱臂。
 ///
 /// 分层原则（性能红线）：
 /// - 盘体 / 沟槽 / 高光 / 星光 / 唱臂都是**静态**层，各自 `RepaintBoundary` 缓存，不进旋转子树；
@@ -26,7 +26,7 @@ class VinylDisc extends StatefulWidget {
     this.coverUrl,
     this.title = '',
     this.coverDecodeWidth = 512,
-    this.period = const Duration(seconds: 7),
+    this.period = const Duration(seconds: 20),
     this.showTonearm = true,
     this.tintColor,
     this.refractionUrl,
@@ -51,7 +51,7 @@ class VinylDisc extends StatefulWidget {
   /// 封面解码宽度（按实际显示尺寸传，避免大图解码）。
   final int coverDecodeWidth;
 
-  /// 转一圈的时长。
+  /// 转**一整圈**（360°）的时长。角度按累计值连续推进，暂停/恢复不重置。
   final Duration period;
 
   /// 是否绘制唱臂。
@@ -656,33 +656,68 @@ class _SparklePainter extends CustomPainter {
   bool shouldRepaint(_SparklePainter oldDelegate) => false;
 }
 
-/// 唱臂：白色杆体 + 灰色边缘阴影，支点在右上。
-/// pose 0 = 抬起（暂停，落点贴盘缘 ≈0.98R），1 = 落针（播放，落点沟槽环带中线 ≈0.76R）。
+/// 唱臂：极淡半透明杆体 + 极轻边缘阴影，支点在盘体右上、盘圆圆外。
+///
+/// 尺寸按参考图（酷狗概念版实拍）核对过：杆长约 0.87×盘面直径（近似纵贯整个盘面）、
+/// 杆宽约 0.014×直径、末端带约 10° 折角、唱头约占杆长 6%、唱针极短。
+/// pose 0 = 抬起（暂停，落点贴盘缘 ≈0.99R），1 = 落针（播放，落点沟槽环带中线 ≈0.78R）。
 @visibleForTesting
 class VinylTonearmPainter extends CustomPainter {
   const VinylTonearmPainter({required this.pose});
 
   final double pose;
 
-  /// 支点（相对盘体方形，右上角外侧）。
-  static const Offset pivotFraction = Offset(0.962, 0.115);
+  /// 支点（相对盘体方形）：右上角，落在盘圆之外的空角里。
+  static const Offset pivotFraction = Offset(0.960, 0.115);
 
-  /// 臂长（相对盘体直径）。
-  static const double armLengthFraction = 0.3053;
+  /// 直杆段长（相对盘体边长，从支点向下）。
+  static const double straightLength = 0.615;
+
+  /// 末端折角段长（参考图杆身近竖直、最下端向盘内折一点点）。
+  static const double bendLength = 0.230;
+
+  /// 折角角度（度，向盘内侧）。
+  static const double bendDegrees = 10.0;
+
+  /// 唱头高（沿杆方向）与唱针长（相对盘体边长）。
+  static const double headHeight = 0.052;
+  static const double stylusLength = 0.026;
+
+  /// 杆宽（相对盘体边长）。
+  static const double rodWidth = 0.0140;
 
   /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
-  static const double playingDegrees = 18.0;
-  static const double pausedDegrees = -4.0;
+  static const double playingDegrees = 27.0;
+  static const double pausedDegrees = 15.0;
+
+  /// 折角段末端（局部坐标：原点在支点，+y 沿杆向下）。
+  static Offset _bendEnd(double w) {
+    const r = bendDegrees * math.pi / 180;
+    return Offset(
+      -w * bendLength * math.sin(r),
+      w * (straightLength + bendLength * math.cos(r)),
+    );
+  }
+
+  /// 唱针落点（局部坐标）。
+  static Offset _localTip(double w) {
+    const r = bendDegrees * math.pi / 180;
+    final reach = w * (headHeight / 2 + stylusLength);
+    return _bendEnd(w) + Offset(-reach * math.sin(r), reach * math.cos(r));
+  }
 
   /// 当前姿态下唱针落点（供测试断言「播放落沟槽中线、暂停贴盘缘」）。
   @visibleForTesting
   static Offset tipPosition(Size size, double pose) {
     final w = size.shortestSide;
     final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
-    final armLength = w * armLengthFraction;
+    final local = _localTip(w);
     final radians = _radians(pose);
     return pivot +
-        Offset(-armLength * math.sin(radians), armLength * math.cos(radians));
+        Offset(
+          local.dx * math.cos(radians) - local.dy * math.sin(radians),
+          local.dx * math.sin(radians) + local.dy * math.cos(radians),
+        );
   }
 
   static double _radians(double pose) =>
@@ -692,135 +727,141 @@ class VinylTonearmPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.shortestSide;
     final pivot = Offset(w * pivotFraction.dx, w * pivotFraction.dy);
-    final armLength = w * armLengthFraction;
     final radians = _radians(pose);
 
+    // —— 轴座（静态层，不随杆旋转）：竖向淡白圆角夹座 + 两道卡扣细线 + 中心圆柱 ——
+    final baseRect = Rect.fromCenter(
+      center: pivot,
+      width: w * 0.070,
+      height: w * 0.155,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        baseRect.translate(w * 0.004, w * 0.005),
+        Radius.circular(w * 0.016),
+      ),
+      Paint()
+        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.010),
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.016)),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.60),
+            const Color(0xFFEDF1F6).withValues(alpha: 0.44),
+            Colors.white.withValues(alpha: 0.24),
+          ],
+          stops: const [0.0, 0.58, 1.0],
+        ).createShader(baseRect),
+    );
+    for (final dy in const [-0.030, 0.026]) {
+      canvas.drawLine(
+        Offset(pivot.dx - w * 0.024, pivot.dy + w * dy),
+        Offset(pivot.dx + w * 0.024, pivot.dy + w * dy),
+        Paint()
+          ..color = const Color(0xFF98A2AE).withValues(alpha: 0.18)
+          ..strokeWidth = w * 0.0020,
+      );
+    }
+    canvas.drawCircle(
+      pivot + Offset(0, w * 0.004),
+      w * 0.014,
+      Paint()..color = Colors.white.withValues(alpha: 0.30),
+    );
+
+    // —— 杆体（随姿态旋转）：直杆 + 末端 10° 折角，末端挂唱头与短唱针 ——
     canvas.save();
     canvas.translate(pivot.dx, pivot.dy);
     canvas.rotate(radians);
 
-    // 顶部配重/夹具：参考图里是一块竖向白色圆角方块，带两道卡扣灰线。
-    final clampRect = Rect.fromCenter(
-      center: Offset(0, -armLength * 0.10),
-      width: w * 0.048,
-      height: w * 0.082,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        clampRect.translate(w * 0.004, w * 0.005),
-        Radius.circular(w * 0.012),
-      ),
-      Paint()..color = Colors.black.withValues(alpha: 0.18),
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(clampRect, Radius.circular(w * 0.012)),
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFF2F5F9), Color(0xFFD2D8E0)],
-        ).createShader(clampRect),
-    );
-    for (final dy in const [-0.013, 0.011]) {
-      canvas.drawLine(
-        Offset(-w * 0.017, clampRect.center.dy + w * dy),
-        Offset(w * 0.017, clampRect.center.dy + w * dy),
-        Paint()
-          ..color = const Color(0xFFB4BCC6).withValues(alpha: 0.55)
-          ..strokeWidth = w * 0.0022,
-      );
-    }
+    const bendRad = bendDegrees * math.pi / 180;
+    final bendEnd = _bendEnd(w);
+    final rodPath =
+        Path()
+          ..moveTo(0, -w * 0.012)
+          ..lineTo(0, w * straightLength)
+          ..lineTo(bendEnd.dx, bendEnd.dy);
 
-    // 灰色边缘阴影：紧贴杆体右侧的细窄暗边，而不是整根杆的投影。
-    canvas.drawLine(
-      Offset(w * 0.0050, 0),
-      Offset(w * 0.0050, armLength - w * 0.016),
+    // 投影：极轻的一点落感，不做高反差投影。
+    canvas.drawPath(
+      rodPath.shift(Offset(w * 0.004, w * 0.006)),
       Paint()
-        ..color = const Color(0xFF9AA1AB).withValues(alpha: 0.55)
-        ..strokeWidth = w * 0.0042
-        ..strokeCap = StrokeCap.round,
-    );
-    // 白色杆体：很细的直杆，正面近纯白、右侧略暗。
-    final rodWidth = w * 0.0105;
-    canvas.drawLine(
-      Offset.zero,
-      Offset(0, armLength),
-      Paint()
-        ..strokeWidth = rodWidth
+        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
+        ..strokeWidth = w * rodWidth
         ..strokeCap = StrokeCap.round
-        ..shader = const LinearGradient(
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
+    );
+    // 杆体：低对比半透明白（左亮右淡），不用纯白 → 浅灰的高反差渐变。
+    canvas.drawPath(
+      rodPath,
+      Paint()
+        ..strokeWidth = w * rodWidth
+        ..strokeCap = StrokeCap.round
+        ..shader = LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: [Colors.white, Colors.white, Color(0xFFE2E7EE)],
-        ).createShader(Rect.fromLTWH(-rodWidth / 2, 0, rodWidth, armLength)),
+          colors: [
+            Colors.white.withValues(alpha: 0.66),
+            Colors.white.withValues(alpha: 0.50),
+            const Color(0xFFE6EBF2).withValues(alpha: 0.32),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ).createShader(
+          Rect.fromLTRB(
+            -w * 0.050,
+            0,
+            w * 0.008,
+            w * (straightLength + bendLength),
+          ),
+        ),
     );
 
-    // 唱头：沿杆方向的细长白色圆角块 + 探出的短唱针。
+    // 唱头：沿折角方向的短圆角块 + 探出的极短唱针。
+    canvas.save();
+    canvas.translate(bendEnd.dx, bendEnd.dy);
+    canvas.rotate(bendRad);
     final headRect = Rect.fromCenter(
-      center: Offset(0, armLength - w * 0.018),
-      width: w * 0.026,
-      height: w * 0.062,
+      center: Offset.zero,
+      width: w * 0.040,
+      height: w * headHeight,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         headRect.translate(w * 0.004, w * 0.005),
-        Radius.circular(w * 0.009),
+        Radius.circular(w * 0.010),
       ),
-      Paint()..color = Colors.black.withValues(alpha: 0.20),
+      Paint()
+        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.009)),
+      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.010)),
       Paint()
-        ..shader = const LinearGradient(
+        ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFF0F3F7), Color(0xFFCFD5DE)],
+          colors: [
+            Colors.white.withValues(alpha: 0.62),
+            Colors.white.withValues(alpha: 0.42),
+            const Color(0xFFD8DEE7).withValues(alpha: 0.26),
+          ],
+          stops: const [0.0, 0.6, 1.0],
         ).createShader(headRect),
     );
     canvas.drawLine(
-      Offset(0, armLength + w * 0.010),
-      Offset(0, armLength + w * 0.028),
+      Offset(0, w * headHeight / 2),
+      Offset(0, w * (headHeight / 2 + stylusLength)),
       Paint()
-        ..color = const Color(0xFF8E959F)
-        ..strokeWidth = w * 0.0025
+        ..color = const Color(0xFF8E959F).withValues(alpha: 0.40)
+        ..strokeWidth = w * 0.0024
         ..strokeCap = StrokeCap.round,
     );
-
     canvas.restore();
-
-    // 支点轴座（不随杆旋转）：竖向白色圆角夹座 + 中心圆柱。
-    final baseRect = Rect.fromCenter(
-      center: pivot,
-      width: w * 0.040,
-      height: w * 0.090,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        baseRect.translate(w * 0.005, w * 0.007),
-        Radius.circular(w * 0.012),
-      ),
-      Paint()..color = Colors.black.withValues(alpha: 0.20),
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.012)),
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.white, Color(0xFFE9EDF2), Color(0xFFB9C1CB)],
-        ).createShader(baseRect),
-    );
-    final cylinder = pivot + Offset(0, -w * 0.012);
-    canvas.drawCircle(
-      cylinder,
-      w * 0.013,
-      Paint()..color = const Color(0xFFE6EAF0),
-    );
-    canvas.drawCircle(
-      cylinder,
-      w * 0.006,
-      Paint()..color = const Color(0xFFABB3BE),
-    );
+    canvas.restore();
   }
 
   @override
