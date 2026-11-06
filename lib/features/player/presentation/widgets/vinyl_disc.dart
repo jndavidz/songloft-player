@@ -663,14 +663,17 @@ class _SparklePainter extends CustomPainter {
   bool shouldRepaint(_SparklePainter oldDelegate) => false;
 }
 
-/// 唱臂：极细半透明杆体 + 极轻边缘阴影，支点在缩小后的盘体右上角、盘圆圆外。
+/// 唱臂：极细半透明杆体 + 极轻边缘阴影，支点在盘圆外侧、且垂直位置不高于盘顶。
 ///
 /// 几何（单位 = 组件方形边长 w，见 [VinylDisc.discScale] 盘径 0.78w）：
-/// - 支点 (0.958w, 0.105w)，离盘心 0.605w ≈ 1.55R（盘缘外侧，臂才有竖直下垂的余量）；
-/// - 细杆：直杆 0.380w + 末端 30° 折角 0.075w，唱针到支点 0.486w；杆宽 0.0062w
-///   （= 盘径的 0.008，远细于上一版的 0.014w）；
-/// - 暂停 0°（长端垂直）：杆身 / 折角 / 唱头 / 唱针**整根都在盘圆之外**，唱针贴盘缘外侧；
-/// - 播放 12.8°（几何反算）：唱针落到封面圆外的沟槽环带中线 0.77R，杆身不进入封面圆。
+/// - 盘顶 y = 0.110w、盘缘 x = 0.890w（盘心 (0.5w, 0.5w)、R = 0.390w）；
+/// - 支点 (0.954w, 0.130w)：水平在盘圆外（离盘心 0.586w ≈ 1.50R），垂直在盘顶**以下**
+///   0.020w —— 不允许再架到方形上部的空角里；
+/// - 细杆：直杆 0.390w + 末端 30° 折角 0.070w，唱针到支点 0.491w；杆宽 0.0062w
+///   （= 盘径的 0.008）；
+/// - 暂停 0°（长端垂直）：杆身 / 折角 / 唱头 / 唱针**整根都在盘圆之外**（最近点 1.039R，
+///   间隙 0.015w），唱针尖端 1.063R 贴盘缘外侧；
+/// - 播放 13.4°（几何反算）：唱针落到封面圆外的沟槽环带中线 0.770R，杆身不进入封面圆。
 ///
 /// 两个姿态只由「绕支点旋转」得到，不改杆长与支点。
 @visibleForTesting
@@ -679,14 +682,17 @@ class VinylTonearmPainter extends CustomPainter {
 
   final double pose;
 
-  /// 支点（相对方形边长）：右上角，落在盘圆之外的空角里。
-  static const Offset pivotFraction = Offset(0.958, 0.105);
+  /// 支点（相对方形边长）：盘圆右侧、垂直位置在盘顶之下 0.020w。
+  ///
+  /// 盘顶 y = (1 - [VinylDisc.discScale]) / 2 = 0.110；支点 y 必须 ≥ 该值，
+  /// 否则又会被架到方形上部的空角里（用户明确否掉）。
+  static const Offset pivotFraction = Offset(0.954, 0.130);
 
   /// 直杆段长（相对方形边长）。细杆的主要可视长度。
-  static const double straightLength = 0.380;
+  static const double straightLength = 0.390;
 
   /// 末端折角段长。
-  static const double bendLength = 0.075;
+  static const double bendLength = 0.070;
 
   /// 折角角度（度，向盘内侧）。
   static const double bendDegrees = 30.0;
@@ -701,9 +707,9 @@ class VinylTonearmPainter extends CustomPainter {
 
   /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
   ///
-  /// 暂停 = 0°：直杆（长端）垂直；播放 = 12.8°：几何反算出的最小内旋角，
+  /// 暂停 = 0°：直杆（长端）垂直；播放 = 13.4°：几何反算出的最小内旋角，
   /// 唱针正好落到 (封面半径, 盘半径) 环带的中线。
-  static const double playingDegrees = 12.8;
+  static const double playingDegrees = 13.4;
   static const double pausedDegrees = 0.0;
 
   /// 盘体半径（与各盘体绘制层同一坐标系）。
@@ -804,22 +810,23 @@ class VinylTonearmPainter extends CustomPainter {
     final radians = _radians(pose);
 
     // —— 轴座（静态层，不随杆旋转）：竖向淡白圆角夹座 + 两道卡扣细线 + 中心圆柱 ——
+    // 与细杆同比例缩小；轴心即支点，座体上下各 0.060w（不把支点视觉上「抬高」）。
     final baseRect = Rect.fromCenter(
       center: pivot,
-      width: w * 0.062,
-      height: w * 0.138,
+      width: w * 0.058,
+      height: w * 0.120,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         baseRect.translate(w * 0.003, w * 0.004),
-        Radius.circular(w * 0.0145),
+        Radius.circular(w * 0.0135),
       ),
       Paint()
         ..color = const Color(0xFF101820).withValues(alpha: 0.10)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.0145)),
+      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.0135)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
@@ -832,10 +839,10 @@ class VinylTonearmPainter extends CustomPainter {
           stops: const [0.0, 0.58, 1.0],
         ).createShader(baseRect),
     );
-    for (final dy in const [-0.030, 0.026]) {
+    for (final dy in const [-0.026, 0.023]) {
       canvas.drawLine(
-        Offset(pivot.dx - w * 0.021, pivot.dy + w * dy),
-        Offset(pivot.dx + w * 0.021, pivot.dy + w * dy),
+        Offset(pivot.dx - w * 0.018, pivot.dy + w * dy),
+        Offset(pivot.dx + w * 0.018, pivot.dy + w * dy),
         Paint()
           ..color = const Color(0xFF98A2AE).withValues(alpha: 0.18)
           ..strokeWidth = w * 0.0020,
@@ -843,7 +850,7 @@ class VinylTonearmPainter extends CustomPainter {
     }
     canvas.drawCircle(
       pivot + Offset(0, w * 0.004),
-      w * 0.0125,
+      w * 0.0110,
       Paint()..color = Colors.white.withValues(alpha: 0.30),
     );
 

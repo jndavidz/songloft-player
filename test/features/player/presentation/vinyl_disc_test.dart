@@ -117,6 +117,10 @@ void main() {
       220 * VinylTonearmPainter.pivotFraction.dy,
     );
     expect((pivot - center).distance - rDisc, greaterThan(0.15 * 220));
+
+    // 支点垂直位置不得高于盘顶（用户明确否掉「架在方形上部空角里」）。
+    expect(pivot.dy, greaterThanOrEqualTo(center.dy - rDisc));
+    expect(pivot.dx, greaterThan(center.dx + rDisc));
   });
 
   test('播放态：唱针落在 (封面半径, 盘半径) 环带内，杆身不进封面圆', () {
@@ -134,7 +138,7 @@ void main() {
     for (final point in VinylTonearmPainter.armSamples(size, 1)) {
       expect((point - center).distance, greaterThan(rLabel));
     }
-    expect(VinylTonearmPainter.playingDegrees, closeTo(12.8, 0.2));
+    expect(VinylTonearmPainter.playingDegrees, closeTo(13.4, 0.2));
   });
 
   test('唱臂是细杆：杆宽不超过盘径的 0.009，且仍可见', () {
