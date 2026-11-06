@@ -165,9 +165,17 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
     );
   }
 
-  /// 歌名 / 歌手 / 元数据（唱盘上方）。
+  /// 歌名 / 歌手（+ 专辑）在唱盘上方。
   Widget _buildSongHeader(BuildContext context, Song song) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
+    final artist = song.artist?.trim() ?? '';
+    final album = song.album?.trim() ?? '';
+    // 第二行：`歌手 - 《专辑》`；缺专辑只显示歌手，缺歌手只显示《专辑》。
+    final subtitle =
+        album.isEmpty
+            ? (artist.isEmpty ? loc.playerUnknownArtist : artist)
+            : (artist.isEmpty ? '《$album》' : '$artist - 《$album》');
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.xl,
@@ -188,7 +196,7 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
           ),
           const SizedBox(height: 6),
           Text(
-            song.artist ?? AppLocalizations.of(context).playerUnknownArtist,
+            subtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -212,40 +220,39 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
   ) {
     final theme = Theme.of(context);
     final size = MediaQuery.sizeOf(context);
-    return Column(
-      children: [
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // 舞台取可用区域与屏宽的较小值，给唱臂溢出留余量。
-              final stage = math.min(constraints.maxHeight, size.width) * 0.88;
-              return Center(
-                child: VideoStage(
-                  song: song,
-                  width: stage,
-                  height: stage,
-                  fallback: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => _showPage(1),
-                    child: _buildVinyl(
-                      context,
-                      song,
-                      stage * 0.92,
-                      palette: palette,
-                      isPlaying: state.isPlaying,
-                    ),
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 舞台取「可用高度扣掉歌词行高」与屏宽的较小值，给唱臂溢出留余量。
+        // 唱盘 + 歌词整体贴顶排布 → 两行歌词紧贴盘下，余量留在底部（控制区上方）。
+        final stage = math.min(constraints.maxHeight - 56, size.width) * 0.88;
+        return Column(
+          children: [
+            const SizedBox(height: 4),
+            VideoStage(
+              song: song,
+              width: stage,
+              height: stage,
+              fallback: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _showPage(1),
+                child: _buildVinyl(
+                  context,
+                  song,
+                  stage * 0.92,
+                  palette: palette,
+                  isPlaying: state.isPlaying,
                 ),
-              );
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: CompactLyrics(activeColor: _lyricInk(palette, theme)),
-        ),
-        const SizedBox(height: 2),
-      ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: CompactLyrics(activeColor: _lyricInk(palette, theme)),
+            ),
+            const Spacer(),
+          ],
+        );
+      },
     );
   }
 

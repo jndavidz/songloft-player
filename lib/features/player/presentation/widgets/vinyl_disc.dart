@@ -663,17 +663,18 @@ class _SparklePainter extends CustomPainter {
   bool shouldRepaint(_SparklePainter oldDelegate) => false;
 }
 
-/// 唱臂：极细半透明杆体 + 极轻边缘阴影，支点在盘圆外侧、且垂直位置不高于盘顶。
+/// 唱臂：等宽极细杆体 + 极轻边缘阴影，支点在盘圆外侧，且**轴座整体**不高于盘顶。
 ///
 /// 几何（单位 = 组件方形边长 w，见 [VinylDisc.discScale] 盘径 0.78w）：
 /// - 盘顶 y = 0.110w、盘缘 x = 0.890w（盘心 (0.5w, 0.5w)、R = 0.390w）；
-/// - 支点 (0.954w, 0.130w)：水平在盘圆外（离盘心 0.586w ≈ 1.50R），垂直在盘顶**以下**
-///   0.020w —— 不允许再架到方形上部的空角里；
-/// - 细杆：直杆 0.390w + 末端 30° 折角 0.070w，唱针到支点 0.491w；杆宽 0.0062w
-///   （= 盘径的 0.008）；
-/// - 暂停 0°（长端垂直）：杆身 / 折角 / 唱头 / 唱针**整根都在盘圆之外**（最近点 1.039R，
-///   间隙 0.015w），唱针尖端 1.063R 贴盘缘外侧；
-/// - 播放 13.4°（几何反算）：唱针落到封面圆外的沟槽环带中线 0.770R，杆身不进入封面圆。
+/// - 支点 (0.954w, 0.170w)：水平在盘圆外（离盘心 0.561w ≈ 1.44R），垂直下移；
+/// - 轴座 0.050w × 0.096w，**座顶 y = 0.122w**，比盘顶低 0.012w —— 座块 / 卡扣线 /
+///   中心圆的最高点都不过盘顶线；
+/// - 等宽细杆：直杆 0.355w + 末端 30° 折角 0.070w，两段**同一 strokeWidth 0.0062w**
+///   （= 盘径的 0.008），无渐变宽度、关节不收口；唱头 0.013w×0.028w（约 2 倍杆宽的独立小块）；
+/// - 暂停 0°（长端垂直）：杆身 / 折角 / 唱头 / 唱针**整根都在盘圆之外**（最近点 1.070R，
+///   间隙 0.027w），唱针尖端 1.072R 贴盘缘外侧；
+/// - 播放 15.1°（几何反算）：唱针落到封面圆外的沟槽环带中线 0.770R，杆身不进入封面圆。
 ///
 /// 两个姿态只由「绕支点旋转」得到，不改杆长与支点。
 @visibleForTesting
@@ -682,14 +683,14 @@ class VinylTonearmPainter extends CustomPainter {
 
   final double pose;
 
-  /// 支点（相对方形边长）：盘圆右侧、垂直位置在盘顶之下 0.020w。
+  /// 支点（相对方形边长）：盘圆右侧、垂直位置在盘顶之下 0.060w。
   ///
   /// 盘顶 y = (1 - [VinylDisc.discScale]) / 2 = 0.110；支点 y 必须 ≥ 该值，
-  /// 否则又会被架到方形上部的空角里（用户明确否掉）。
-  static const Offset pivotFraction = Offset(0.954, 0.130);
+  /// 且因为轴座还向下压，实际上要满足「座顶」（[baseTopY]）也不高于盘顶。
+  static const Offset pivotFraction = Offset(0.954, 0.170);
 
   /// 直杆段长（相对方形边长）。细杆的主要可视长度。
-  static const double straightLength = 0.390;
+  static const double straightLength = 0.355;
 
   /// 末端折角段长。
   static const double bendLength = 0.070;
@@ -698,19 +699,30 @@ class VinylTonearmPainter extends CustomPainter {
   static const double bendDegrees = 30.0;
 
   /// 唱头宽 / 高（沿杆方向）与唱针长（相对方形边长）。
-  static const double headWidth = 0.030;
-  static const double headHeight = 0.046;
+  static const double headWidth = 0.013;
+  static const double headHeight = 0.028;
   static const double stylusLength = 0.020;
 
   /// 杆宽（相对方形边长）。约等于盘径的 0.008，保持「很细的杆」的观感。
+  ///
+  /// 直杆段与折角段用**同一个** strokeWidth 绘制（等宽，无收窄）。
   static const double rodWidth = 0.0062;
+
+  /// 轴座尺寸（相对方形边长）：宽 × 高，座块最高点 = [baseTopY]。
+  static const double baseWidth = 0.050;
+  static const double baseHeight = 0.096;
 
   /// 播放 / 暂停的杆体角度（相对「竖直向下」，顺时针为正）。
   ///
-  /// 暂停 = 0°：直杆（长端）垂直；播放 = 13.4°：几何反算出的最小内旋角，
+  /// 暂停 = 0°：直杆（长端）垂直；播放 = 15.1°：几何反算出的最小内旋角，
   /// 唱针正好落到 (封面半径, 盘半径) 环带的中线。
-  static const double playingDegrees = 13.4;
+  static const double playingDegrees = 15.1;
   static const double pausedDegrees = 0.0;
+
+  /// 轴座顶部的 y（全局坐标）。测试用它断言「轴座整体不高于盘顶」。
+  @visibleForTesting
+  static double baseTopY(Size size) =>
+      size.shortestSide * (pivotFraction.dy - baseHeight / 2);
 
   /// 盘体半径（与各盘体绘制层同一坐标系）。
   @visibleForTesting
@@ -810,47 +822,48 @@ class VinylTonearmPainter extends CustomPainter {
     final radians = _radians(pose);
 
     // —— 轴座（静态层，不随杆旋转）：竖向淡白圆角夹座 + 两道卡扣细线 + 中心圆柱 ——
-    // 与细杆同比例缩小；轴心即支点，座体上下各 0.060w（不把支点视觉上「抬高」）。
+    // 座顶 = pivot - baseHeight/2 = 0.122w，整体都在盘顶（0.110w）之下。
     final baseRect = Rect.fromCenter(
       center: pivot,
-      width: w * 0.058,
-      height: w * 0.120,
+      width: w * baseWidth,
+      height: w * baseHeight,
     );
+    const baseCorner = 0.011;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        baseRect.translate(w * 0.003, w * 0.004),
-        Radius.circular(w * 0.0135),
+        baseRect.translate(w * 0.002, w * 0.003),
+        Radius.circular(w * baseCorner),
       ),
       Paint()
-        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.008),
+        ..color = const Color(0xFF101820).withValues(alpha: 0.09)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.006),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(baseRect, Radius.circular(w * 0.0135)),
+      RRect.fromRectAndRadius(baseRect, Radius.circular(w * baseCorner)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withValues(alpha: 0.60),
-            const Color(0xFFEDF1F6).withValues(alpha: 0.44),
-            Colors.white.withValues(alpha: 0.24),
+            Colors.white.withValues(alpha: 0.54),
+            const Color(0xFFEDF1F6).withValues(alpha: 0.40),
+            Colors.white.withValues(alpha: 0.22),
           ],
           stops: const [0.0, 0.58, 1.0],
         ).createShader(baseRect),
     );
-    for (final dy in const [-0.026, 0.023]) {
+    for (final dy in const [-0.018, 0.015]) {
       canvas.drawLine(
-        Offset(pivot.dx - w * 0.018, pivot.dy + w * dy),
-        Offset(pivot.dx + w * 0.018, pivot.dy + w * dy),
+        Offset(pivot.dx - w * 0.015, pivot.dy + w * dy),
+        Offset(pivot.dx + w * 0.015, pivot.dy + w * dy),
         Paint()
           ..color = const Color(0xFF98A2AE).withValues(alpha: 0.18)
-          ..strokeWidth = w * 0.0020,
+          ..strokeWidth = w * 0.0016,
       );
     }
     canvas.drawCircle(
-      pivot + Offset(0, w * 0.004),
-      w * 0.0110,
+      pivot + Offset(0, w * 0.003),
+      w * 0.0085,
       Paint()..color = Colors.white.withValues(alpha: 0.30),
     );
 
@@ -861,47 +874,28 @@ class VinylTonearmPainter extends CustomPainter {
 
     const bendRad = bendDegrees * math.pi / 180;
     final bendEnd = _bendEnd(w);
-    final rodPath =
-        Path()
-          ..moveTo(0, -w * 0.012)
-          ..lineTo(0, w * straightLength)
-          ..lineTo(bendEnd.dx, bendEnd.dy);
+    final rodTop = Offset(0, -w * 0.012);
+    final rodMid = Offset(0, w * straightLength);
 
-    // 投影：极轻的一点落感，不做高反差投影。
-    canvas.drawPath(
-      rodPath.shift(Offset(w * 0.0025, w * 0.004)),
-      Paint()
-        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
-        ..strokeWidth = w * rodWidth
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.005),
-    );
-    // 杆体：低对比半透明白（左亮右淡），不用纯白 → 浅灰的高反差渐变。
-    canvas.drawPath(
-      rodPath,
-      Paint()
-        ..strokeWidth = w * rodWidth
-        ..strokeCap = StrokeCap.round
-        ..shader = LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            Colors.white.withValues(alpha: 0.66),
-            Colors.white.withValues(alpha: 0.50),
-            const Color(0xFFE6EBF2).withValues(alpha: 0.32),
-          ],
-          stops: const [0.0, 0.5, 1.0],
-        ).createShader(
-          Rect.fromLTRB(
-            -w * rodWidth / 2,
-            0,
-            w * rodWidth / 2,
-            w * (straightLength + bendLength),
-          ),
-        ),
-    );
+    // 等宽杆：直杆段 + 折角段各自一条 drawLine，共用同一 strokeWidth，无渐变、不收口。
+    final shadowPaint =
+        Paint()
+          ..color = const Color(0xFF101820).withValues(alpha: 0.09)
+          ..strokeWidth = w * rodWidth
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.004);
+    final rodPaint =
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.55)
+          ..strokeWidth = w * rodWidth
+          ..strokeCap = StrokeCap.round;
+    final shadowShift = Offset(w * 0.002, w * 0.003);
+    canvas.drawLine(rodTop + shadowShift, rodMid + shadowShift, shadowPaint);
+    canvas.drawLine(rodMid + shadowShift, bendEnd + shadowShift, shadowPaint);
+    canvas.drawLine(rodTop, rodMid, rodPaint);
+    canvas.drawLine(rodMid, bendEnd, rodPaint);
 
-    // 唱头：沿折角方向的短圆角块 + 探出的极短唱针。
+    // 唱头：独立的小等宽圆角块（不是杆的变宽），沿折角方向挂一小段唱针。
     canvas.save();
     canvas.translate(bendEnd.dx, bendEnd.dy);
     canvas.rotate(bendRad);
@@ -910,28 +904,19 @@ class VinylTonearmPainter extends CustomPainter {
       width: w * headWidth,
       height: w * headHeight,
     );
+    const headCorner = 0.004;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        headRect.translate(w * 0.0025, w * 0.004),
-        Radius.circular(w * 0.008),
+        headRect.translate(w * 0.002, w * 0.003),
+        Radius.circular(w * headCorner),
       ),
       Paint()
-        ..color = const Color(0xFF101820).withValues(alpha: 0.10)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.006),
+        ..color = const Color(0xFF101820).withValues(alpha: 0.09)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, w * 0.005),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(headRect, Radius.circular(w * 0.008)),
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withValues(alpha: 0.62),
-            Colors.white.withValues(alpha: 0.42),
-            const Color(0xFFD8DEE7).withValues(alpha: 0.26),
-          ],
-          stops: const [0.0, 0.6, 1.0],
-        ).createShader(headRect),
+      RRect.fromRectAndRadius(headRect, Radius.circular(w * headCorner)),
+      Paint()..color = Colors.white.withValues(alpha: 0.48),
     );
     canvas.drawLine(
       Offset(0, w * headHeight / 2),

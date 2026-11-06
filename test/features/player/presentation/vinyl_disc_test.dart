@@ -118,9 +118,13 @@ void main() {
     );
     expect((pivot - center).distance - rDisc, greaterThan(0.15 * 220));
 
-    // 支点垂直位置不得高于盘顶（用户明确否掉「架在方形上部空角里」）。
+    // 支点垂直位置不得高于盘顶；**轴座整体**（座块最高点）也不得高于盘顶。
     expect(pivot.dy, greaterThanOrEqualTo(center.dy - rDisc));
     expect(pivot.dx, greaterThan(center.dx + rDisc));
+    expect(
+      VinylTonearmPainter.baseTopY(size),
+      greaterThanOrEqualTo(center.dy - rDisc),
+    );
   });
 
   test('播放态：唱针落在 (封面半径, 盘半径) 环带内，杆身不进封面圆', () {
@@ -138,7 +142,36 @@ void main() {
     for (final point in VinylTonearmPainter.armSamples(size, 1)) {
       expect((point - center).distance, greaterThan(rLabel));
     }
-    expect(VinylTonearmPainter.playingDegrees, closeTo(13.4, 0.2));
+    expect(VinylTonearmPainter.playingDegrees, closeTo(15.1, 0.2));
+  });
+
+  test('杆是等宽的：直杆段与折角段每个截面宽度都等于同一常量', () {
+    const size = Size(220, 220);
+    final w = size.shortestSide;
+    final expected = w * VinylTonearmPainter.rodWidth;
+    final samples = VinylTonearmPainter.armSamples(size, 0);
+
+    // armSamples 顺序：直杆 25 站 × (中线, +半宽, -半宽)，折角 9 站 × 同。
+    for (var i = 0; i < 25; i++) {
+      final base = i * 3;
+      expect(
+        (samples[base + 1] - samples[base + 2]).distance,
+        closeTo(expected, 1e-9),
+      );
+    }
+    for (var i = 0; i < 9; i++) {
+      final base = 75 + i * 3;
+      expect(
+        (samples[base + 1] - samples[base + 2]).distance,
+        closeTo(expected, 1e-9),
+      );
+    }
+
+    // 唱头只是约 2 倍杆宽的小块，不应读作「杆在末端变宽」。
+    expect(
+      VinylTonearmPainter.headWidth,
+      lessThanOrEqualTo(2.5 * VinylTonearmPainter.rodWidth),
+    );
   });
 
   test('唱臂是细杆：杆宽不超过盘径的 0.009，且仍可见', () {
