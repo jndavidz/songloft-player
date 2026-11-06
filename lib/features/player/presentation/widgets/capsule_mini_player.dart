@@ -465,12 +465,7 @@ class CapsuleMiniPlayer extends ConsumerWidget {
               onSpeedChanged: notifier.setSpeed,
             );
           case 'song_info':
-            showSongInfoDialog(
-              context,
-              ref,
-              song,
-              playbackSource: state.playbackSource,
-            );
+            showSongInfoDialog(context, ref, song);
           case 'cache_song':
             if (isCached) {
               removeSongFromDevice(context, ref, song);

@@ -11,7 +11,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/utils/responsive_snackbar.dart';
+import '../../player/data/song_mv_api.dart';
 import '../../player/presentation/providers/player_provider.dart';
+import '../../player/presentation/song_mv_page.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../data/browse_identity.dart';
 import '../data/browse_models.dart';
@@ -24,6 +27,7 @@ import 'sheet_detail_page.dart';
 import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
 import 'widgets/browse_track_tile.dart';
+import 'widgets/browse_video_tile.dart';
 
 enum BrowseSearchType { music, album, artist, sheet }
 
@@ -50,6 +54,9 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
   final List<BrowseAlbum> _albums = [];
   final List<BrowseArtist> _artists = [];
   final List<BrowseSheet> _sheets = [];
+
+  /// 在线 MV / 视频（只在「单曲」tab 与音乐结果混排；服务端未就绪时为空）。
+  final List<BrowseVideo> _videos = [];
 
   bool _isLoading = false;
   bool _isLoadingMore = false;
@@ -108,6 +115,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
       _albums.clear();
       _artists.clear();
       _sheets.clear();
+      _videos.clear();
     });
     _focusNode.unfocus();
 
@@ -122,6 +130,11 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
 
     try {
       final api = ref.read(pluginBrowseApiProvider);
+      // MV 搜索与音乐列表并行：服务端未上线该类型时返回空，静默不出区块。
+      final videosFuture =
+          _type == BrowseSearchType.music
+              ? _probeVideos(api, _keyword)
+              : Future.value(const <BrowseVideo>[]);
       final res = await api.search(keywords: _keyword, type: _type.name);
       if (!mounted) return;
       setState(() {
@@ -129,12 +142,31 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
         _isEnd = res.isEnd;
         _isLoading = false;
       });
+      final videos = await videosFuture;
+      if (!mounted || _keyword != kw) return;
+      if (videos.isNotEmpty) {
+        setState(() => _videos.addAll(videos));
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _error = e;
         _isLoading = false;
       });
+    }
+  }
+
+  /// 并行探测在线 MV（`type=mv`）：服务端未就绪时静默返回空，
+  /// 搜索结果里不出「相关视频」区块，也就没有点了没反应的死入口。
+  Future<List<BrowseVideo>> _probeVideos(
+    PluginBrowseApi api,
+    String keywords,
+  ) async {
+    try {
+      final res = await api.search(keywords: keywords, type: 'mv', limit: 10);
+      return res.videos.where((v) => v.isPlayable).toList();
+    } catch (_) {
+      return const [];
     }
   }
 
@@ -164,6 +196,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
       _albums.clear();
       _artists.clear();
       _sheets.clear();
+      _videos.clear();
       _isLoading = true;
       _error = null;
       _isEnd = true;
@@ -171,6 +204,10 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
     });
     try {
       final api = ref.read(pluginBrowseApiProvider);
+      final videosFuture =
+          type == BrowseSearchType.music
+              ? _probeVideos(api, _keyword)
+              : Future.value(const <BrowseVideo>[]);
       final res = await api.search(keywords: _keyword, type: _type.name);
       if (!mounted) return;
       setState(() {
@@ -178,6 +215,11 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
         _isEnd = res.isEnd;
         _isLoading = false;
       });
+      final videos = await videosFuture;
+      if (!mounted) return;
+      if (videos.isNotEmpty) {
+        setState(() => _videos.addAll(videos));
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -275,6 +317,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                               _albums.clear();
                               _artists.clear();
                               _sheets.clear();
+                              _videos.clear();
                             });
                           },
                         )
@@ -322,6 +365,29 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
     );
   }
 
+  /// 打开在线 MV：搜索结果只带 id/平台，先取可播放直链，再进既有 MV 播放页
+  /// （与「...」菜单 → 歌曲视频走同一链路）。取不到时明确提示，不静默。
+  Future<void> _openVideo(BrowseVideo video) async {
+    final l10n = AppLocalizations.of(context);
+    final track = await ref
+        .read(songMvApiProvider)
+        .findMv(
+          source: video.source,
+          id: video.id,
+          title: video.title,
+          artist: video.artist,
+        );
+    if (!mounted) return;
+    if (track == null) {
+      ResponsiveSnackBar.show(context, message: l10n.songMvUnavailable);
+      return;
+    }
+    await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(MaterialPageRoute<void>(builder: (_) => SongMvPage(track: track)));
+  }
+
   Widget _buildResults(BuildContext context) {
     final currentSong = ref.watch(currentSongProvider);
     if (_isLoading) {
@@ -336,7 +402,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
       );
     }
     final empty = switch (_type) {
-      BrowseSearchType.music => _tracks.isEmpty,
+      BrowseSearchType.music => _tracks.isEmpty && _videos.isEmpty,
       BrowseSearchType.album => _albums.isEmpty,
       BrowseSearchType.artist => _artists.isEmpty,
       BrowseSearchType.sheet => _sheets.isEmpty,
@@ -353,11 +419,34 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
       BrowseSearchType.artist => _artists.length,
       BrowseSearchType.sheet => _sheets.length,
     };
+    // 「单曲」tab 里把 MV 结果混排在音乐列表顶部（含一个区块标题）。
+    final videoCount = _type == BrowseSearchType.music ? _videos.length : 0;
+    final headerCount = videoCount > 0 ? 1 : 0;
+    final leadingCount = headerCount + videoCount;
     return ListView.builder(
       controller: _scrollController,
-      itemCount: count + (_isEnd ? 0 : 1),
+      itemCount: leadingCount + count + (_isEnd ? 0 : 1),
       itemBuilder: (context, index) {
-        if (index >= count) {
+        if (index < headerCount) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: Text(
+              AppLocalizations.of(context).browseRelatedVideos,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+          );
+        }
+        if (index < leadingCount) {
+          final video = _videos[index - headerCount];
+          return BrowseVideoTile(
+            video: video,
+            platformLabel: browsePlatformLabel(video.source),
+            tag: 'MV',
+            onTap: () => _openVideo(video),
+          );
+        }
+        final musicIndex = index - leadingCount;
+        if (musicIndex >= count) {
           return const Padding(
             padding: EdgeInsets.all(16),
             child: Center(child: CircularProgressIndicator()),
@@ -365,10 +454,10 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
         }
         switch (_type) {
           case BrowseSearchType.music:
-            final track = _tracks[index];
+            final track = _tracks[musicIndex];
             return BrowseTrackTile(
               track: track,
-              index: index,
+              index: musicIndex,
               showSource: true,
               isCurrent: isCurrentBrowseTrack(currentSong, track),
               onTap:
@@ -376,7 +465,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                     context,
                     ref,
                     _tracks,
-                    startIndex: index,
+                    startIndex: musicIndex,
                   ),
               // 专辑名可点：插件 album/info 支持 name+artist 精装二段式（无 id）。
               onAlbumTap:
@@ -395,7 +484,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
                   () => RemotePlayback.showAddToPlaylist(context, ref, [track]),
             );
           case BrowseSearchType.album:
-            final album = _albums[index];
+            final album = _albums[musicIndex];
             return ListTile(
               leading: BrowseCover(
                 url: album.coverUrl,
@@ -421,7 +510,7 @@ class _BrowseSearchPageState extends ConsumerState<BrowseSearchPage> {
               onTap: () => pushAlbumDetail(context, album),
             );
           case BrowseSearchType.artist:
-            final artist = _artists[index];
+            final artist = _artists[musicIndex];
             return ListTile(
               leading: BrowseCover(
                 url: artist.avatarUrl,

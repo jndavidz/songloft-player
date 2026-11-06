@@ -72,7 +72,7 @@ class PluginBrowseApi {
     return response.data ?? const {};
   }
 
-  /// 多类型搜索：type ∈ music/album/artist/sheet。
+  /// 多类型搜索：type ∈ music/album/artist/sheet/mv。
   Future<BrowseSearchResponse> search({
     required String keywords,
     String type = 'music',

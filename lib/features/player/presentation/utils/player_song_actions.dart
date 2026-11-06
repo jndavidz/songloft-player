@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/song.dart';
 import '../../../../shared/utils/responsive_snackbar.dart';
 import '../../../../shared/utils/device_cache_action.dart';
+import '../../../../shared/utils/song_source_label.dart';
 import '../../../../shared/widgets/confirm_dialog.dart';
 import '../../../../shared/widgets/delete_song_dialog.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -160,26 +161,20 @@ Future<void> openSongMv(BuildContext context, WidgetRef ref, Song song) async {
 
 /// 打开「歌曲信息」弹窗：码率/格式/采样率/大小/类型/播放来源/缓存位置。
 ///
-/// [playbackSource] 传入当前播放来源（来自 PlayerState）；非播放中的歌传 null。
-void showSongInfoDialog(
-  BuildContext context,
-  WidgetRef ref,
-  Song song, {
-  PlaybackSource? playbackSource,
-}) {
+/// 播放来源按歌曲自身的真实音源显示平台名（网易云/QQ/酷狗/酷我/咪咕/千千/
+/// 哔哩哔哩/WebDAV），本地歌曲写「本地」——**不再展示 `在线播放` 这类笼统文案**。
+/// 码率/采样率缺失（远端探测失败或未扫描）时整行隐藏，不显示 `--`。
+void showSongInfoDialog(BuildContext context, WidgetRef ref, Song song) {
   showDialog<void>(
     context: context,
-    builder:
-        (context) =>
-            _SongInfoDialog(song: song, playbackSource: playbackSource),
+    builder: (context) => _SongInfoDialog(song: song),
   );
 }
 
 class _SongInfoDialog extends ConsumerWidget {
   final Song song;
-  final PlaybackSource? playbackSource;
 
-  const _SongInfoDialog({required this.song, this.playbackSource});
+  const _SongInfoDialog({required this.song});
 
   String _typeLabel(AppLocalizations l10n) {
     switch (song.type) {
@@ -193,23 +188,18 @@ class _SongInfoDialog extends ConsumerWidget {
   }
 
   String _bitRateLabel() {
-    if (song.bitRate <= 0) return '—';
     final kbps =
         song.bitRate >= 1000 ? (song.bitRate / 1000).round() : song.bitRate;
     return '$kbps kbps';
   }
 
   String _sampleRateLabel() {
-    if (song.sampleRate <= 0) return '—';
     return '${(song.sampleRate / 1000).toStringAsFixed(1)} kHz';
   }
 
-  String _sourceLabel(AppLocalizations l10n, bool cached) {
-    // 未在播放时，用缓存状态推断来源展示。
-    final src = playbackSource;
-    if (src == PlaybackSource.localCache) return l10n.songInfoSourceLocal;
-    if (src == PlaybackSource.remoteStream) return l10n.songInfoSourceRemote;
-    return cached ? l10n.songInfoSourceLocal : l10n.songInfoSourceUnknown;
+  /// 播放来源：优先真实平台名；识别不出时按歌曲类型给通用文案（本地写「本地」）。
+  String _sourceLabel(AppLocalizations l10n) {
+    return songPlatformName(song) ?? _typeLabel(l10n);
   }
 
   @override
@@ -229,11 +219,11 @@ class _SongInfoDialog extends ConsumerWidget {
       (l10n.songInfoType, _typeLabel(l10n)),
       if (song.format != null && song.format!.isNotEmpty)
         (l10n.songInfoFormat, song.format!.toUpperCase()),
-      (l10n.songInfoBitRate, _bitRateLabel()),
-      (l10n.songInfoSampleRate, _sampleRateLabel()),
+      if (song.bitRate > 0) (l10n.songInfoBitRate, _bitRateLabel()),
+      if (song.sampleRate > 0) (l10n.songInfoSampleRate, _sampleRateLabel()),
       if (song.fileSize > 0)
         (l10n.songInfoFileSize, Formatters.formatFileSize(song.fileSize)),
-      (l10n.songInfoPlaybackSource, _sourceLabel(l10n, cached)),
+      (l10n.songInfoPlaybackSource, _sourceLabel(l10n)),
       if (cached) (l10n.songInfoCachePath, entry.path),
     ];
 

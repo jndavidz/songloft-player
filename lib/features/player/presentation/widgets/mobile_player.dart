@@ -336,12 +336,7 @@ class _MobilePlayerState extends ConsumerState<MobilePlayer>
                 case 'song_info':
                   final song = state.currentSong;
                   if (song != null) {
-                    showSongInfoDialog(
-                      context,
-                      ref,
-                      song,
-                      playbackSource: state.playbackSource,
-                    );
+                    showSongInfoDialog(context, ref, song);
                   }
                 case 'song_video':
                   final song = state.currentSong;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/song.dart';
+import '../../../../shared/utils/song_source_label.dart';
 
 /// 单曲播放页的附加信息胶囊：年份 / 播放来源 / 码率·采样率。
 ///
@@ -16,17 +17,6 @@ class SongMetaChips extends StatelessWidget {
   const SongMetaChips({super.key, required this.song});
 
   final Song song;
-
-  static const _platformNames = {
-    'qq': 'QQ',
-    'kugou': '酷狗',
-    'kuwo': '酷我',
-    'netease': '网易云',
-    'migu': '咪咕',
-    'qianqian': '千千',
-    'bilibili': '哔哩哔哩',
-    'webdav': 'WebDAV',
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -63,11 +53,8 @@ class SongMetaChips extends StatelessWidget {
   }
 
   String _originLabel(AppLocalizations l10n) {
-    final key = _sourceKey();
-    final name = key == null ? null : _platformNames[key];
-    if (name != null) return name;
-    final entry = song.pluginEntryPath.toLowerCase();
-    if (entry.contains('dav')) return 'WebDAV';
+    final platform = songPlatformName(song);
+    if (platform != null) return platform;
     switch (song.type) {
       case 'radio':
         return l10n.songTypeRadioLabel;
@@ -76,18 +63,6 @@ class SongMetaChips extends StatelessWidget {
       default:
         return l10n.songTypeLocalLabel;
     }
-  }
-
-  /// 真实音源标识：kwqq 把平台写进 `source_data.s`（netease/qq/kugou/kuwo/…），
-  /// 其余接口可能直接给 `source`；两者都只当白名单键用，未命中不展示原值。
-  String? _sourceKey() {
-    for (final key in const ['s', 'source']) {
-      final value = song.sourceData?[key];
-      if (value is String && value.trim().isNotEmpty) {
-        return value.trim().toLowerCase();
-      }
-    }
-    return null;
   }
 
   String? _qualityLabel() {

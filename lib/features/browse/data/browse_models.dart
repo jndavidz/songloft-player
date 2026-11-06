@@ -349,6 +349,7 @@ class BrowseSearchResponse {
   final List<BrowseAlbum> albums;
   final List<BrowseArtist> artists;
   final List<BrowseSheet> sheets;
+  final List<BrowseVideo> videos;
   final String? source;
 
   const BrowseSearchResponse({
@@ -358,6 +359,7 @@ class BrowseSearchResponse {
     this.albums = const [],
     this.artists = const [],
     this.sheets = const [],
+    this.videos = const [],
     this.source,
   });
 
@@ -392,8 +394,54 @@ class BrowseSearchResponse {
                   .map((e) => BrowseSheet.fromJson(e as Map<String, dynamic>))
                   .toList()
               : const [],
+      videos:
+          (type == 'mv' || type == 'video')
+              ? items
+                  .map((e) => BrowseVideo.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : const [],
     );
   }
+}
+
+/// 在线 MV / 视频搜索结果条目（服务端按类型搜 MV：`type=mv`）。
+///
+/// 只携带可点选的定位信息（id / 平台 / 封面 / 时长 / 清晰度），可播放直链由
+/// `SongMvApi.findMv` 按 source+id 再查（与「...」菜单 → 歌曲视频同一链路）。
+class BrowseVideo {
+  final String id;
+  final String source;
+  final String title;
+  final String artist;
+  final String? coverUrl;
+  final int duration; // 秒
+  final String? quality;
+
+  const BrowseVideo({
+    required this.id,
+    required this.source,
+    required this.title,
+    this.artist = '',
+    this.coverUrl,
+    this.duration = 0,
+    this.quality,
+  });
+
+  /// 是否具备点播条件：缺 id 或平台源码的条目直接不展示，避免死入口。
+  bool get isPlayable => id.isNotEmpty && source.isNotEmpty;
+
+  factory BrowseVideo.fromJson(Map<String, dynamic> json) => BrowseVideo(
+    id: json['id']?.toString() ?? '',
+    source: (json['source'] as String? ?? '').trim().toLowerCase(),
+    title: json['title'] as String? ?? 'Unknown',
+    artist: json['artist'] as String? ?? '',
+    coverUrl: json['cover'] as String? ?? json['cover_url'] as String?,
+    duration:
+        (json['duration_s'] as num?)?.toInt() ??
+        (json['duration'] as num?)?.toInt() ??
+        0,
+    quality: json['quality'] as String?,
+  );
 }
 
 /// 专辑详情响应（hero 元数据 + 官方曲序曲目）。

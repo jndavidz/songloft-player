@@ -315,12 +315,7 @@ class DesktopPlayer extends ConsumerWidget {
                     cacheSongToDevice(context, ref, song);
                   }
                 case 'song_info':
-                  showSongInfoDialog(
-                    context,
-                    ref,
-                    song,
-                    playbackSource: state.playbackSource,
-                  );
+                  showSongInfoDialog(context, ref, song);
               }
             },
             itemBuilder:

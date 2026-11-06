@@ -305,12 +305,7 @@ class _DesktopFullPlayerState extends ConsumerState<DesktopFullPlayer>
               case 'song_info':
                 final song = state.currentSong;
                 if (song != null) {
-                  showSongInfoDialog(
-                    context,
-                    ref,
-                    song,
-                    playbackSource: state.playbackSource,
-                  );
+                  showSongInfoDialog(context, ref, song);
                 }
               case 'delete':
                 deleteCurrentSongFromPlayer(context, ref);

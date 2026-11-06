@@ -5087,6 +5087,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browseTabSheets => 'Playlists';
 
   @override
+  String get browseRelatedVideos => 'Related videos';
+
+  @override
   String get browseSearchHistory => 'Search history';
 
   @override

@@ -108,15 +108,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    // 默认单曲 tab：fake 收到 music，歌曲条目可见
-    expect(fake.typesCalled, ['music']);
+    // 默认单曲 tab：fake 收到 mv 探测 + music，歌曲条目可见
+    expect(fake.typesCalled, ['mv', 'music']);
     expect(find.text('歌曲T'), findsOneWidget);
 
     // 切到专辑 tab：就地换列表、同一关键词
     await tester.tap(find.text('专辑'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['music', 'album']);
+    expect(fake.typesCalled, ['mv', 'music', 'album']);
     expect(find.text('专辑A'), findsOneWidget);
     expect(find.text('歌曲T'), findsNothing);
 
@@ -124,17 +124,17 @@ void main() {
     await tester.tap(find.text('歌手'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['music', 'album', 'artist']);
+    expect(fake.typesCalled, ['mv', 'music', 'album', 'artist']);
     expect(find.text('歌手B'), findsOneWidget);
 
     // 切到歌单 tab
     await tester.tap(find.text('歌单'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(fake.typesCalled, ['music', 'album', 'artist', 'sheet']);
+    expect(fake.typesCalled, ['mv', 'music', 'album', 'artist', 'sheet']);
     expect(find.text('歌单C'), findsOneWidget);
 
-    // 搜索页未触发除 search 外的任何插件端点调用
-    expect(fake.searchCalls, 4);
+    // 搜索页未触发除 search 外的任何插件端点调用（含一次 mv 探测）
+    expect(fake.searchCalls, 5);
   });
 }
