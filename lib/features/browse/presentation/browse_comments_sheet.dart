@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/song.dart';
+import '../../../shared/utils/published_time.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import 'widgets/browse_cover.dart';
@@ -211,6 +212,15 @@ class _CommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    // 字段缺失时整条隐藏：不显示空占位，也不拿 1970 兜底。
+    final timeLabel =
+        comment.publishedAt != null
+            ? formatPublishedTime(
+              comment.publishedAt!,
+              yesterdayLabel: l10n.browseTimeYesterday,
+            )
+            : comment.publishedAtText;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -238,6 +248,16 @@ class _CommentTile extends StatelessWidget {
                   ),
                 ),
               ),
+              if (timeLabel != null) ...[
+                const SizedBox(width: 8),
+                Text(
+                  timeLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              const SizedBox(width: 8),
               Icon(
                 Icons.thumb_up_alt_outlined,
                 size: 14,

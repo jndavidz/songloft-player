@@ -9005,6 +9005,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'清空全部播放记录'**
   String get browseClearPlayHistory;
+
+  /// No description provided for @browseTimeYesterday.
+  ///
+  /// In zh, this message translates to:
+  /// **'昨天'**
+  String get browseTimeYesterday;
+
+  /// No description provided for @songInfoLyricist.
+  ///
+  /// In zh, this message translates to:
+  /// **'作词'**
+  String get songInfoLyricist;
+
+  /// No description provided for @songInfoComposer.
+  ///
+  /// In zh, this message translates to:
+  /// **'作曲'**
+  String get songInfoComposer;
+
+  /// No description provided for @songInfoArranger.
+  ///
+  /// In zh, this message translates to:
+  /// **'编曲'**
+  String get songInfoArranger;
 }
 
 class _AppLocalizationsDelegate

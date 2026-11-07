@@ -2953,5 +2953,9 @@
   "browseKeywordRequired": "Please enter a keyword",
   "browseOfflineHint": "Connect to the server to use this feature",
   "browseComingSoon": "Coming soon",
-  "browseClearPlayHistory": "Clear all play history"
+  "browseClearPlayHistory": "Clear all play history",
+  "browseTimeYesterday": "Yesterday",
+  "songInfoLyricist": "Lyricist",
+  "songInfoComposer": "Composer",
+  "songInfoArranger": "Arranger"
 }

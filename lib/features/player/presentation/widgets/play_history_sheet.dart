@@ -208,6 +208,7 @@ class PlayHistorySheet extends ConsumerWidget {
           key: ValueKey('history_${entry.song.id}_${entry.song.type}'),
           song: entry.song,
           isCurrentSong: currentSongId == entry.song.id,
+          showSourceMeta: true,
           subtitleSuffix: _formatPlayedAt(entry.playedAt),
           onTap: () => _playFrom(context, ref, entry),
           menuActions: [

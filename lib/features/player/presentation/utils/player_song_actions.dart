@@ -216,6 +216,15 @@ class _SongInfoDialog extends ConsumerWidget {
         (l10n.songInfoArtist, song.artist!),
       if (song.album != null && song.album!.isNotEmpty)
         (l10n.songInfoAlbum, song.album!),
+      // 词曲编曲：数据未就绪或该值为空时整行隐藏（不写 `--` / 「未知」）。
+      if (song.credits != null) ...[
+        if (song.credits!.lyricist.isNotEmpty)
+          (l10n.songInfoLyricist, song.credits!.lyricist.join('、')),
+        if (song.credits!.composer.isNotEmpty)
+          (l10n.songInfoComposer, song.credits!.composer.join('、')),
+        if (song.credits!.arranger.isNotEmpty)
+          (l10n.songInfoArranger, song.credits!.arranger.join('、')),
+      ],
       (l10n.songInfoType, _typeLabel(l10n)),
       if (song.format != null && song.format!.isNotEmpty)
         (l10n.songInfoFormat, song.format!.toUpperCase()),

@@ -5186,4 +5186,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get browseClearPlayHistory => 'Clear all play history';
+
+  @override
+  String get browseTimeYesterday => 'Yesterday';
+
+  @override
+  String get songInfoLyricist => 'Lyricist';
+
+  @override
+  String get songInfoComposer => 'Composer';
+
+  @override
+  String get songInfoArranger => 'Arranger';
 }

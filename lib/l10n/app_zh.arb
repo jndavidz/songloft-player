@@ -3059,5 +3059,9 @@
   "browseKeywordRequired": "请输入搜索关键词",
   "browseOfflineHint": "需要连接服务器后使用",
   "browseComingSoon": "即将上线",
-  "browseClearPlayHistory": "清空全部播放记录"
+  "browseClearPlayHistory": "清空全部播放记录",
+  "browseTimeYesterday": "昨天",
+  "songInfoLyricist": "作词",
+  "songInfoComposer": "作曲",
+  "songInfoArranger": "编曲"
 }

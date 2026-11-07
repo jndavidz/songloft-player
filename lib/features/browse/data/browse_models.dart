@@ -8,6 +8,8 @@ library;
 
 import 'dart:convert';
 
+import '../../../shared/utils/published_time.dart';
+
 /// 上游来源平台标识 → 中文简称（品牌名，不进 l10n）。
 const Map<String, String> kBrowsePlatformLabels = {
   'kuwo': '酷我',
@@ -282,7 +284,15 @@ class BrowseComment {
   final String? avatar;
   final String comment;
   final int like;
-  final int? createAt; // 毫秒时间戳
+
+  /// 结构化发布时间（已归一为本地时区语义），来自 `create_time`（秒/毫秒）或
+  /// MusicFree 的 `createAt`（毫秒）。识别不出时为 null。
+  final DateTime? publishedAt;
+
+  /// 上游已格式化好的时间文本（`create_time_text` / `time` 之类字符串），
+  /// 存在且没有结构化时间时直接展示。
+  final String? publishedAtText;
+
   final List<BrowseCommentReply> replies;
 
   const BrowseComment({
@@ -291,22 +301,50 @@ class BrowseComment {
     required this.comment,
     this.avatar,
     this.like = 0,
-    this.createAt,
+    this.publishedAt,
+    this.publishedAtText,
     this.replies = const [],
   });
 
-  factory BrowseComment.fromJson(Map<String, dynamic> json) => BrowseComment(
-    id: json['id']?.toString() ?? '',
-    nickName: json['nickName'] as String? ?? '匿名用户',
-    avatar: json['avatar'] as String?,
-    comment: json['comment'] as String? ?? '',
-    like: (json['like'] as num?)?.toInt() ?? 0,
-    createAt: (json['createAt'] as num?)?.toInt(),
-    replies:
-        (json['replies'] as List<dynamic>? ?? [])
-            .map((e) => BrowseCommentReply.fromJson(e as Map<String, dynamic>))
-            .toList(),
-  );
+  factory BrowseComment.fromJson(Map<String, dynamic> json) {
+    // 结构化时间优先级：create_time（服务端/插件新字段）→ createAt（旧形状）。
+    final publishedAt = parsePublishedTime(
+      json['create_time'] ?? json['createTime'] ?? json['createAt'],
+    );
+    // 只有拿不到结构化时间时才用上游文本，避免出现两套口径。
+    final publishedAtText =
+        publishedAt == null
+            ? _cleanText(
+              json['create_time_text'] ??
+                  json['createTimeText'] ??
+                  json['time'],
+            )
+            : null;
+    return BrowseComment(
+      id: json['id']?.toString() ?? '',
+      nickName: json['nickName'] as String? ?? '匿名用户',
+      avatar: json['avatar'] as String?,
+      comment: json['comment'] as String? ?? '',
+      like: (json['like'] as num?)?.toInt() ?? 0,
+      publishedAt: publishedAt,
+      publishedAtText: publishedAtText,
+      replies:
+          (json['replies'] as List<dynamic>? ?? [])
+              .map(
+                (e) => BrowseCommentReply.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
+    );
+  }
+}
+
+/// 非空字符串原样返回（去首尾空白），其余形态返回 null。
+String? _cleanText(dynamic value) {
+  if (value is String) {
+    final text = value.trim();
+    if (text.isNotEmpty) return text;
+  }
+  return null;
 }
 
 /// 评论的楼中楼回复。

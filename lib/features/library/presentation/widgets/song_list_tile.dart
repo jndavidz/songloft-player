@@ -6,6 +6,7 @@ import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/models/song.dart';
+import '../../../../shared/utils/song_source_label.dart';
 import '../../../../shared/widgets/browse_card.dart' show BrowseCardAction;
 import '../../../../shared/widgets/cover_image.dart';
 import '../../../../shared/widgets/favorite_button.dart';
@@ -121,6 +122,7 @@ class SongListTile extends StatelessWidget {
       song: song,
       placeholderIcon: _getTypeIcon(),
       isCurrentSong: isCurrentSong,
+      showSourceMeta: true,
       showCover: !isSelectionMode,
       showCheckbox: isSelectionMode,
       isChecked: isSelected,
@@ -136,6 +138,9 @@ class SongListTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final coverUrl = song.coverUrl;
+    final platform = songOnlinePlatformName(song);
+    final album = song.album?.trim();
+    final hasAlbum = album != null && album.isNotEmpty;
 
     return InkWell(
       onTap: isSelectionMode ? onSelect : onTap,
@@ -183,18 +188,33 @@ class SongListTile extends StatelessWidget {
             // 封面
             _buildCoverImage(coverUrl, 40),
             const SizedBox(width: 12),
-            // 标题
+            // 标题（窄屏时在线歌曲把专辑名折到第二行，避免挤掉表头列）
             Expanded(
               flex: 3,
-              child: ScrollingText(
-                text: song.title,
-                style:
-                    isCurrentSong
-                        ? TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        )
-                        : null,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ScrollingText(
+                    text: song.title,
+                    style:
+                        isCurrentSong
+                            ? TextStyle(
+                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            )
+                            : null,
+                  ),
+                  if (isNarrow && platform != null && hasAlbum)
+                    Text(
+                      album,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                ],
               ),
             ),
             const SizedBox(width: 16),
@@ -210,13 +230,16 @@ class SongListTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            // 专辑（窄屏隐藏）
+            // 专辑（窄屏隐藏）：在线歌曲缺专辑时留空，不写「未知专辑」
             if (!isNarrow) ...[
               Expanded(
                 flex: 2,
                 child: Text(
-                  song.album ??
-                      AppLocalizations.of(context).libraryUnknownAlbum,
+                  hasAlbum
+                      ? album
+                      : (platform == null
+                          ? AppLocalizations.of(context).libraryUnknownAlbum
+                          : ''),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: colorScheme.onSurfaceVariant),
@@ -224,8 +247,8 @@ class SongListTile extends StatelessWidget {
               ),
               const SizedBox(width: 16),
             ],
-            // 类型标签
-            SizedBox(width: 60, child: _buildTypeChip(context)),
+            // 类型标签（在线歌曲改显示平台名）
+            SizedBox(width: 68, child: _buildTypeChip(context)),
             const SizedBox(width: 16),
             // 时长
             SizedBox(
@@ -274,22 +297,29 @@ class SongListTile extends StatelessWidget {
     String label;
     Color color;
 
-    switch (song.type) {
-      case AppConstants.songTypeRadio:
-        label = l10n.songTypeRadio;
-        color = colorScheme.tertiary;
-        break;
-      case AppConstants.songTypeRemote:
-        label = l10n.songTypeRemote;
-        color = colorScheme.secondary;
-        break;
-      default:
-        label = l10n.songTypeLocal;
-        color = colorScheme.primary;
+    // 在线歌曲：这一列标注真实平台名（白名单映射，不回显内部枚举）。
+    final platform = songOnlinePlatformName(song);
+    if (platform != null) {
+      label = platform;
+      color = colorScheme.secondary;
+    } else {
+      switch (song.type) {
+        case AppConstants.songTypeRadio:
+          label = l10n.songTypeRadio;
+          color = colorScheme.tertiary;
+          break;
+        case AppConstants.songTypeRemote:
+          label = l10n.songTypeRemote;
+          color = colorScheme.secondary;
+          break;
+        default:
+          label = l10n.songTypeLocal;
+          color = colorScheme.primary;
+      }
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),

@@ -34,3 +34,13 @@ String? songPlatformName(Song song) {
   }
   return null;
 }
+
+/// 在线曲库平台展示名：与 [songPlatformName] 一致，但把 WebDAV 视为「无平台」。
+///
+/// 列表行里「平台」是**在线音源**的标注位，WebDAV 是插件挂载的本机文件，与
+/// 本地歌曲同样不该占位（用户明确要求不显示「未知」）。
+String? songOnlinePlatformName(Song song) {
+  final name = songPlatformName(song);
+  if (name == kSongPlatformNames['webdav']) return null;
+  return name;
+}

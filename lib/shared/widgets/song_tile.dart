@@ -4,6 +4,7 @@ import '../../core/theme/app_dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../l10n/app_localizations.dart';
 import '../models/song.dart';
+import '../utils/song_source_label.dart';
 import 'browse_card.dart' show BrowseCardAction;
 import 'cover_image.dart';
 import 'favorite_button.dart';
@@ -46,6 +47,12 @@ class SongTile extends StatelessWidget {
   /// 为空时副标题保持只显示艺术家。
   final String? subtitleSuffix;
 
+  /// 是否在副标题下再加一行「专辑 · 平台」。
+  ///
+  /// 只给在线歌曲用（曲库 / 播放历史列表）：本地与 WebDAV 无平台时不追加行，
+  /// 专辑名缺失时该行只显示平台，不显示「未知专辑」这类占位。
+  final bool showSourceMeta;
+
   final IconData placeholderIcon;
 
   final VoidCallback? onTap;
@@ -68,6 +75,7 @@ class SongTile extends StatelessWidget {
     this.showDuration = false,
     this.menuActions = const [],
     this.subtitleSuffix,
+    this.showSourceMeta = false,
     this.placeholderIcon = Icons.music_note,
     this.onTap,
     this.onLongPress,
@@ -77,6 +85,7 @@ class SongTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
+    final meta = _sourceMetaLine();
 
     return ListTile(
       onTap: onTap,
@@ -86,6 +95,7 @@ class SongTile extends StatelessWidget {
           isCurrentSong
               ? RoundedRectangleBorder(borderRadius: AppRadius.mdAll)
               : null,
+      isThreeLine: meta != null,
       leading: _buildLeading(context),
       title: ScrollingText(
         text: song.title,
@@ -97,13 +107,53 @@ class SongTile extends StatelessWidget {
                 )
                 : null,
       ),
-      subtitle: Text(
-        _subtitleText(l10n),
+      subtitle: _buildSubtitle(context, l10n, meta),
+      trailing: _buildTrailing(context),
+    );
+  }
+
+  /// 「专辑 · 平台」行；在线歌曲才返回非空（本地/WebDAV 不占位）。
+  String? _sourceMetaLine() {
+    if (!showSourceMeta) return null;
+    final platform = songOnlinePlatformName(song);
+    if (platform == null) return null;
+    final album = song.album?.trim();
+    return album != null && album.isNotEmpty ? '$album · $platform' : platform;
+  }
+
+  Widget _buildSubtitle(
+    BuildContext context,
+    AppLocalizations l10n,
+    String? meta,
+  ) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    final artistText = _subtitleText(l10n);
+    if (meta == null) {
+      return Text(
+        artistText,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: colorScheme.onSurfaceVariant),
-      ),
-      trailing: _buildTrailing(context),
+        style: TextStyle(color: color),
+      );
+    }
+    // 两行策略：歌手一行、专辑/平台一行，均在窄屏省略，不挤掉歌名与歌手。
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          artistText,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: color),
+        ),
+        Text(
+          meta,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
+        ),
+      ],
     );
   }
 

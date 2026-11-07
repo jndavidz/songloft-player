@@ -30,6 +30,9 @@ class Song {
   /// 上游音源元数据（远程歌曲通常是 JSON 字符串，含 `source` 平台标识等）。
   final Map<String, dynamic>? sourceData;
 
+  /// 词曲编曲（服务端/插件提供，字段可能缺失或为空）。
+  final SongCredits? credits;
+
   final bool isLive;
   final bool isVideo; // 是否含真实视频轨（后端 ffprobe 探测），据此渲染画面/选择投屏 mime
   final DateTime addedAt;
@@ -59,6 +62,7 @@ class Song {
     this.sourceCoverUrl,
     this.pluginEntryPath = '',
     this.sourceData,
+    this.credits,
     this.isLive = false,
     this.isVideo = false,
     required this.addedAt,
@@ -66,6 +70,7 @@ class Song {
   });
 
   factory Song.fromJson(Map<String, dynamic> json) {
+    final sourceData = _parseSourceData(json['source_data']);
     return Song(
       id: json['id'] as int,
       type: json['type'] as String? ?? 'local',
@@ -89,7 +94,9 @@ class Song {
       sourceUrl: json['source_url'] as String?,
       sourceCoverUrl: json['source_cover_url'] as String?,
       pluginEntryPath: json['plugin_entry_path'] as String? ?? '',
-      sourceData: _parseSourceData(json['source_data']),
+      sourceData: sourceData,
+      // 顶层字段与插件写入 `source_data.credits` 两种形态都兼容。
+      credits: SongCredits.tryParse(json['credits'] ?? sourceData?['credits']),
       isLive: json['is_live'] as bool? ?? false,
       isVideo: json['is_video'] as bool? ?? false,
       addedAt:
@@ -159,6 +166,7 @@ class Song {
     String? sourceCoverUrl,
     String? pluginEntryPath,
     Map<String, dynamic>? sourceData,
+    SongCredits? credits,
     bool? isLive,
     bool? isVideo,
     DateTime? addedAt,
@@ -188,6 +196,7 @@ class Song {
       sourceCoverUrl: sourceCoverUrl ?? this.sourceCoverUrl,
       pluginEntryPath: pluginEntryPath ?? this.pluginEntryPath,
       sourceData: sourceData ?? this.sourceData,
+      credits: credits ?? this.credits,
       isLive: isLive ?? this.isLive,
       isVideo: isVideo ?? this.isVideo,
       addedAt: addedAt ?? this.addedAt,
@@ -217,6 +226,55 @@ Map<String, dynamic>? _parseSourceData(dynamic value) {
     }
   }
   return null;
+}
+
+/// 词曲编曲名单（服务端/插件提供，字段可能缺失、为空或为单个字符串）。
+class SongCredits {
+  final List<String> lyricist;
+  final List<String> composer;
+  final List<String> arranger;
+
+  const SongCredits({
+    this.lyricist = const [],
+    this.composer = const [],
+    this.arranger = const [],
+  });
+
+  /// 三类名单全空时视为「无数据」，UI 整块不展示。
+  bool get isEmpty => lyricist.isEmpty && composer.isEmpty && arranger.isEmpty;
+
+  /// 容错解析：Map / JSON 字符串 / 单值字符串 / 数组都接受，缺字段给空列表。
+  static SongCredits? tryParse(dynamic value) {
+    final map = _asMap(value);
+    if (map == null) return null;
+    final credits = SongCredits(
+      lyricist: _asStringList(map['lyricist'] ?? map['lyric']),
+      composer: _asStringList(map['composer']),
+      arranger: _asStringList(map['arranger']),
+    );
+    return credits.isEmpty ? null : credits;
+  }
+
+  static Map<String, dynamic>? _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is String && value.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is Map<String, dynamic>) return decoded;
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  static List<String> _asStringList(dynamic value) {
+    final raw = value is List ? value : (value == null ? const [] : [value]);
+    return raw
+        .map((e) => e?.toString().trim() ?? '')
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
 }
 
 /// 标签分类聚合项：某维度的一个取值、歌曲数量、及一首代表歌曲的封面 URL。

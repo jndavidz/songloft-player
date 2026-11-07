@@ -1407,7 +1407,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       ],
                       const SizedBox(width: 16),
                       SizedBox(
-                        width: 60,
+                        width: 68,
                         child: Text(
                           l10n.libraryColumnType,
                           style: textTheme.titleSmall?.copyWith(

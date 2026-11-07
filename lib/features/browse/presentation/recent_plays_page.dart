@@ -170,6 +170,7 @@ class _RecentPlaysPageState extends ConsumerState<RecentPlaysPage> {
                     final entry = _entries[index];
                     return SongTile(
                       song: entry.song,
+                      showSourceMeta: true,
                       subtitleSuffix: _formatTime(entry.playedAt),
                       isCurrentSong: currentSong?.id == entry.song.id,
                       onTap: () => _playFrom(index),

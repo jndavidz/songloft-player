@@ -2987,5 +2987,9 @@
   "settingsHomeShowRadioFavorites": "Mostrar Radios favoritas en inicio",
   "settingsHomeShowRadioFavoritesDesc": "Solo controla la tarjeta de inicio cuando se muestra la sección de radios. Se guarda en este dispositivo para este servidor y cuenta.",
   "settingsHomeShowRadios": "Mostrar sección de radios",
-  "settingsHomeShowRadiosDesc": "Mostrar Mis radios en inicio. Esta opción se guarda en este dispositivo."
+  "settingsHomeShowRadiosDesc": "Mostrar Mis radios en inicio. Esta opción se guarda en este dispositivo.",
+  "browseTimeYesterday": "Ayer",
+  "songInfoLyricist": "Letra",
+  "songInfoComposer": "Compositor",
+  "songInfoArranger": "Arreglista"
 }

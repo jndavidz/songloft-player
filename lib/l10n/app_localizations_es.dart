@@ -5273,4 +5273,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get browseClearPlayHistory => '清空全部播放记录';
+
+  @override
+  String get browseTimeYesterday => 'Ayer';
+
+  @override
+  String get songInfoLyricist => 'Letra';
+
+  @override
+  String get songInfoComposer => 'Compositor';
+
+  @override
+  String get songInfoArranger => 'Arreglista';
 }

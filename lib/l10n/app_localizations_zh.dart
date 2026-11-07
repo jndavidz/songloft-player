@@ -4971,4 +4971,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get browseClearPlayHistory => '清空全部播放记录';
+
+  @override
+  String get browseTimeYesterday => '昨天';
+
+  @override
+  String get songInfoLyricist => '作词';
+
+  @override
+  String get songInfoComposer => '作曲';
+
+  @override
+  String get songInfoArranger => '编曲';
 }
