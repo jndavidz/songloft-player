@@ -5285,4 +5285,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get songInfoArranger => 'Arreglista';
+
+  @override
+  String get browseCommentsUnsupported =>
+      'Esta fuente aún no admite comentarios';
+
+  @override
+  String get browseCommentsNoSource =>
+      'Esta canción no tiene fuente en línea, comentarios no disponibles';
 }

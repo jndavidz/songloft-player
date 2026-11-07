@@ -4983,4 +4983,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get songInfoArranger => '编曲';
+
+  @override
+  String get browseCommentsUnsupported => '该来源暂不支持评论';
+
+  @override
+  String get browseCommentsNoSource => '这首歌没有可用的在线来源，无法获取评论';
 }

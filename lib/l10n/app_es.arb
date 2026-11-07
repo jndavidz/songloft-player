@@ -2991,5 +2991,7 @@
   "browseTimeYesterday": "Ayer",
   "songInfoLyricist": "Letra",
   "songInfoComposer": "Compositor",
-  "songInfoArranger": "Arreglista"
+  "songInfoArranger": "Arreglista",
+  "browseCommentsUnsupported": "Esta fuente aún no admite comentarios",
+  "browseCommentsNoSource": "Esta canción no tiene fuente en línea, comentarios no disponibles"
 }

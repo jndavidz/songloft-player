@@ -633,12 +633,17 @@ class BrowseRecommendTags {
 class BrowseCommentsResponse {
   final int total;
   final bool hasMore;
+
+  /// 实际命中的来源（插件回传；显式传 source 时应与请求一致）。
+  final String? source;
+
   final List<BrowseComment> hot;
   final List<BrowseComment> comments;
 
   const BrowseCommentsResponse({
     this.total = 0,
     this.hasMore = false,
+    this.source,
     this.hot = const [],
     this.comments = const [],
   });
@@ -647,6 +652,7 @@ class BrowseCommentsResponse {
       BrowseCommentsResponse(
         total: (json['total'] as num?)?.toInt() ?? 0,
         hasMore: json['has_more'] as bool? ?? false,
+        source: json['source'] as String?,
         hot:
             (json['hot'] as List<dynamic>? ?? [])
                 .map((e) => BrowseComment.fromJson(e as Map<String, dynamic>))

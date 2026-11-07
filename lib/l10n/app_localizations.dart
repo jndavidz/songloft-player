@@ -9029,6 +9029,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'编曲'**
   String get songInfoArranger;
+
+  /// No description provided for @browseCommentsUnsupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'该来源暂不支持评论'**
+  String get browseCommentsUnsupported;
+
+  /// No description provided for @browseCommentsNoSource.
+  ///
+  /// In zh, this message translates to:
+  /// **'这首歌没有可用的在线来源，无法获取评论'**
+  String get browseCommentsNoSource;
 }
 
 class _AppLocalizationsDelegate

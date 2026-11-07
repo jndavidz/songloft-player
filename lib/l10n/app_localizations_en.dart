@@ -5198,4 +5198,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get songInfoArranger => 'Arranger';
+
+  @override
+  String get browseCommentsUnsupported =>
+      'This source doesn\'t support comments yet';
+
+  @override
+  String get browseCommentsNoSource =>
+      'No online source for this song, comments unavailable';
 }

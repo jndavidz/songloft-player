@@ -2957,5 +2957,7 @@
   "browseTimeYesterday": "Yesterday",
   "songInfoLyricist": "Lyricist",
   "songInfoComposer": "Composer",
-  "songInfoArranger": "Arranger"
+  "songInfoArranger": "Arranger",
+  "browseCommentsUnsupported": "This source doesn't support comments yet",
+  "browseCommentsNoSource": "No online source for this song, comments unavailable"
 }

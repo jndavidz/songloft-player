@@ -35,6 +35,30 @@ String? songPlatformName(Song song) {
   return null;
 }
 
+/// 歌曲真实音源标识（`source_data.s`，其次 `source_data.source`），小写归一。
+///
+/// 与 [songPlatformName] 不同：这里**不过白名单**，识别不出展示名也返回原始标识，
+/// 供需要按源路由的接口（评论等）使用；两者都没有时返回 null。
+String? songSourceKey(Song song) {
+  for (final key in const ['s', 'source']) {
+    final value = song.sourceData?[key];
+    if (value is String) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) return trimmed.toLowerCase();
+    }
+  }
+  return null;
+}
+
+/// 平台曲目标识（`source_data.i`）：QQ 为歌曲 mid、酷狗为 FileHash、网易云为
+/// 数字 song id、酷我为 rid。缺失时返回 null，调用方退回 title+artist 回查。
+String? songSourceId(Song song) {
+  final value = song.sourceData?['i'];
+  if (value == null) return null;
+  final text = value.toString().trim();
+  return text.isEmpty ? null : text;
+}
+
 /// 在线曲库平台展示名：与 [songPlatformName] 一致，但把 WebDAV 视为「无平台」。
 ///
 /// 列表行里「平台」是**在线音源**的标注位，WebDAV 是插件挂载的本机文件，与

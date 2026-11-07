@@ -3063,5 +3063,7 @@
   "browseTimeYesterday": "昨天",
   "songInfoLyricist": "作词",
   "songInfoComposer": "作曲",
-  "songInfoArranger": "编曲"
+  "songInfoArranger": "编曲",
+  "browseCommentsUnsupported": "该来源暂不支持评论",
+  "browseCommentsNoSource": "这首歌没有可用的在线来源，无法获取评论"
 }

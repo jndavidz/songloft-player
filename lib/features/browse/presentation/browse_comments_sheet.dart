@@ -1,6 +1,6 @@
 /// 播放页评论弹层（票 13，只读）：热评优先 + 分页加载 + 用户名/头像/内容/时间/点赞。
-/// 当前歌为在线歌时优先按标题/歌手回搜（Song 模型不透出 source_data，插件端点
-/// 支持 title+artist 回搜 netease id）；无评论资源时给空态；限流/失败给错误态可重试。
+/// **按歌曲自己的音源取评论**（netease/qq/kugou/kuwo，各自内容不同），不再固定
+/// 回搜 netease；源不支持评论（migu/qianqian）或歌曲没有在线来源时给明确提示。
 
 library;
 
@@ -11,10 +11,14 @@ import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/song.dart';
 import '../../../shared/utils/published_time.dart';
+import '../../../shared/utils/song_source_label.dart';
 import '../data/browse_models.dart';
 import '../data/plugin_browse_api.dart';
 import 'widgets/browse_cover.dart';
 import 'widgets/browse_state_view.dart';
+
+/// 服务端门面已实现评论的来源（与 kwqq 插件 COMMENT_SOURCES 一致）。
+const Set<String> kCommentSourceKeys = {'netease', 'qq', 'kugou', 'kuwo'};
 
 class BrowseCommentsSheet extends ConsumerStatefulWidget {
   final Song song;
@@ -46,21 +50,47 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   bool _hasMore = false;
+  bool _unsupported = false;
   int _page = 1;
   int _total = 0;
   Object? _error;
 
+  /// 当前歌曲的音源标识（source_data.s），与展示名分开：路由用标识、UI 用名称。
+  String? _source;
+  String? _songSourceId;
+
+  /// 实际命中来源（插件回传优先），用于头部「当前来源」标识。
+  String? _displaySource;
+
   @override
   void initState() {
     super.initState();
+    _source = songSourceKey(widget.song);
+    _songSourceId = songSourceId(widget.song);
+    _displaySource = _source;
     _load(reset: true);
   }
 
   Future<void> _load({bool reset = false}) async {
+    final source = _source;
+    // 源不支持或歌曲没有在线来源：不发请求，直接给明确提示（不换源、不装空列表）。
+    if (source == null || !kCommentSourceKeys.contains(source)) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isLoadingMore = false;
+          _hasMore = false;
+          _unsupported = true;
+          _error = null;
+        });
+      }
+      return;
+    }
     if (reset) {
       setState(() {
         _isLoading = true;
         _error = null;
+        _unsupported = false;
         _page = 1;
       });
     } else {
@@ -71,6 +101,8 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
       final api = ref.read(pluginBrowseApiProvider);
       final page = reset ? 1 : _page + 1;
       final res = await api.comments(
+        source: source,
+        id: _songSourceId,
         title: widget.song.title,
         artist: widget.song.artist,
         page: page,
@@ -85,9 +117,19 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
         _comments.addAll(res.comments);
         _total = res.total;
         _hasMore = res.hasMore;
+        _displaySource = res.source ?? source;
         if (res.hasMore) _page = page;
         _isLoading = false;
         _isLoadingMore = false;
+      });
+    } on BrowseUnsupportedException {
+      if (!mounted) return;
+      setState(() {
+        _unsupported = true;
+        _error = null;
+        _isLoading = false;
+        _isLoadingMore = false;
+        _hasMore = false;
       });
     } catch (e) {
       if (!mounted) return;
@@ -102,18 +144,23 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final sourceLabel =
+        _displaySource == null ? null : kSongPlatformNames[_displaySource];
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Row(
             children: [
-              Expanded(
-                child: Text(
-                  '${l10n.browseComments} $_total',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+              Text(
+                '${l10n.browseComments} $_total',
+                style: Theme.of(context).textTheme.titleMedium,
               ),
+              if (sourceLabel != null) ...[
+                const SizedBox(width: 8),
+                _SourceBadge(label: sourceLabel),
+              ],
+              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close, size: 20),
                 onPressed: () => Navigator.of(context).pop(),
@@ -126,6 +173,16 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
           child:
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
+                  : _unsupported
+                  ? BrowseStateView(
+                    isLoading: false,
+                    emptyTitle:
+                        _source == null
+                            ? l10n.browseCommentsNoSource
+                            : l10n.browseCommentsUnsupported,
+                    emptySubtitle: _source == null ? null : sourceLabel,
+                    emptyIcon: Icons.block_outlined,
+                  )
                   : _error != null
                   ? BrowseStateView(
                     isLoading: false,
@@ -200,6 +257,31 @@ class _BrowseCommentsSheetState extends ConsumerState<BrowseCommentsSheet> {
                   ),
         ),
       ],
+    );
+  }
+}
+
+/// 当前来源小标识（克制样式：浅底小字，只标平台名，不出现内部枚举）。
+class _SourceBadge extends StatelessWidget {
+  final String label;
+
+  const _SourceBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
   }
 }

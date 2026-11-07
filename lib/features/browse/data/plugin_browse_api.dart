@@ -209,8 +209,14 @@ class PluginBrowseApi {
     );
   }
 
-  /// 歌曲评论（只读）。id 缺省时按 title+artist 回搜 netease 歌曲。
+  /// 歌曲评论（只读）。
+  ///
+  /// [source] 必须传歌曲自己的音源（netease/qq/kugou/kuwo）；显式传源时插件不会
+  /// 再回落到默认源。id 优先（QQ mid / 酷狗 FileHash / 网易云 song id / 酷我 rid），
+  /// 缺失时靠 title+artist 回查。源不支持时插件返回 `unsupported` 标记，此处归一
+  /// 成 [BrowseUnsupportedException]。
   Future<BrowseCommentsResponse> comments({
+    String? source,
     String? id,
     String? title,
     String? artist,
@@ -218,12 +224,16 @@ class PluginBrowseApi {
     int limit = 20,
   }) async {
     final data = await _post('music/comments', {
+      if (source != null && source.isNotEmpty) 'source': source,
       if (id != null && id.isNotEmpty) 'id': id,
       if (title != null && title.isNotEmpty) 'title': title,
       if (artist != null && artist.isNotEmpty) 'artist': artist,
       'page': page,
       'limit': limit,
     });
+    if (data['unsupported'] == true) {
+      throw BrowseUnsupportedException(data['error']?.toString() ?? '该源暂不支持评论');
+    }
     return BrowseCommentsResponse.fromJson(data);
   }
 }
