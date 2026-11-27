@@ -13,6 +13,7 @@ import '../../../player/presentation/providers/player_provider.dart';
 import '../../data/dlna_service.dart';
 import '../../data/dlna_log.dart';
 import '../../domain/dlna_state.dart';
+import '../../domain/managed_devices.dart';
 
 /// 一次投屏所需的参数：资源 URL + DIDL mime 类型。
 typedef _CastArgs = ({String url, PlayType mime});
@@ -205,6 +206,14 @@ class DlnaNotifier extends Notifier<DlnaState> {
   void clearError() => state = state.copyWith(error: () => null);
 
   Future<void> castToDevice(DlnaDeviceInfo device) async {
+    // ADR-0001 / 已托管渲染端不得原生 DLNA 直投（CCH / LX06）——
+    // 直投会绕开 bridge 的票据/代次管理、制造第二控制面。拒绝并设置
+    // 明确文案，由既有 UI 错误展示路径呈现给用户。
+    if (isManagedDevice(device.location)) {
+      dlnaLog('castToDevice blocked managed device=${device.id} loc=${device.location}');
+      state = state.copyWith(error: () => managedDeviceCastBlocked);
+      return;
+    }
     final playerState = ref.read(playerStateProvider);
     final song = playerState.currentSong;
     if (song == null || song.url == null) return;
